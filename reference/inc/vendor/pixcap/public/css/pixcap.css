@@ -1,0 +1,243 @@
+/*!
+ * Pixcap - 无感人机验证（基础样式）
+ * 登录/内联/内容防刷等场景的覆盖样式见主题 inc/assets/css/pixcap-content.css
+ */
+
+.pixcap-floating-container {
+    position: absolute;
+    z-index: 9999;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    pointer-events: auto;
+}
+
+.pixcap-widget {
+    box-sizing: border-box;
+    min-width: 240px;
+    max-width: 320px;
+    border-radius: 12px;
+    background: var(--pixcap-bg, #ffffff);
+    color: var(--pixcap-fg, #1f2937);
+    border: 1px solid var(--pixcap-border, rgba(0, 0, 0, 0.08));
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    font-size: 13px;
+    line-height: 1.4;
+    transition: opacity .25s ease, transform .25s ease;
+}
+
+.pixcap-widget * {
+    box-sizing: border-box;
+}
+
+.pixcap-widget.pixcap-floating-hide {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+}
+
+.pixcap-widget.pixcap-floating-show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.pixcap-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 56px;
+    padding: 12px 16px;
+}
+
+.pixcap-brand-area {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.pixcap-brand-logo {
+    width: 22px;
+    height: 22px;
+    display: block;
+}
+
+.pixcap-brand-name {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+}
+
+.pixcap-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.pixcap-icon.pixcap-icon-spin {
+    border: 2px solid var(--pixcap-spin-track, rgba(0, 0, 0, 0.12));
+    border-top-color: var(--pixcap-accent, #2563eb);
+    animation: pixcap-spin .7s linear infinite;
+}
+
+.pixcap-icon.pixcap-icon-check {
+    background: var(--pixcap-success, #16a34a);
+}
+
+.pixcap-icon.pixcap-icon-check::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 7px;
+    height: 12px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.pixcap-icon.pixcap-icon-cross {
+    background: var(--pixcap-danger, #dc2626);
+}
+
+.pixcap-icon.pixcap-icon-cross::before,
+.pixcap-icon.pixcap-icon-cross::after {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 4px;
+    width: 2px;
+    height: 12px;
+    background: #fff;
+}
+
+.pixcap-icon.pixcap-icon-cross::before { transform: rotate(45deg); }
+.pixcap-icon.pixcap-icon-cross::after { transform: rotate(-45deg); }
+
+.pixcap-label {
+    flex: 1;
+    min-width: 0;
+}
+
+.pixcap-expire-info,
+.pixcap-cooldown-msg {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--pixcap-muted, #6b7280);
+}
+
+.pixcap-expire-info:empty,
+.pixcap-cooldown-msg:empty {
+    display: none;
+}
+
+@keyframes pixcap-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------------- 主题 ---------------- */
+
+.pixcap-widget[data-pixcap-theme="business"] {
+    --pixcap-bg: #ffffff;
+    --pixcap-fg: #1f2937;
+    --pixcap-accent: #2563eb;
+    --pixcap-border: #e5e7eb;
+    --pixcap-muted: #6b7280;
+    --pixcap-success: #16a34a;
+    --pixcap-danger: #dc2626;
+}
+
+.pixcap-widget[data-pixcap-theme="default"] {
+    --pixcap-bg: #ffffff;
+    --pixcap-fg: #111827;
+    --pixcap-accent: #4f46e5;
+    --pixcap-border: #e5e7eb;
+    --pixcap-muted: #6b7280;
+    --pixcap-success: #16a34a;
+    --pixcap-danger: #dc2626;
+}
+
+.pixcap-widget[data-pixcap-theme="light"] {
+    --pixcap-bg: #f9fafb;
+    --pixcap-fg: #111827;
+    --pixcap-accent: #0ea5e9;
+    --pixcap-border: #e5e7eb;
+    --pixcap-muted: #6b7280;
+    --pixcap-success: #10b981;
+    --pixcap-danger: #ef4444;
+}
+
+.pixcap-widget[data-pixcap-theme="dark"] {
+    --pixcap-bg: #1f2937;
+    --pixcap-fg: #f9fafb;
+    --pixcap-accent: #60a5fa;
+    --pixcap-border: #374151;
+    --pixcap-muted: #9ca3af;
+    --pixcap-success: #34d399;
+    --pixcap-danger: #f87171;
+}
+
+.pixcap-widget[data-pixcap-theme="aqua"] {
+    --pixcap-bg: #f0fdff;
+    --pixcap-fg: #0f172a;
+    --pixcap-accent: #06b6d4;
+    --pixcap-border: #a5f3fc;
+    --pixcap-muted: #64748b;
+    --pixcap-success: #14b8a6;
+    --pixcap-danger: #f43f5e;
+}
+
+.pixcap-widget[data-pixcap-theme="caramel"] {
+    --pixcap-bg: #fff7ed;
+    --pixcap-fg: #431407;
+    --pixcap-accent: #f59e0b;
+    --pixcap-border: #fed7aa;
+    --pixcap-muted: #92400e;
+    --pixcap-success: #22c55e;
+    --pixcap-danger: #ef4444;
+}
+
+.pixcap-widget[data-pixcap-theme="cupcake"] {
+    --pixcap-bg: #fdf2f8;
+    --pixcap-fg: #500724;
+    --pixcap-accent: #ec4899;
+    --pixcap-border: #fbcfe8;
+    --pixcap-muted: #9d174d;
+    --pixcap-success: #10b981;
+    --pixcap-danger: #ef4444;
+}
+
+.pixcap-widget[data-pixcap-theme="cyberpunk"] {
+    --pixcap-bg: #0b0b12;
+    --pixcap-fg: #f0abfc;
+    --pixcap-accent: #22d3ee;
+    --pixcap-border: #3f3f46;
+    --pixcap-muted: #a1a1aa;
+    --pixcap-success: #4ade80;
+    --pixcap-danger: #fb7185;
+}
+
+.pixcap-widget[data-pixcap-theme="lime"] {
+    --pixcap-bg: #f7fee7;
+    --pixcap-fg: #1a2e05;
+    --pixcap-accent: #84cc16;
+    --pixcap-border: #d9f99d;
+    --pixcap-muted: #3f6212;
+    --pixcap-success: #22c55e;
+    --pixcap-danger: #ef4444;
+}
+
+.pixcap-widget[data-pixcap-theme="wireframe"] {
+    --pixcap-bg: #ffffff;
+    --pixcap-fg: #000000;
+    --pixcap-accent: #000000;
+    --pixcap-border: #000000;
+    --pixcap-muted: #000000;
+    --pixcap-success: #000000;
+    --pixcap-danger: #000000;
+    border-radius: 0;
+    box-shadow: none;
+    border-width: 2px;
+}

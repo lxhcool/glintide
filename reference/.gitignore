@@ -1,5 +1,7 @@
 # Composer dependencies
 inc/vendor/*
+!inc/vendor/pixcap/
+inc/vendor/pixcap/src/
 
 # OS files
 .DS_Store
@@ -10,5 +12,3 @@ inc/vendor/*
 # IDE
 .idea/
 .vscode/
-
-# 参考主题副本(本地参考用,不提交)

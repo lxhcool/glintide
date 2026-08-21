@@ -1,0 +1,63 @@
+.pix-ppo-hide-block-editor {
+    border: 1px solid #dfe6ff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8faff 0%, #fff 100%);
+    padding: 16px;
+}
+
+.pix-ppo-hide-block-editor__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.pix-ppo-hide-block-editor__icon {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: #fff;
+    background: #3158ff;
+}
+
+.pix-ppo-hide-block-editor__icon:before {
+    width: auto;
+    height: auto;
+    font-size: 18px;
+}
+
+.pix-ppo-hide-block-editor__text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.pix-ppo-hide-block-editor__text strong {
+    font-size: 15px;
+    line-height: 1.4;
+    color: #101828;
+}
+
+.pix-ppo-hide-block-editor__text span {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #667085;
+}
+
+.pix-ppo-hide-block-editor__body {
+    padding: 14px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px dashed #c8d2ff;
+}
+
+.pix-ppo-hide-block-editor__body > .block-editor-inner-blocks > .block-editor-block-list__layout > *:first-child {
+    margin-top: 0;
+}
+
+.pix-ppo-hide-block-editor__body > .block-editor-inner-blocks > .block-editor-block-list__layout > *:last-child {
+    margin-bottom: 0;
+}

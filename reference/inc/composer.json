@@ -1,0 +1,10 @@
+{
+    "require": {
+        "yurunsoft/pay-sdk": "~3.0",
+        "yurunsoft/yurun-oauth-login": "~3.0",
+        "alibabacloud/dysmsapi-20170525": "^4.5",
+        "alibabacloud/dypnsapi-20170525": "^2.0",
+        "kkokk/poster": "^3.0",
+        "zoujingli/wechat-developer": "^1.2"
+    }
+}

@@ -1,0 +1,105 @@
+.ppo-msg-list .edit-row {
+    opacity: 0; 
+}
+
+.ppo-msg-list table tr:hover .edit-row {
+    opacity: 1;
+}
+
+.ppo-pagenav  .page-numbers {
+    display: inline-block;
+    vertical-align: baseline;
+    min-width: 30px;
+    min-height: 30px;
+    margin: 0;
+    padding: 0 4px;
+    line-height: 2.225;
+    text-align: center;
+    color: #2271b1;
+    border-color: #2271b1;
+    background: #f6f7f7;
+    box-sizing: border-box;
+    font-size: 13px;
+    text-decoration: none;
+    border-width: 1px;
+    border-style: solid;
+    -webkit-appearance: none;
+    border-radius: 3px;
+    white-space: nowrap;
+}
+
+.ppo-pagenav .paging-input {
+    margin-left: 10px;
+}
+
+.ppo-pagenav span.tablenav-paging-text {
+    padding-left: 3px;
+}
+
+.ppo-pagenav span.page-numbers.current {
+    border-color: #dcdcde !important;
+    background: #f6f7f7 !important;
+    color: #a7aaad !important;
+}
+
+.admin-msg-page .top-bar {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.edit-msg-wrap .top-bar {
+    justify-content: flex-start;
+}
+
+.admin-msg-page {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 8px;
+}
+
+.admin-msg-page .nav-tab-wrapper a:first-child {
+    margin-left: 0;
+}
+
+.admin-msg-page .page-title-action , .admin-msg-page .page-title-action:active {
+    margin-left: 0;
+    border-radius: 20px;
+    padding: 3px 20px;
+    border-color: #1a48ca;
+    color: #1a48ca;
+    margin-right: 10px;
+}
+
+.create-msg-wrap form#notification-form , .edit-msg-wrap form#notification-edit-form {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 30px;
+    background: #f9f9f9;
+}
+
+.admin-msg-page .notice-info {
+    background: #f9edd4;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-decoration: none;
+    text-shadow: none;
+    top: -3px;
+    line-height: 2.15384615;
+    padding: 3px 20px;
+    color: #7e3218;
+    border: 1px solid #cbada5;
+}
+
+.admin-msg-page input.button.button-primary {
+    background: #2a25ff;
+    padding: 5px 25px;
+    border-radius: 20px;
+}
+
+.admin-msg-page p.submit {
+    padding: 30px;
+}

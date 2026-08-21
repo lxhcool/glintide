@@ -1,0 +1,42 @@
+body {
+    font-size: 15px;
+    line-height: 1.4em;
+    font-family: "microsoft yahei";
+    color: #313131;
+  }
+
+.mce-btn i.ri-eye-off-line {
+    font-size: 18px;
+}
+
+
+#cet[contenteditable=true] {
+    padding: 5px 15px;
+    border-radius: 7px;
+    outline: 2px solid #cecfff;
+    display: flex;
+}
+
+#cet[contenteditable=true]:focus {
+    outline: 2px solid #2276d2;
+}
+
+.hide-content {
+    padding: 20px;
+    background: #f2f3ff;
+    border-radius: 7px;
+}
+
+.hide-title {
+    font-weight: 600;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #dfe2ff;
+    color: #30287f;
+}
+
+.qt-hide {
+    display: none;
+}
+
+

@@ -1,0 +1,29 @@
+button.fileuploader-action.fileuploader-urlitem-remove {
+    background: #fe7676;
+    box-shadow: -1px 1px 6px rgba(254, 118, 118, .8);
+    border-radius: 50%;
+}
+
+.fileuploader-items .fileuploader-item .fileuploader-action.fileuploader-urlitem-remove i {
+    font-size: 14px;
+    text-shadow: none;
+}
+
+.user-moment-item .moment_item {
+    padding: 20px;
+    border: 1px solid #ebebfc;
+    border-radius: 8px;
+    background: linear-gradient(322deg, #f8f8ff, #faf9ffbf);
+}
+
+.user-moment-item .moment-single-inner {
+    flex-direction: column;
+}
+
+.user-moment-item .top-header {
+    display: flex;
+}
+
+.user-moment-item .top-meta {
+    flex: 1;
+}

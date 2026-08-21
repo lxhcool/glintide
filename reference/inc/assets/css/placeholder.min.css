@@ -1,0 +1,118 @@
+/* <div class="skeleton-container">
+
+  <!-- 圆形头像 -->
+  <div class="skeleton skeleton-avatar-round"></div>
+
+  <!-- 方形头像 -->
+  <div class="skeleton skeleton-avatar-square"></div>
+
+  <!-- 图片 -->
+  <div class="skeleton skeleton-image"></div>
+
+  <!-- 多行文字 -->
+  <div class="skeleton skeleton-text-line"></div>
+  <div class="skeleton skeleton-text-line short"></div>
+  <div class="skeleton skeleton-text-line"></div>
+
+  <!-- 按钮 -->
+  <div class="skeleton skeleton-button"></div>
+
+</div> */
+
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    background: #ffffff;
+  }
+
+  .skeleton-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+  }
+
+  /* 左侧文本组 */
+.skeleton-text-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+  
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: #ededf8;
+    border-radius: 8px;
+    will-change: transform;
+  }
+  
+  /* 动画 */
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(to right, transparent 0%, rgb(247 247 255 / 65%) 50%, transparent 100%);
+    animation: shimmer 1s linear infinite;
+  }
+  
+  @keyframes shimmer {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(300%);
+    }
+  }
+  
+  /* 圆形头像 */
+  .skeleton-avatar-round {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+  }
+  
+  /* 方形头像 */
+  .skeleton-avatar-square {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+  }
+  
+  /* 图片 */
+  .skeleton-image {
+    width: 100%;
+    height: 160px;
+    border-radius: 12px;
+  }
+  
+  /* 文字行 */
+  .skeleton-text-line {
+    height: 14px;
+    border-radius: 6px;
+  }
+  .skeleton-text-line.short {
+    width: 60%;
+  }
+  
+  /* 按钮 */
+  .skeleton-button {
+    width: 100px;
+    height: 36px;
+    border-radius: 20px;
+  }
+
+  /* 全屏盒子 */
+  .skeleton-full-box {
+    width: 100%;
+    height: 72px;
+    border-radius: 8px;
+  }
+  

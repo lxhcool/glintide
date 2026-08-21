@@ -1,0 +1,106 @@
+.pixcap-content-bubble-host {
+    overflow: visible;
+}
+
+.pixcap-content-bubble-host > .pixcap-floating-container {
+    z-index: 10050;
+}
+
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget {
+    min-width: 220px;
+    max-width: min(260px, calc(100vw - 24px));
+}
+
+.pixcap-content-bubble-host > .pixcap-content-floating .pixcap-widget.pixcap-floating-hide {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.pixcap-login-bubble .pixcap-widget,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget {
+    overflow: hidden;
+}
+
+.pixcap-login-bubble {
+    left: 0;
+    right: 0;
+    width: 100%;
+}
+
+.pixcap-login-bubble .pixcap-widget {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.pixcap-login-inline-mount {
+    display: block;
+    width: 100%;
+    margin: 0 0 12px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+.pixcap-login-inline-mount.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.pixcap-login-inline-mount.is-hiding {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+
+.pixcap-login-inline-mount .pixcap-widget {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    overflow: hidden;
+}
+
+.pixcap-login-bubble .pixcap-widget .pixcap-main,
+.pixcap-login-inline-mount .pixcap-widget .pixcap-main,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget .pixcap-main {
+    min-height: 48px;
+    padding: 12px 16px;
+    align-items: center;
+}
+
+.pixcap-login-bubble .pixcap-widget .pixcap-label,
+.pixcap-login-inline-mount .pixcap-widget .pixcap-label,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget .pixcap-label {
+    display: block;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    line-height: 1.25;
+}
+
+.pixcap-login-bubble .pixcap-widget .pixcap-brand-area,
+.pixcap-login-inline-mount .pixcap-widget .pixcap-brand-area,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget .pixcap-brand-area {
+    align-self: center;
+}
+
+.pixcap-login-bubble .pixcap-widget .pixcap-expire-info:empty,
+.pixcap-login-inline-mount .pixcap-widget .pixcap-expire-info:empty,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget .pixcap-expire-info:empty,
+.pixcap-login-bubble .pixcap-widget .pixcap-cooldown-msg:empty,
+.pixcap-login-inline-mount .pixcap-widget .pixcap-cooldown-msg:empty,
+.pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget .pixcap-cooldown-msg:empty {
+    display: none;
+    padding: 0;
+}
+
+@media (max-width: 480px) {
+    .pixcap-login-bubble .pixcap-widget {
+        width: 100%;
+    }
+
+    .pixcap-content-bubble-host > .pixcap-floating-container .pixcap-widget {
+        min-width: 200px;
+        max-width: calc(100vw - 20px);
+    }
+}
