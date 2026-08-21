@@ -12,6 +12,11 @@ if ( ! defined( 'GLINTIDE_VERSION' ) ) {
 define( 'GLINTIDE_DIR', get_template_directory() );
 define( 'GLINTIDE_URL', get_template_directory_uri() );
 
+// 兼容 Codestar Framework 的常量引用
+define( 'THEME_DIR', GLINTIDE_DIR );
+define( 'THEME_URL', GLINTIDE_URL );
+define( 'PIX_VERSION', GLINTIDE_VERSION );
+
 /**
  * 主题基础设置
  */
@@ -97,6 +102,12 @@ function glintide_scripts() {
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
+
+/**
+ * 后台:加载 Codestar Framework 与主题设置
+ */
+require_once GLINTIDE_DIR . '/inc/assets/codestar-framework/codestar-framework.php';
+require_once GLINTIDE_DIR . '/inc/options/theme-option.php';
 
 /**
  * 内容宽度
