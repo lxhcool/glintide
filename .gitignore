@@ -1,0 +1,14 @@
+# Composer dependencies
+inc/vendor/*
+!inc/vendor/pixcap/
+inc/vendor/pixcap/src/
+
+# OS files
+.DS_Store
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
