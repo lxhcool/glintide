@@ -22,6 +22,13 @@ get_header();
 
 		<div class="center-content pix-home-main">
 			<div id="primary" class="site-main">
+				<div class="pix-home-stream">
+
+				<?php if ( ! is_paged() ) : ?>
+				<figure class="pix-home-banner">
+					<img src="<?php echo esc_url( glintide_home_banner_url() ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" width="1000" height="667" fetchpriority="high" decoding="async">
+				</figure>
+				<?php endif; ?>
 
 				<?php if ( have_posts() ) : ?>
 
@@ -41,6 +48,8 @@ get_header();
 					<?php get_template_part( 'tpl/content', 'none' ); ?>
 
 				<?php endif; ?>
+
+				</div>
 
 			</div><!-- #main -->
 		</div>

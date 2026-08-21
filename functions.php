@@ -108,6 +108,7 @@ add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
  */
 require_once GLINTIDE_DIR . '/inc/assets/codestar-framework/codestar-framework.php';
 require_once GLINTIDE_DIR . '/inc/options/theme-option.php';
+require_once GLINTIDE_DIR . '/inc/options/home-option.php';
 
 /**
  * 内容宽度
@@ -126,6 +127,20 @@ function glintide_site_logo() {
 	} else {
 		echo '<a class="site-logo-text" href="' . esc_url( home_url( '/' ) ) . '" rel="home">' . esc_html( get_bloginfo( 'name' ) ) . '</a>';
 	}
+}
+
+/**
+ * 首页顶部封面地址
+ */
+function glintide_home_banner_url() {
+	$options = get_option( 'glintide_options', array() );
+	$banner  = isset( $options['home_banner'] ) ? $options['home_banner'] : array();
+
+	if ( is_array( $banner ) && ! empty( $banner['url'] ) ) {
+		return $banner['url'];
+	}
+
+	return GLINTIDE_URL . '/assets/images/banner.jpg';
 }
 
 /**

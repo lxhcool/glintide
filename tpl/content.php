@@ -8,19 +8,13 @@
 
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'pix-post-card' ); ?>>
 
-	<?php if ( has_post_thumbnail() ) : ?>
-	<a class="pix-post-card-cover" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
+	<div class="pix-post-card-body">
 		<?php
 		$glintide_cats = get_the_category();
 		if ( ! empty( $glintide_cats ) ) :
 			?>
-			<span class="pix-post-card-cat"><?php echo esc_html( $glintide_cats[0]->name ); ?></span>
+			<a class="pix-post-card-cat" href="<?php echo esc_url( get_category_link( $glintide_cats[0]->term_id ) ); ?>"><?php echo esc_html( $glintide_cats[0]->name ); ?></a>
 		<?php endif; ?>
-		<?php the_post_thumbnail( 'large' ); ?>
-	</a>
-	<?php endif; ?>
-
-	<div class="pix-post-card-body">
 
 		<h2 class="pix-post-card-title">
 			<a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a>

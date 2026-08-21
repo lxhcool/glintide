@@ -311,17 +311,44 @@ button {
 /*--------------------------------------------------------------
 # 文章卡片
 --------------------------------------------------------------*/
+.pix-home-stream {
+	background: var(--color-pix-surface);
+	border-radius: var(--pix-radius);
+	box-shadow: var(--pix-shadow-card);
+	overflow: hidden;
+}
+
+.pix-home-banner {
+	width: 100%;
+	margin: 0;
+	aspect-ratio: 5 / 2;
+	border-radius: 0;
+	background: var(--color-pix-primary-soft);
+	box-shadow: none;
+	overflow: hidden;
+}
+
+.pix-home-banner img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
 .pix-post-list {
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
 }
 
+.pix-home-stream .pix-post-list {
+	gap: 0;
+}
+
 .pix-post-card {
 	background: var(--color-pix-surface);
 	border-radius: var(--pix-radius);
 	box-shadow: var(--pix-shadow-card);
-	overflow: hidden;
 	transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -330,42 +357,45 @@ button {
 	box-shadow: var(--pix-shadow-float);
 }
 
-/* 封面图 */
-.pix-post-card-cover {
-	position: relative;
-	display: block;
-	aspect-ratio: 16 / 9;
-	overflow: hidden;
-	background: var(--color-pix-primary-soft);
+.pix-home-stream .pix-post-card {
+	border-radius: 0;
+	box-shadow: none;
+	transition: background-color 0.2s ease;
 }
 
-.pix-post-card-cover img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	transition: transform 0.4s ease;
+.pix-home-stream .pix-post-card:hover {
+	background: var(--color-pix-primary-tint);
+	box-shadow: none;
+	transform: none;
 }
 
-.pix-post-card:hover .pix-post-card-cover img {
-	transform: scale(1.04);
+.pix-home-stream .pix-pagination {
+	margin: 0;
+	padding: 24px;
 }
 
-.pix-post-card-cover .pix-post-card-cat {
-	position: absolute;
-	top: 12px;
-	left: 12px;
-	z-index: 2;
-	padding: 4px 12px;
-	border-radius: 999px;
-	background: color-mix(in srgb, var(--color-pix-primary) 88%, transparent);
-	color: #fff;
-	font-size: 12px;
-	backdrop-filter: blur(4px);
+.pix-home-stream .pix-content-none {
+	border-radius: 0;
+	box-shadow: none;
 }
 
 /* 卡片内容 */
 .pix-post-card-body {
 	padding: 20px 22px 18px;
+}
+
+.pix-post-card-cat {
+	display: inline-flex;
+	align-items: center;
+	margin-bottom: 8px;
+	color: var(--color-pix-primary);
+	font-size: 12px;
+	font-weight: 600;
+	transition: color 0.2s ease;
+}
+
+.pix-post-card-cat:hover {
+	color: var(--color-pix-primary-hover);
 }
 
 .pix-post-card-title {
