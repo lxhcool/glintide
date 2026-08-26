@@ -215,3 +215,33 @@ function glintide_pagination() {
 		)
 	);
 }
+
+/**
+ * 文章浏览量
+ */
+function glintide_post_views( $post_id = 0 ) {
+	$post_id = $post_id ? $post_id : get_the_ID();
+	$count   = absint( get_post_meta( $post_id, 'views', true ) );
+	return number_format_i18n( $count );
+}
+
+/**
+ * 文章第一个分类名
+ */
+function glintide_post_first_cat() {
+	$categories = get_the_category();
+	if ( empty( $categories ) ) {
+		return '';
+	}
+	return $categories[0]->name;
+}
+
+/**
+ * 文章卡片底部元信息(浏览量/评论/点赞)
+ */
+function glintide_post_card_meta() {
+	$html  = '<div class="post-views item"><i class="ri-eye-line" aria-hidden="true"></i><span class="number">' . esc_html( glintide_post_views() ) . '</span></div>';
+	$html .= '<div class="post-comments item"><i class="ri-chat-4-line" aria-hidden="true"></i><span class="number">' . esc_html( get_comments_number() ) . '</span></div>';
+	$html .= '<div class="post-likes item"><i class="ri-heart-3-line" aria-hidden="true"></i><span class="number">' . esc_html( absint( get_post_meta( get_the_ID(), 'likes_count', true ) ) ) . '</span></div>';
+	return $html;
+}
