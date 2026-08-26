@@ -90,7 +90,7 @@ class Glintide_Widget_Music extends Glintide_Widget {
 		$html .= '</div>';
 		$html .= '<div class="glintide-music-player-controls">';
 		$html .= '<button type="button" class="glintide-music-control" data-music-toggle aria-label="播放/暂停"><i class="iconfont icon-icon_pause_linear_light1" aria-hidden="true"></i></button>';
-		$html .= '<button type="button" class="glintide-music-control" data-music-next aria-label="下一首"><i class="iconfont icon-a-icon_arrowdoubleright_linear_light-01" aria-hidden="true"></i></button>';
+		$html .= '<button type="button" class="glintide-music-control" data-music-next aria-label="下一首"><i class="iconfont icon-a-icon_arrowright_linear_light" aria-hidden="true"></i></button>';
 		$html .= '</div>';
 		$html .= '</div>';
 
