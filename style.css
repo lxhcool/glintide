@@ -1448,10 +1448,6 @@ button {
 	background: var(--color-glintide-primary-soft)
 }
 
-.glintide-hitokoto-widget {
-	padding: 0
-}
-
 .glintide_hitokoto_widget.widget {
 	padding: 0;
 	background: transparent;
