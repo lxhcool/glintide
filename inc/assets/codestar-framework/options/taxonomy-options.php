@@ -12,8 +12,8 @@ CSF::createTaxonomyOptions( $prefix, array(
   'taxonomy' => 'category',
 ) );
 
-$pix_taxonomy_options = get_option('ppo_options');
-$cash = (is_array($pix_taxonomy_options) && !empty($pix_taxonomy_options['cash_icon'])) ? $pix_taxonomy_options['cash_icon'] : '¥';
+$glintide_taxonomy_options = get_option('ppo_options');
+$cash = (is_array($glintide_taxonomy_options) && !empty($glintide_taxonomy_options['cash_icon'])) ? $glintide_taxonomy_options['cash_icon'] : '¥';
 //
 // Create a section
 //
@@ -94,7 +94,7 @@ $moments_cat = '_ppo_moments_options';
 
 CSF::createTaxonomyOptions( $moments_cat, array(
   'taxonomy' => 'moments',
-  'class'      => 'pix-options tax-content',
+  'class'      => 'glintide-options tax-content',
   'data_type'  => 'unserialize',
 ) );
 

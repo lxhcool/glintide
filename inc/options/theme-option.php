@@ -337,7 +337,7 @@ CSF::createSection(
 				'id'          => 'back_top_bg_color',
 				'type'        => 'color',
 				'title'       => '回到顶部按钮颜色',
-				'output'      => '.pix-global-back-top',
+				'output'      => '.glintide-global-back-top',
 				'output_mode' => 'background-color',
 				'default'     => '#3157ff',
 			),
@@ -345,7 +345,7 @@ CSF::createSection(
 				'id'          => 'back_top_icon_color',
 				'type'        => 'color',
 				'title'       => '回到顶部图标颜色',
-				'output'      => '.pix-global-back-top',
+				'output'      => '.glintide-global-back-top',
 				'output_mode' => 'color',
 				'default'     => '#ffffff',
 			),
@@ -354,7 +354,7 @@ CSF::createSection(
 				'type'        => 'number',
 				'title'       => '回到顶部按钮圆角',
 				'unit'        => 'px',
-				'output'      => '.pix-global-back-top',
+				'output'      => '.glintide-global-back-top',
 				'output_mode' => 'border-radius',
 				'default'     => 16,
 			),
@@ -376,10 +376,66 @@ CSF::createSection(
 				'default' => true,
 			),
 			array(
+				'id'      => 'sidebar_left_width',
+				'type'    => 'number',
+				'title'   => '左栏宽度',
+				'unit'    => 'px',
+				'default' => 260,
+				'min'     => 180,
+				'max'     => 400,
+			),
+			array(
+				'id'      => 'center_width',
+				'type'    => 'number',
+				'title'   => '中栏宽度',
+				'unit'    => 'px',
+				'default' => 640,
+				'min'     => 480,
+				'max'     => 900,
+			),
+			array(
 				'id'      => 'sidebar_right_enable',
 				'type'    => 'switcher',
 				'title'   => '启用右栏',
 				'default' => true,
+			),
+			array(
+				'id'      => 'sidebar_right_width',
+				'type'    => 'number',
+				'title'   => '右栏宽度',
+				'unit'    => 'px',
+				'default' => 260,
+				'min'     => 180,
+				'max'     => 400,
+			),
+		),
+	)
+);
+
+// 卡片样式
+CSF::createSection(
+	$prefix,
+	array(
+		'id'     => 'appearance_card',
+		'parent' => 'appearance_panel',
+		'title'  => '卡片样式',
+		'fields' => array(
+			array(
+				'id'      => 'card_radius',
+				'type'    => 'number',
+				'title'   => '卡片圆角',
+				'desc'    => '卡片圆角大小,单位 px',
+				'unit'    => 'px',
+				'default' => 16,
+				'min'     => 0,
+				'max'     => 64,
+			),
+			array(
+				'id'      => 'card_shadow',
+				'type'    => 'textarea',
+				'title'   => '卡片阴影',
+				'desc'    => '卡片阴影 CSS 值',
+				'default' => 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 8px 40px -12px',
 			),
 		),
 	)

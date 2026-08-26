@@ -1,8 +1,8 @@
 <?php if ( ! defined( 'ABSPATH' )  ) { die; } // Cannot access directly.
 
-$pix_payment_options = get_option('ppo_options');
-$pix_cash_name = (is_array($pix_payment_options) && !empty($pix_payment_options['cash_name'])) ? $pix_payment_options['cash_name'] : '余额';
-$pix_credit_name = (is_array($pix_payment_options) && !empty($pix_payment_options['credit_name'])) ? $pix_payment_options['credit_name'] : '积分';
+$glintide_payment_options = get_option('ppo_options');
+$glintide_cash_name = (is_array($glintide_payment_options) && !empty($glintide_payment_options['cash_name'])) ? $glintide_payment_options['cash_name'] : '余额';
+$glintide_credit_name = (is_array($glintide_payment_options) && !empty($glintide_payment_options['credit_name'])) ? $glintide_payment_options['credit_name'] : '积分';
 
 //
 // Metabox of the PAGE
@@ -59,7 +59,7 @@ CSF::createMetabox( $prefix_post_opts, array(
   'post_type'    => 'post',
   'show_restore' => true,
   'priority'     => 'high',
-  'class'      => 'pix-options',
+  'class'      => 'glintide-options',
 ) );
 
 //
@@ -95,15 +95,15 @@ CSF::createSection( $prefix_post_opts, array(
           'title'      => '支付(查看)类型',
           'inline'      => true,
           'options'    => array(
-            'cash' => $pix_cash_name.'支付',
-            'credit' => $pix_credit_name.'支付',
+            'cash' => $glintide_cash_name.'支付',
+            'credit' => $glintide_credit_name.'支付',
             'login' => '登录可见',
             'limits' => '等级限制',
             'cmt' => '评论可见',
             'pwd' => '自定义密码',
             'open' => '无限制(免费)',
           ),
-          'desc'       => '如选'.$pix_credit_name.'支付，请先配置'.$pix_credit_name.'设置',
+          'desc'       => '如选'.$glintide_credit_name.'支付，请先配置'.$glintide_credit_name.'设置',
           'default'    => 'cash'
         ),
 
@@ -154,8 +154,8 @@ CSF::createSection( $prefix_post_opts, array(
         array(
           'id'    => 'credit_price',
           'type'  => 'number',
-          'title' => $pix_credit_name.'售价',
-          'unit'        => $pix_credit_name,
+          'title' => $glintide_credit_name.'售价',
+          'unit'        => $glintide_credit_name,
           'default'     => 25,
           'dependency' => array( 'pay_type', '==', 'credit' ),
         ),

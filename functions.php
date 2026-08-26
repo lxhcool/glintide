@@ -15,7 +15,9 @@ define( 'GLINTIDE_URL', get_template_directory_uri() );
 // 兼容 Codestar Framework 的常量引用
 define( 'THEME_DIR', GLINTIDE_DIR );
 define( 'THEME_URL', GLINTIDE_URL );
-define( 'PIX_VERSION', GLINTIDE_VERSION );
+if ( ! defined( 'PIX_VERSION' ) ) {
+	define( 'PIX_VERSION', GLINTIDE_VERSION );
+}
 
 /**
  * 主题基础设置
@@ -100,6 +102,9 @@ function glintide_scripts() {
 
 	// 图标字体(remixicon)
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
+
+	// 音乐播放器使用主题自带 iconfont
+	wp_enqueue_style( 'glintide-iconfont', GLINTIDE_URL . '/assets/iconfont/iconfont.css', array(), GLINTIDE_VERSION );
 }
 add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
 
@@ -108,6 +113,60 @@ add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
  */
 require_once GLINTIDE_DIR . '/inc/assets/codestar-framework/codestar-framework.php';
 require_once GLINTIDE_DIR . '/inc/options/theme-option.php';
+
+/**
+ * 前台:REST API(网易云歌单解析等)
+ */
+require_once GLINTIDE_DIR . '/inc/mod/glintide-rest.php';
+
+/**
+ * 前台:小工具管理器(插拔式,自动扫描 inc/widgets/)
+ */
+require_once GLINTIDE_DIR . '/inc/widgets/class-glintide-widgets.php';
+Glintide_Widgets::init();
+
+/**
+ * 读取主题设置
+ *
+ * @param string $option  设置键名
+ * @param mixed  $default 默认值
+ * @return mixed
+ */
+function glintide_get_option( $option = '', $default = null ) {
+	$options = get_option( 'glintide_options' );
+	return ( isset( $options[ $option ] ) ) ? $options[ $option ] : $default;
+}
+
+/**
+ * 输出主题设置驱动的 CSS 变量(卡片圆角/阴影/栏宽等)
+ */
+function glintide_custom_css_vars() {
+	$radius = (int) glintide_get_option( 'card_radius', 16 );
+	$radius = max( 0, min( 64, $radius ) );
+
+	$shadow = glintide_get_option(
+		'card_shadow',
+		'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 8px 40px -12px'
+	);
+	$shadow = wp_strip_all_tags( (string) $shadow );
+
+	// 三栏宽度
+	$left_width   = max( 0, (int) glintide_get_option( 'sidebar_left_width', 260 ) );
+	$center_width = max( 0, (int) glintide_get_option( 'center_width', 640 ) );
+	$right_width  = max( 0, (int) glintide_get_option( 'sidebar_right_width', 260 ) );
+	?>
+	<style id="glintide-custom-css-vars">
+	:root {
+		--glintide-radius: <?php echo (int) $radius; ?>px;
+		--glintide-shadow-card: <?php echo esc_attr( $shadow ); ?>;
+		--glintide-sidebar-left-width: <?php echo (int) $left_width; ?>px;
+		--glintide-center-width: <?php echo (int) $center_width; ?>px;
+		--glintide-sidebar-right-width: <?php echo (int) $right_width; ?>px;
+	}
+	</style>
+	<?php
+}
+add_action( 'wp_head', 'glintide_custom_css_vars', 99 );
 require_once GLINTIDE_DIR . '/inc/options/home-option.php';
 
 /**
@@ -152,7 +211,7 @@ function glintide_pagination() {
 			'mid_size'  => 2,
 			'prev_text' => '<i class="ri-arrow-left-line" aria-hidden="true"></i>',
 			'next_text' => '<i class="ri-arrow-right-line" aria-hidden="true"></i>',
-			'class'     => 'pix-pagination',
+			'class'     => 'glintide-pagination',
 		)
 	);
 }

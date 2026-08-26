@@ -8,19 +8,19 @@
 get_header();
 ?>
 
-<div class="pix-content">
+<div class="glintide-content">
 
-	<div class="pix-home-layout<?php echo is_active_sidebar( 'sidebar-left' ) ? ' pix-home-layout--has-left' : ''; ?><?php echo is_active_sidebar( 'sidebar-right' ) ? ' pix-home-layout--has-right' : ''; ?>">
+	<div class="glintide-home-layout<?php echo is_active_sidebar( 'sidebar-left' ) ? ' glintide-home-layout--has-left' : ''; ?><?php echo is_active_sidebar( 'sidebar-right' ) ? ' glintide-home-layout--has-right' : ''; ?>">
 
 		<?php if ( is_active_sidebar( 'sidebar-left' ) ) : ?>
-		<aside class="left left-widget pix-home-sidebar pix-home-sidebar-left" aria-label="<?php esc_attr_e( '左侧栏', 'glintide' ); ?>">
-			<div class="widget_inner pix-home-widget-stack">
+		<aside class="left left-widget glintide-home-sidebar glintide-home-sidebar-left" aria-label="<?php esc_attr_e( '左侧栏', 'glintide' ); ?>">
+			<div class="widget_inner glintide-home-widget-stack">
 				<?php dynamic_sidebar( 'sidebar-left' ); ?>
 			</div>
 		</aside>
 		<?php endif; ?>
 
-		<div class="center-content pix-home-main">
+		<div class="center-content glintide-home-main">
 			<div id="primary" class="site-main">
 
 				<?php
@@ -28,10 +28,10 @@ get_header();
 					the_post();
 					?>
 
-					<article id="post-<?php the_ID(); ?>" <?php post_class( 'pix-single-card' ); ?>>
+					<article id="post-<?php the_ID(); ?>" <?php post_class( 'glintide-single-card' ); ?>>
 
-						<header class="pix-single-header">
-							<h1 class="pix-single-title"><?php the_title(); ?></h1>
+						<header class="glintide-single-header">
+							<h1 class="glintide-single-title"><?php the_title(); ?></h1>
 						</header>
 
 						<div class="entry-content">
@@ -62,8 +62,8 @@ get_header();
 		</div>
 
 		<?php if ( is_active_sidebar( 'sidebar-right' ) ) : ?>
-		<aside class="right right-widget pix-home-sidebar pix-home-sidebar-right" aria-label="<?php esc_attr_e( '右侧栏', 'glintide' ); ?>">
-			<div class="widget_inner pix-home-widget-stack">
+		<aside class="right right-widget glintide-home-sidebar glintide-home-sidebar-right" aria-label="<?php esc_attr_e( '右侧栏', 'glintide' ); ?>">
+			<div class="widget_inner glintide-home-widget-stack">
 				<?php dynamic_sidebar( 'sidebar-right' ); ?>
 			</div>
 		</aside>

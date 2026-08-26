@@ -10,8 +10,8 @@ if ( ! is_active_sidebar( 'sidebar-left' ) ) {
 }
 ?>
 
-<aside id="secondary-left" class="widget-area pix-home-sidebar pix-home-sidebar-left">
-	<div class="widget_inner pix-home-widget-stack">
+<aside id="secondary-left" class="widget-area glintide-home-sidebar glintide-home-sidebar-left">
+	<div class="widget_inner glintide-home-widget-stack">
 		<?php dynamic_sidebar( 'sidebar-left' ); ?>
 	</div>
 </aside>

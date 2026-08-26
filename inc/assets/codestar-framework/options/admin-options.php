@@ -9,9 +9,9 @@ $prefix = 'ppo_options';
 // Create options
 //
 CSF::createOptions( $prefix, array(
-  'menu_title' => 'PIX主题设置',
-  'menu_slug'  => 'pix-settings',
-  'class'      => 'pix-options',
+  'menu_title' => 'Glintide主题设置',
+  'menu_slug'  => 'glintide-settings',
+  'class'      => 'glintide-options',
   'show_in_customizer' => true,
 ) );
 
@@ -142,7 +142,7 @@ CSF::createSection( $prefix, array(
 	    'title'      => '主题风格',
 	    'inline'  => true,
 	    'options'    => array(
-	  	'classic'    => 'PIX经典',
+	  	'classic'    => 'Glintide经典',
 		  'custom'    => '自定义模块',	  				
 	    ),
 	    'default'    => 'classic',
@@ -172,7 +172,7 @@ CSF::createSection( $prefix, array(
       'type'        => 'number',
       'title'       => '主体页面宽度',
       'unit'        => 'px',
-      'output'      => '.pix-content',
+      'output'      => '.glintide-content',
       'output_mode' => 'max-width',
       'default'     => 1280,
       'desc'        => '请直接填写宽度数字，此处指页面主体内容宽度,中间内容+小工具的总宽度'
@@ -430,7 +430,7 @@ CSF::createSection( $prefix, array(
           'id'          => 'glass_bg',
           'type'        => 'color',
           'title'       => '吸附状态背景色',
-          'output'      => array('.top-header.nav2.showup.active .sub-top-nav-box','.top-nav-box.pix-sticky-fixed','.top-header.nav3.active'),
+          'output'      => array('.top-header.nav2.showup.active .sub-top-nav-box','.top-nav-box.glintide-sticky-fixed','.top-header.nav3.active'),
           'output_mode' => 'background-color',
           'dependency' => array( 'nav_sticky', 'any', 'sticky,showup' ),
           'desc'  => '请设置为半透明效果',
@@ -443,8 +443,8 @@ CSF::createSection( $prefix, array(
           'title'       => '吸附状态文本色',
           'output'      => array(
                       '.top-header.nav2.showup.active .sub-top-nav-box #top_sub_menu > li > a',
-                      '.top-nav-box.pix-sticky-fixed #top_menu > li > a',
-                      '.top-nav-box.pix-sticky-fixed .tool-box li a',
+                      '.top-nav-box.glintide-sticky-fixed #top_menu > li > a',
+                      '.top-nav-box.glintide-sticky-fixed .tool-box li a',
                       '.top-header.nav3.active #top_menu > li > a', 
                       '.top-header.nav3.active .tool-box li a',
                     ),

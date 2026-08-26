@@ -52,7 +52,7 @@ CSF::createSection( $prefix, array(
 // A shortcode [foo title=""]content[/foo]
 //
 CSF::createSection( $prefix, array(
-  'title'     => 'PIX按钮',
+  'title'     => 'Glintide按钮',
   'view'      => 'normal',
   'shortcode' => 'pixbtn',
   'fields'    => array(

@@ -8,22 +8,22 @@
 get_header();
 ?>
 
-<div class="pix-content">
+<div class="glintide-content">
 
-	<div class="pix-home-layout<?php echo is_active_sidebar( 'sidebar-left' ) ? ' pix-home-layout--has-left' : ''; ?><?php echo is_active_sidebar( 'sidebar-right' ) ? ' pix-home-layout--has-right' : ''; ?>">
+	<div class="glintide-home-layout<?php echo is_active_sidebar( 'sidebar-left' ) ? ' glintide-home-layout--has-left' : ''; ?><?php echo is_active_sidebar( 'sidebar-right' ) ? ' glintide-home-layout--has-right' : ''; ?>">
 
 		<?php if ( is_active_sidebar( 'sidebar-left' ) ) : ?>
-		<aside class="left left-widget pix-home-sidebar pix-home-sidebar-left" aria-label="<?php esc_attr_e( '左侧栏', 'glintide' ); ?>">
-			<div class="widget_inner pix-home-widget-stack">
+		<aside class="left left-widget glintide-home-sidebar glintide-home-sidebar-left" aria-label="<?php esc_attr_e( '左侧栏', 'glintide' ); ?>">
+			<div class="widget_inner glintide-home-widget-stack">
 				<?php dynamic_sidebar( 'sidebar-left' ); ?>
 			</div>
 		</aside>
 		<?php endif; ?>
 
-		<div class="center-content pix-home-main">
+		<div class="center-content glintide-home-main">
 			<div id="primary" class="site-main">
 
-				<header class="pix-archive-header">
+				<header class="glintide-archive-header">
 					<h1>
 						<?php
 						if ( is_category() ) {
@@ -44,13 +44,13 @@ get_header();
 						?>
 					</h1>
 					<?php if ( get_the_archive_description() ) : ?>
-						<div class="pix-archive-desc"><?php echo wp_kses_post( wpautop( get_the_archive_description() ) ); ?></div>
+						<div class="glintide-archive-desc"><?php echo wp_kses_post( wpautop( get_the_archive_description() ) ); ?></div>
 					<?php endif; ?>
 				</header>
 
 				<?php if ( have_posts() ) : ?>
 
-					<div class="pix-post-list">
+					<div class="glintide-post-list">
 						<?php
 						while ( have_posts() ) :
 							the_post();
@@ -71,8 +71,8 @@ get_header();
 		</div>
 
 		<?php if ( is_active_sidebar( 'sidebar-right' ) ) : ?>
-		<aside class="right right-widget pix-home-sidebar pix-home-sidebar-right" aria-label="<?php esc_attr_e( '右侧栏', 'glintide' ); ?>">
-			<div class="widget_inner pix-home-widget-stack">
+		<aside class="right right-widget glintide-home-sidebar glintide-home-sidebar-right" aria-label="<?php esc_attr_e( '右侧栏', 'glintide' ); ?>">
+			<div class="widget_inner glintide-home-widget-stack">
 				<?php dynamic_sidebar( 'sidebar-right' ); ?>
 			</div>
 		</aside>

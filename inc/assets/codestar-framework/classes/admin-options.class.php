@@ -23,7 +23,7 @@ if ( ! class_exists( 'CSF_Options' ) ) {
     public $args         = array(
 
       // framework title
-      'framework_title'         => 'PIX PRO <small>by Fuzzz</small>',
+      'framework_title'         => 'Glintide PRO <small>by Fuzzz</small>',
       'framework_class'         => '',
 
       // menu settings

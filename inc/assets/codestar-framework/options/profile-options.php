@@ -4,10 +4,10 @@
 // Set a unique slug-like ID
 //
 $prefix = '_ppo_profile_options';
-$pix_profile_options = get_option('ppo_options');
-$pix_profile_cash_name = (is_array($pix_profile_options) && !empty($pix_profile_options['cash_name'])) ? $pix_profile_options['cash_name'] : '余额';
-$pix_profile_credit_name = (is_array($pix_profile_options) && !empty($pix_profile_options['credit_name'])) ? $pix_profile_options['credit_name'] : '积分';
-$pix_profile_xp_name = (is_array($pix_profile_options) && !empty($pix_profile_options['xp_slug'])) ? $pix_profile_options['xp_slug'] : '经验值';
+$glintide_profile_options = get_option('ppo_options');
+$glintide_profile_cash_name = (is_array($glintide_profile_options) && !empty($glintide_profile_options['cash_name'])) ? $glintide_profile_options['cash_name'] : '余额';
+$glintide_profile_credit_name = (is_array($glintide_profile_options) && !empty($glintide_profile_options['credit_name'])) ? $glintide_profile_options['credit_name'] : '积分';
+$glintide_profile_xp_name = (is_array($glintide_profile_options) && !empty($glintide_profile_options['xp_slug'])) ? $glintide_profile_options['xp_slug'] : '经验值';
 
 //
 // Create profile options
@@ -26,25 +26,25 @@ CSF::createSection( $prefix, array(
     array(
       'id'          => 'ppo_balance',
       'type'        => 'number',
-      'title'       => $pix_profile_cash_name,
+      'title'       => $glintide_profile_cash_name,
       'default'     => 0,
-      'unit'      => $pix_profile_cash_name
+      'unit'      => $glintide_profile_cash_name
     ),
 
     array(
       'id'          => 'ppo_credit',
       'type'        => 'number',
-      'title'       => $pix_profile_credit_name,
+      'title'       => $glintide_profile_credit_name,
       'default'     => 0,
-      'unit'      => $pix_profile_credit_name
+      'unit'      => $glintide_profile_credit_name
     ),
 
     array(
       'id'          => 'ppo_user_xp',
       'type'        => 'number',
-      'title'       => $pix_profile_xp_name,
+      'title'       => $glintide_profile_xp_name,
       'default'     => 0,
-      'unit'      => $pix_profile_xp_name
+      'unit'      => $glintide_profile_xp_name
     ),
 
     array(
@@ -55,7 +55,7 @@ CSF::createSection( $prefix, array(
       'attributes'  => array(
         'readonly' => 'readonly',
       ),
-      'desc' => '只读显示：此值会根据用户'.$pix_profile_xp_name.'和后台等级配置自动同步，请通过修改'.$pix_profile_xp_name.'来调整等级'
+      'desc' => '只读显示：此值会根据用户'.$glintide_profile_xp_name.'和后台等级配置自动同步，请通过修改'.$glintide_profile_xp_name.'来调整等级'
     ),
 
     array(
