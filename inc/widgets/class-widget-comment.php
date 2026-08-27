@@ -82,12 +82,13 @@ class Glintide_Widget_Comment extends Glintide_Widget {
 				$author_name     = $comment->comment_author;
 				$post_url        = get_permalink( $comment->comment_post_ID );
 				$avatar_url      = $user_id ? glintide_get_avatar_url( $user_id ) : '';
+				$avatar_fallback  = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
 				$comment_date    = human_time_diff( strtotime( $comment->comment_date ), current_time( 'timestamp' ) ) . '前';
 				$comment_content = self::excerpt( $comment->comment_content );
 				$like_count      = get_comment_meta( $comment->comment_ID, 'like_count', true ) ?: 0;
 
 				$html .= '<a href="' . esc_url( $post_url ) . '" class="glintide-comment-item">';
-				$html .= $avatar_url ? '<img src="' . esc_url( $avatar_url ) . '" alt="' . esc_attr( $author_name ) . '" class="glintide-comment-avatar">' : '<div class="glintide-comment-avatar glintide-comment-avatar-empty"><i class="ri-user-3-line"></i></div>';
+				$html .= $avatar_url ? '<img src="' . esc_url( $avatar_url ) . '" alt="' . esc_attr( $author_name ) . '" class="glintide-comment-avatar" data-glintide-avatar data-glintide-avatar-fallback="' . esc_url( $avatar_fallback ) . '">' : '<div class="glintide-comment-avatar glintide-comment-avatar-empty"><i class="ri-user-3-line"></i></div>';
 				$html .= '<div class="glintide-comment-body">';
 				$html .= '<div class="glintide-comment-meta">';
 				$html .= '<span class="glintide-comment-author">' . esc_html( $author_name ) . '</span>';

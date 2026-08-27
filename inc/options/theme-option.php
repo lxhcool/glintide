@@ -143,6 +143,41 @@ CSF::createSection(
 );
 
 //
+// 用户设置
+//
+CSF::createSection(
+	$prefix,
+	array(
+		'id'       => 'user_panel',
+		'title'    => '用户',
+		'icon'     => 'ri-user-smile-line',
+		'priority' => 3,
+	)
+);
+
+CSF::createSection(
+	$prefix,
+	array(
+		'id'     => 'user_center',
+		'parent' => 'user_panel',
+		'title'  => '用户中心',
+		'fields' => array(
+			array(
+				'id'           => 'user_avatar',
+				'type'         => 'upload',
+				'title'        => '用户默认头像',
+				'desc'         => '没有用户自定义头像时使用。',
+				'library'      => 'image',
+				'button_title' => '选择头像',
+				'remove_title' => '移除头像',
+				'preview'      => true,
+				'default'      => GLINTIDE_URL . '/assets/images/default-avatar.png',
+			),
+		),
+	)
+);
+
+//
 // 外观设置
 //
 CSF::createSection(
@@ -172,9 +207,7 @@ CSF::createSection(
 				'background_blend_mode'           => true,
 				'output'                          => 'body',
 				'default'                         => array(
-					'background-color'              => '#f3efff',
-					'background-gradient-color'     => '#e7f1ff',
-					'background-gradient-direction' => '135deg',
+					'background-color'              => '#ffffff',
 					'background-size'               => 'cover',
 					'background-position'           => 'center center',
 					'background-repeat'             => 'no-repeat',
@@ -201,7 +234,7 @@ CSF::createSection(
 				'step'        => 1,
 				'unit'        => 'px',
 				'default'     => 22,
-				'output'      => '.classic-logo a img',
+				'output'      => '.glintide-left-rail-logo img',
 				'output_mode' => 'height',
 			),
 		),

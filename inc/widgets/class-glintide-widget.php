@@ -131,16 +131,32 @@ function glintide_get_thumb( $post_id ) {
 }
 
 /**
- * 用户头像(优先自定义头像,回退 Gravatar)
+ * 获取主题默认头像地址
+ */
+function glintide_get_default_avatar_url() {
+	$default = function_exists( 'glintide_get_option' ) ? glintide_get_option( 'user_avatar', '' ) : '';
+	if ( is_array( $default ) ) {
+		$default = $default['url'] ?? '';
+	}
+
+	$default = is_string( $default ) ? esc_url_raw( $default ) : '';
+	return $default ? $default : GLINTIDE_URL . '/assets/images/default-avatar.png';
+}
+
+/**
+ * 用户头像(后台自定义头像 → 后台默认头像 → 本地默认头像)
  */
 function glintide_get_avatar_url( $user_id ) {
 	$custom = get_user_meta( $user_id, 'custom_avatar', true );
+	if ( ! $custom ) {
+		$custom = get_user_meta( $user_id, 'upload_avatar', true );
+	}
+	$custom = is_string( $custom ) ? esc_url_raw( $custom ) : '';
 	if ( $custom ) {
 		return $custom;
 	}
 
-	$avatar = get_avatar_url( $user_id, array( 'size' => 96 ) );
-	return $avatar ? $avatar : '';
+	return glintide_get_default_avatar_url();
 }
 
 /**

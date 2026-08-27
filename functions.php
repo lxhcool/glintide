@@ -105,6 +105,13 @@ function glintide_scripts() {
 
 	// 音乐播放器使用主题自带 iconfont
 	wp_enqueue_style( 'glintide-iconfont', GLINTIDE_URL . '/assets/iconfont/iconfont.css', array(), GLINTIDE_VERSION );
+	wp_enqueue_script(
+		'glintide-theme-controls',
+		GLINTIDE_URL . '/assets/js/theme-controls.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/theme-controls.js' ),
+		false
+	);
 }
 add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
 
@@ -124,6 +131,8 @@ require_once GLINTIDE_DIR . '/inc/mod/glintide-rest.php';
  */
 require_once GLINTIDE_DIR . '/inc/widgets/class-glintide-widgets.php';
 Glintide_Widgets::init();
+require_once GLINTIDE_DIR . '/inc/frontend/navigation.php';
+require_once GLINTIDE_DIR . '/inc/frontend/site-tools.php';
 
 /**
  * 读取主题设置
@@ -151,9 +160,10 @@ function glintide_custom_css_vars() {
 	$shadow = wp_strip_all_tags( (string) $shadow );
 
 	// 三栏宽度
-	$left_width   = max( 0, (int) glintide_get_option( 'sidebar_left_width', 260 ) );
-	$center_width = max( 0, (int) glintide_get_option( 'center_width', 640 ) );
-	$right_width  = max( 0, (int) glintide_get_option( 'sidebar_right_width', 260 ) );
+	$left_width   = max( 1, (int) glintide_get_option( 'sidebar_left_width', 260 ) );
+	$center_width = max( 1, (int) glintide_get_option( 'center_width', 640 ) );
+	$right_width  = max( 1, (int) glintide_get_option( 'sidebar_right_width', 260 ) );
+	$layout_width = $left_width + $center_width + $right_width;
 	?>
 	<style id="glintide-custom-css-vars">
 	:root {
@@ -162,6 +172,7 @@ function glintide_custom_css_vars() {
 		--glintide-sidebar-left-width: <?php echo (int) $left_width; ?>px;
 		--glintide-center-width: <?php echo (int) $center_width; ?>px;
 		--glintide-sidebar-right-width: <?php echo (int) $right_width; ?>px;
+		--glintide-layout-width: <?php echo (int) $layout_width; ?>px;
 	}
 	</style>
 	<?php
