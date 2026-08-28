@@ -18,6 +18,7 @@ $hide_body  = in_array( $type, array( 'quote', 'code', 'photo', 'music' ), true 
 $is_article = 'text' === $type;
 $is_photo   = 'photo' === $type;
 $is_music   = 'music' === $type;
+$show_topline = ! $is_article && ! $is_photo && ! $is_music;
 $categories = get_the_category( $post_id );
 $category   = ( ! empty( $categories ) && ! is_wp_error( $categories ) ) ? $categories[0] : null;
 $author     = get_the_author();
@@ -29,7 +30,7 @@ $comments   = absint( get_comments_number() );
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class( array( 'glintide-card', 'glintide-card--' . $type, $is_article ? 'glintide-card--article' : '' ) ); ?> data-glintide-card>
-	<?php if ( ! $is_article && ! $is_photo ) : ?>
+	<?php if ( $show_topline ) : ?>
 		<div class="glintide-card-topline">
 			<span class="glintide-card-type glintide-card-type--<?php echo esc_attr( $type ); ?>">
 				<i class="<?php echo esc_attr( $type_data['icon'] ); ?>" aria-hidden="true"></i>

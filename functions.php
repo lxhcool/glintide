@@ -124,6 +124,22 @@ function glintide_scripts() {
 		filemtime( GLINTIDE_DIR . '/assets/css/glintide-music-backup.css' )
 	);
 
+	// 音乐卡片播放器(网易云直链解析 + 播放 + 降级)
+	wp_enqueue_script(
+		'glintide-card-music',
+		GLINTIDE_URL . '/assets/js/glintide-card-music.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-music.js' ),
+		true
+	);
+	wp_localize_script(
+		'glintide-card-music',
+		'glintideMusic',
+		array(
+			'restUrl' => rest_url( 'glintide/v1/netease-song' ),
+		)
+	);
+
 	// 图标字体(remixicon)
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
 

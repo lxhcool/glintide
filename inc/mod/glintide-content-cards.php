@@ -751,27 +751,30 @@ function glintide_card_get_music_source( $post_id = 0 ) {
  * @return string iframe URL,无则返回空。
  */
 function glintide_card_get_netease_embed_url( $url ) {
-	$url = (string) $url;
+	$url = trim( (string) $url );
 	if ( ! $url ) {
 		return '';
 	}
 
-	// 直接带 id 参数
-	if ( preg_match( '/[?&]id=(\d+)/', $url, $m ) ) {
-		return 'https://music.163.com/outchain/player?type=2&id=' . $m[1] . '&auto=0&height=66';
+	// 统一使用 REST 模块的 ID 解析(支持 #/song?id=、/song/、/m/song/、纯 ID 等)
+	$id = function_exists( 'glintide_extract_netease_song_id' ) ? glintide_extract_netease_song_id( $url ) : '';
+
+	if ( ! $id && stripos( $url, 'playlist' ) === false ) {
+		// 兜底:自行解析,避免 REST 模块未加载时失效
+		if ( preg_match( '/[?&#]id=(\d+)/', $url, $m ) ) {
+			$id = $m[1];
+		} elseif ( preg_match( '#/(?:m/)?song/(\d+)#', $url, $m ) ) {
+			$id = $m[1];
+		} elseif ( preg_match( '/^\d+$/', $url ) ) {
+			$id = $url;
+		}
 	}
 
-	// /song?id=xxx 形式
-	if ( preg_match( '#/song/(\d+)#', $url, $m ) ) {
-		return 'https://music.163.com/outchain/player?type=2&id=' . $m[1] . '&auto=0&height=66';
+	if ( ! $id ) {
+		return '';
 	}
 
-	// 纯 ID
-	if ( preg_match( '/^\d+$/', $url ) ) {
-		return 'https://music.163.com/outchain/player?type=2&id=' . $url . '&auto=0&height=66';
-	}
-
-	return '';
+	return 'https://music.163.com/outchain/player?type=2&id=' . $id . '&auto=0&height=66';
 }
 
 /**
@@ -1056,63 +1059,89 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		$music_title = glintide_card_get_music_title( $post_id );
 		$cover       = glintide_card_get_music_cover_url( $post_id );
 		$source      = glintide_card_get_music_source( $post_id );
+		$summary     = glintide_card_get_summary( $post_id, 40 );
+		$embed_url   = ( 'netease' === $source ) ? glintide_card_get_netease_embed_url( $music_url ) : '';
+		$has_url     = (bool) $music_url;
 
-		$html  = '<div class="' . esc_attr( $base ) . ' glintide-card-media--music-new" data-glintide-music>';
+		// 网易云链接没有可直接使用的音频地址,由前端通过 REST 解析后再下载
+		$download_ready = ( $has_url && 'netease' !== $source );
 
-		// 左侧:文字 + 播放按钮
-		$html .= '<div class="glintide-card-music-info">';
-		if ( $music_title ) {
-			$html .= '<h4 class="glintide-card-music-title">' . esc_html( $music_title ) . '</h4>';
-		}
-		if ( $artist ) {
-			$html .= '<p class="glintide-card-music-artist">' . esc_html( $artist ) . '</p>';
-		} else {
-			$html .= '<p class="glintide-card-music-artist glintide-card-music-artist--empty">未知音乐人</p>';
-		}
+		$html  = '<div class="' . esc_attr( $base ) . ' glintide-music-card" data-glintide-music'
+			. ' data-music-source="' . esc_attr( $source ) . '"'
+			. ' data-music-url="' . esc_attr( $music_url ) . '"'
+			. ' data-music-embed="' . esc_attr( $embed_url ) . '"'
+			. '>';
 
-		$html .= '<div class="glintide-card-music-controls">';
-		$has_audio = false;
-		if ( 'netease' === $source ) {
-			$embed = glintide_card_get_netease_embed_url( $music_url );
-			if ( $embed ) {
-				$has_audio = true;
-				$html .= '<button type="button" class="glintide-card-music-toggle" data-glintide-music-toggle aria-label="播放" data-state="paused">'
-					. '<i class="ri-play-fill" aria-hidden="true"></i>'
-					. '</button>';
-				$html .= '<iframe class="glintide-card-music-netease" data-glintide-music-netease src="' . esc_url( $embed ) . '" frameborder="0" loading="lazy"></iframe>';
-			}
-		} elseif ( $music_url ) {
-			$has_audio = true;
-			$html .= '<button type="button" class="glintide-card-music-toggle" data-glintide-music-toggle aria-label="播放" data-state="paused">'
-				. '<i class="ri-play-fill" aria-hidden="true"></i>'
-				. '</button>';
-			$html .= '<audio class="glintide-card-music-audio" data-glintide-music-audio preload="none"><source src="' . esc_url( $music_url ) . '"></audio>';
-		}
+		// 渐变背景:封面图模糊衍生;无封面时由 CSS 呈现默认蓝色渐变
+		$html .= '<span class="glintide-music-card-bg" data-glintide-music-bg aria-hidden="true"' . ( $cover ? ' style="background-image: url(' . esc_url( $cover ) . ');"' : '' ) . '></span>';
+		$html .= '<span class="glintide-music-card-tint" aria-hidden="true"></span>';
 
-		if ( ! $has_audio ) {
-			$html .= '<button type="button" class="glintide-card-music-toggle" disabled aria-label="无音频">'
-				. '<i class="ri-play-fill" aria-hidden="true"></i>'
-				. '</button>';
-			$html .= '<span class="glintide-card-media-note">音频地址未设置</span>';
-		}
-
-		$html .= '</div>'; // /controls
-		$html .= '</div>'; // /info
-
-		// 右侧:封面 + 底部模糊衔接
-		$html .= '<div class="glintide-card-music-cover-wrap">';
+		// 头部:圆形封面 + 歌名/音乐人 + 播放按钮
+		$html .= '<div class="glintide-music-card-head">';
+		$html .= '<span class="glintide-music-card-cover">';
 		if ( $cover ) {
-			$html .= '<img class="glintide-card-music-cover-img" src="' . esc_url( $cover ) . '" alt="' . esc_attr( $music_title ) . '" loading="lazy" decoding="async">';
+			$html .= '<img class="glintide-music-card-cover-img" data-glintide-music-cover src="' . esc_url( $cover ) . '" alt="' . esc_attr( $music_title ) . '" loading="lazy" decoding="async">';
 		} else {
-			$html .= '<div class="glintide-card-music-cover-img glintide-card-music-cover-img--default" aria-hidden="true">'
-				. '<i class="ri-music-2-line"></i>'
-				. '</div>';
+			$html .= '<span class="glintide-music-card-cover-img glintide-music-card-cover-img--placeholder" data-glintide-music-cover aria-hidden="true"><i class="ri-music-2-fill"></i></span>';
 		}
-		$html .= '<div class="glintide-photo-veil" aria-hidden="true">'
-			. '<span class="glintide-photo-veil-layer"></span>'
-			. '<span class="glintide-photo-veil-tint"></span>'
-			. '</div>';
+		$html .= '</span>';
+
+		$html .= '<div class="glintide-music-card-meta">';
+		$html .= '<h4 class="glintide-music-card-title">' . esc_html( $music_title ? $music_title : '未命名歌曲' ) . '</h4>';
+		if ( $artist ) {
+			$html .= '<p class="glintide-music-card-artist">' . esc_html( $artist ) . '</p>';
+		}
 		$html .= '</div>';
+
+		if ( $has_url ) {
+			$html .= '<button type="button" class="glintide-music-card-play" data-glintide-music-toggle aria-label="播放" data-state="paused">'
+				. '<i class="ri-play-fill" aria-hidden="true"></i>'
+				. '</button>';
+		} else {
+			$html .= '<button type="button" class="glintide-music-card-play" disabled aria-label="音频地址未设置">'
+				. '<i class="ri-play-fill" aria-hidden="true"></i>'
+				. '</button>';
+		}
+		$html .= '</div>';
+
+		// 歌词 / 文案
+		if ( $summary ) {
+			$html .= '<p class="glintide-music-card-lyrics">' . esc_html( $summary ) . '</p>';
+		}
+
+		// 状态提示:解析中 / 失败降级提示
+		$html .= '<p class="glintide-music-card-note" data-glintide-music-note role="status" aria-live="polite" hidden></p>';
+
+		// 底部:进度控制 + 辅助操作(点赞 / 下载)
+		$liked     = isset( $_COOKIE[ 'glintide_liked_' . $post_id ] ) ? ' is-liked' : '';
+		$like_icon = $liked ? 'ri-heart-3-fill' : 'ri-heart-3-line';
+		$html .= '<div class="glintide-music-card-bottom">';
+		$html .= '<span class="glintide-music-card-time" data-glintide-music-time-current>00:00</span>';
+		$html .= '<input type="range" class="glintide-music-card-seek" data-glintide-music-seek min="0" max="1000" step="1" value="0" aria-label="播放进度"'
+			. ( $has_url ? '' : ' disabled' ) . '>';
+		$html .= '<span class="glintide-music-card-time" data-glintide-music-time-duration>00:00</span>';
+		$html .= '<div class="glintide-music-card-actions">';
+		$html .= '<button type="button" class="glintide-music-card-action glintide-music-card-action--like' . $liked . '" data-glintide-like="' . esc_attr( $post_id ) . '" aria-pressed="' . ( $liked ? 'true' : 'false' ) . '" aria-label="点赞" title="点赞">'
+			. '<i class="' . esc_attr( $like_icon ) . '" aria-hidden="true"></i>'
+			. '</button>';
+		$html .= '<a class="glintide-music-card-action glintide-music-card-action--download" data-glintide-music-download'
+			. ( $download_ready ? '' : ' disabled aria-disabled="true"' )
+			. ' href="' . ( $download_ready ? esc_url( $music_url ) : '#' ) . '"'
+			. ' target="_blank" rel="noopener noreferrer" download aria-label="下载" title="下载音频">'
+			. '<i class="ri-download-2-line" aria-hidden="true"></i>'
+			. '</a>';
+		$html .= '</div>';
+		$html .= '</div>';
+
+		// 降级容器:直链不可用时插入网易云官方嵌入播放器
+		$html .= '<div class="glintide-music-card-fallback" data-glintide-music-fallback hidden></div>';
+
+		// 音频元素:自上传音频直接给 source,网易云由 JS 解析后注入
+		if ( $has_url && 'netease' !== $source ) {
+			$html .= '<audio class="glintide-card-music-audio" data-glintide-music-audio preload="none"><source src="' . esc_url( $music_url ) . '"></audio>';
+		} else {
+			$html .= '<audio class="glintide-card-music-audio" data-glintide-music-audio preload="none"></audio>';
+		}
 
 		$html .= '</div>'; // /base
 		return $html;

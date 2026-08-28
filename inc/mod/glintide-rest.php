@@ -32,8 +32,190 @@ add_action(
 				),
 			)
 		);
+
+		register_rest_route(
+			'glintide/v1',
+			'/netease-song',
+			array(
+				'methods'             => 'GET',
+				'callback'            => 'glintide_netease_song_api',
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'url' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			)
+		);
 	}
 );
+
+/**
+ * 网易云请求头
+ *
+ * @return array
+ */
+function glintide_netease_headers() {
+	return array(
+		'Referer'    => 'https://music.163.com/',
+		'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36',
+	);
+}
+
+/**
+ * 从歌曲链接提取歌曲 ID
+ *
+ * 支持以下形式:
+ * - https://music.163.com/#/song?id=123
+ * - https://music.163.com/song?id=123
+ * - https://music.163.com/song/123
+ * - https://y.music.163.com/m/song/123
+ * - 纯数字 ID
+ *
+ * @param string $url 歌曲链接
+ * @return string
+ */
+function glintide_extract_netease_song_id( $url ) {
+	$url = trim( (string) $url );
+	if ( ! $url ) {
+		return '';
+	}
+
+	// 歌单链接不是单曲,排除,避免把歌单 ID 当成歌曲 ID
+	if ( stripos( $url, 'playlist' ) !== false ) {
+		return '';
+	}
+
+	if ( preg_match( '/[?&#]id=(\d+)/', $url, $m ) ) {
+		return $m[1];
+	}
+
+	if ( preg_match( '#/(?:m/)?song/(\d+)#', $url, $m ) ) {
+		return $m[1];
+	}
+
+	if ( preg_match( '/^\d+$/', $url ) ) {
+		return $url;
+	}
+
+	return '';
+}
+
+/**
+ * 获取网易云歌曲音频直链
+ *
+ * @param string $id      歌曲 ID
+ * @param array  $headers 请求头
+ * @return string 直链,失败返回空字符串
+ */
+function glintide_netease_get_song_audio_url( $id, $headers ) {
+	$resp = wp_remote_post(
+		'https://music.163.com/api/song/enhance/player/url',
+		array(
+			'headers' => array_merge( array( 'Content-Type' => 'application/x-www-form-urlencoded' ), $headers ),
+			'body'    => 'ids=[' . $id . ']&br=320000',
+			'timeout' => 15,
+		)
+	);
+
+	if ( is_wp_error( $resp ) ) {
+		return '';
+	}
+
+	$body = json_decode( wp_remote_retrieve_body( $resp ), true );
+
+	if ( empty( $body['data'][0]['url'] ) ) {
+		return '';
+	}
+
+	return esc_url_raw( (string) $body['data'][0]['url'] );
+}
+
+/**
+ * 获取网易云歌曲元信息(标题 / 音乐人 / 封面)
+ *
+ * @param string $id      歌曲 ID
+ * @param array  $headers 请求头
+ * @return array
+ */
+function glintide_netease_get_song_meta( $id, $headers ) {
+	$resp = wp_remote_get(
+		'https://music.163.com/api/song/detail?ids=[' . rawurlencode( $id ) . ']',
+		array(
+			'headers' => $headers,
+			'timeout' => 15,
+		)
+	);
+
+	if ( is_wp_error( $resp ) ) {
+		return array();
+	}
+
+	$body = json_decode( wp_remote_retrieve_body( $resp ), true );
+
+	if ( empty( $body['songs'][0] ) ) {
+		return array();
+	}
+
+	$song       = $body['songs'][0];
+	$artist_arr = isset( $song['artists'] ) ? $song['artists'] : array();
+	$names      = array();
+
+	foreach ( $artist_arr as $artist ) {
+		if ( ! empty( $artist['name'] ) ) {
+			$names[] = $artist['name'];
+		}
+	}
+
+	return array(
+		'title'  => isset( $song['name'] ) ? $song['name'] : '',
+		'artist' => implode( ' / ', $names ),
+		'cover'  => isset( $song['album']['picUrl'] ) ? $song['album']['picUrl'] : '',
+	);
+}
+
+/**
+ * 单曲解析 API
+ *
+ * 返回音频直链;受版权限制时 audioUrl 为空,由前端降级为官方嵌入播放器。
+ *
+ * @param WP_REST_Request $request 请求对象
+ * @return array|WP_Error
+ */
+function glintide_netease_song_api( $request ) {
+	$url = sanitize_text_field( (string) $request->get_param( 'url' ) );
+	$id  = glintide_extract_netease_song_id( $url );
+
+	if ( ! $id ) {
+		return new WP_Error( 'invalid_url', '无效的网易云歌曲链接', array( 'status' => 400 ) );
+	}
+
+	$cache_key = 'glintide_netease_song_' . $id;
+	$cached    = get_transient( $cache_key );
+
+	if ( is_array( $cached ) ) {
+		return $cached;
+	}
+
+	$headers   = glintide_netease_headers();
+	$audio_url = glintide_netease_get_song_audio_url( $id, $headers );
+	$meta      = glintide_netease_get_song_meta( $id, $headers );
+
+	$result = array(
+		'id'       => $id,
+		'audioUrl' => $audio_url,
+		'embedUrl' => 'https://music.163.com/outchain/player?type=2&id=' . $id . '&auto=0&height=66',
+		'title'    => isset( $meta['title'] ) ? $meta['title'] : '',
+		'artist'   => isset( $meta['artist'] ) ? $meta['artist'] : '',
+		'cover'    => isset( $meta['cover'] ) ? $meta['cover'] : '',
+	);
+
+	// 直链有时效,短时间缓存;解析失败时缓存更久,避免频繁请求第三方
+	set_transient( $cache_key, $result, $audio_url ? 2 * HOUR_IN_SECONDS : 10 * MINUTE_IN_SECONDS );
+
+	return $result;
+}
 
 /**
  * 歌单解析 API
