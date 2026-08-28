@@ -2,7 +2,7 @@
 /**
  * 小工具: 音乐播放器(网易云歌单)
  *
- * 以专辑封面为视觉中心的玻璃播放器，保留歌单解析与原生 audio 播放能力。
+ * 从项目 reference 备份完整移植原版播放器，保留当前主题的 REST API 地址。
  *
  * @package glintide
  */
@@ -15,7 +15,7 @@ class Glintide_Widget_Music extends Glintide_Widget {
 
 	public static $id          = 'glintide_music_widget';
 	public static $title       = 'PPO · 音乐播放器';
-	public static $description = '网易云歌单播放器, 封面玻璃卡片 UI';
+	public static $description = '网易云歌单播放器，支持播放/进度/音量/播放模式';
 	public static $classname   = 'ppo-widget glintide_music_widget';
 
 	public static function fields() {
@@ -24,13 +24,18 @@ class Glintide_Widget_Music extends Glintide_Widget {
 				'id'    => 'title',
 				'type'  => 'text',
 				'title' => '标题',
-				'desc'  => '留空则使用当前歌曲或歌手名称',
 			),
 			array(
 				'id'    => 'playlist_url',
 				'type'  => 'text',
 				'title' => '网易云歌单链接',
-				'desc'  => '粘贴网易云歌单地址, 如 https://music.163.com/#/playlist?id=3778678',
+				'desc'  => '粘贴网易云歌单地址，如 https://music.163.com/#/playlist?id=3778678',
+			),
+			array(
+				'id'      => 'show_playlist',
+				'type'    => 'switcher',
+				'title'   => '显示播放列表',
+				'default' => true,
 			),
 			array(
 				'id'      => 'default_volume',
@@ -47,347 +52,187 @@ class Glintide_Widget_Music extends Glintide_Widget {
 
 	public static function render( $instance ) {
 		$playlist_url   = $instance['playlist_url'] ?? '';
+		$show_playlist  = ! empty( $instance['show_playlist'] );
 		$default_volume = isset( $instance['default_volume'] ) ? intval( $instance['default_volume'] ) : 65;
 		$default_volume = max( 0, min( 100, $default_volume ) );
 
-		$uid            = 'glintide-music-' . uniqid();
-		$api_url        = rest_url( 'glintide/v1/netease-playlist' );
-		$fallback_cover = GLINTIDE_URL . '/assets/images/banner.jpg';
-		$display_title  = isset( $instance['title'] ) ? trim( (string) $instance['title'] ) : '';
+		$uid     = 'pix-music-' . uniqid();
+		$api_url = rest_url( 'glintide/v1/netease-playlist' );
 
-		$html  = '<div class="glintide-music-widget glintide-music-immersive" id="' . esc_attr( $uid ) . '" data-api="' . esc_url( $api_url ) . '" data-url="' . esc_attr( $playlist_url ) . '" data-volume="' . esc_attr( $default_volume ) . '" data-fallback-cover="' . esc_url( $fallback_cover ) . '" data-display-title="' . esc_attr( $display_title ) . '">';
-		$html .= '<div class="glintide-music-cover-bg" data-music-cover-bg style="background-image: url(\'' . esc_url( $fallback_cover ) . '\');" aria-hidden="true"></div>';
-		$html .= '<div class="glintide-music-glass-fade" aria-hidden="true"></div>';
-		$html .= '<div class="glintide-music-shell">';
-
-		$html .= '<div class="glintide-music-hero">';
-		$html .= '<div class="glintide-music-cover">';
-		$html .= '<img src="' . esc_url( $fallback_cover ) . '" data-music-cover alt="当前歌曲封面" width="96" height="96" loading="lazy">';
-		$html .= '</div>';
-		$html .= '<div class="glintide-music-info">';
-		$html .= '<div class="glintide-music-title" data-music-title>Daydream Coast</div>';
-		$html .= '<div class="glintide-music-hero-artist" data-music-hero-artist>Luna Marina</div>';
-		$html .= '</div>';
-		$html .= '<button type="button" class="glintide-music-hero-play" data-music-toggle aria-label="播放/暂停">';
-		$html .= '<i class="iconfont icon-icon_play_facial_light" aria-hidden="true"></i>';
-		$html .= '</button>';
-		$html .= '</div>';
-
-		$html .= '<div class="glintide-music-playlist-panel" data-music-playlist-panel>';
-		$html .= '<div class="glintide-music-playlist" data-music-playlist></div>';
-		$html .= '</div>';
-
-		$html .= '<div class="glintide-music-playerbar">';
-		$html .= '<svg class="glintide-music-player-progress" data-music-progress-track role="slider" tabindex="0" aria-label="调整播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">';
-		$html .= '<path class="glintide-music-player-progress-track" data-music-progress-base></path>';
-		$html .= '<path class="glintide-music-player-progress-fill" data-music-progress-fill style="opacity:0"></path>';
-		$html .= '</svg>';
-		$html .= '<span class="glintide-music-progress-tooltip" data-music-progress-tooltip aria-hidden="true">0:00</span>';
-		$html .= '<img class="glintide-music-current-cover" src="' . esc_url( $fallback_cover ) . '" data-music-cover alt="当前播放封面" width="48" height="48" loading="lazy">';
-		$html .= '<div class="glintide-music-current">';
-		$html .= '<span class="glintide-music-current-title" data-music-current-title>Daydream Coast</span>';
-		$html .= '<span class="glintide-music-current-artist" data-music-current-artist>Luna Marina</span>';
-		$html .= '</div>';
-		$html .= '<div class="glintide-music-player-controls">';
-		$html .= '<button type="button" class="glintide-music-control" data-music-toggle aria-label="播放/暂停"><i class="iconfont icon-icon_pause_linear_light1" aria-hidden="true"></i></button>';
-		$html .= '<button type="button" class="glintide-music-control" data-music-next aria-label="下一首"><i class="iconfont icon-a-icon_arrowright_linear_light" aria-hidden="true"></i></button>';
+		$html  = '<div class="pix-music-widget pix-music-immersive" id="' . esc_attr( $uid ) . '" data-api="' . esc_url( $api_url ) . '" data-url="' . esc_attr( $playlist_url ) . '" data-volume="' . $default_volume . '" data-show-playlist="' . ( $show_playlist ? '1' : '0' ) . '">';
+		$html .= '<div class="pix-music-cover-bg" data-music-cover-bg></div>';
+		$html .= '<div class="pix-music-cover-overlay"></div>';
+		$html .= '<div class="pix-music-body">';
+		$html .= '<div class="pix-music-top">';
+		$html .= '<span class="pix-music-title" data-music-title>加载中...</span>';
+		$html .= '<div class="pix-music-ctrls">';
+		$html .= '<button type="button" class="pix-music-btn" data-music-mode aria-label="播放模式"><i class="ri-repeat-line"></i></button>';
+		$html .= '<button type="button" class="pix-music-btn" data-music-prev aria-label="上一首"><i class="ri-skip-back-line"></i></button>';
+		$html .= '<button type="button" class="pix-music-btn is-main" data-music-toggle aria-label="播放/暂停"><i class="ri-play-line"></i></button>';
+		$html .= '<button type="button" class="pix-music-btn" data-music-next aria-label="下一首"><i class="ri-skip-forward-line"></i></button>';
 		$html .= '</div>';
 		$html .= '</div>';
-
+		$html .= '<div class="pix-music-sub">';
+		$html .= '<span class="pix-music-artist" data-music-artist></span>';
+		$html .= '<div class="pix-music-vol">';
+		$html .= '<button type="button" class="pix-music-mini" data-music-mute aria-label="静音"><i class="ri-volume-up-line"></i></button>';
+		$html .= '<div class="pix-music-vol-track" data-music-vol-track><div class="pix-music-vol-fill" data-music-vol-fill></div></div>';
 		$html .= '</div>';
-		$html .= '<p class="glintide-music-error" data-music-error role="status"></p>';
-		$html .= '<audio data-music-audio preload="metadata" aria-hidden="true"></audio>';
+		$html .= '</div>';
+		$html .= '<div class="pix-music-progress">';
+		$html .= '<span class="pix-music-time" data-music-current>0:00</span>';
+		$html .= '<div class="pix-music-track" data-music-track><div class="pix-music-fill" data-music-fill></div></div>';
+		$html .= '<span class="pix-music-time" data-music-duration>0:00</span>';
+		$html .= '</div>';
+		$html .= '</div>';
+		if ( $show_playlist ) {
+			$html .= '<div class="pix-music-playlist" data-music-playlist></div>';
+		}
+		$html .= '<p class="pix-music-error" data-music-error></p>';
+		$html .= '<audio data-music-audio preload="metadata"></audio>';
 		$html .= '</div>';
 
 		$html .= '<script>
 		(function(){
 			var root = document.getElementById("' . esc_attr( $uid ) . '");
 			if (!root) return;
-
 			var apiUrl = root.getAttribute("data-api");
 			var playlistUrl = root.getAttribute("data-url");
-			var fallbackCover = root.getAttribute("data-fallback-cover");
-			var displayTitle = root.getAttribute("data-display-title") || "";
 			var defaultVolume = parseFloat(root.getAttribute("data-volume") || "65") / 100;
+			var showPlaylist = root.getAttribute("data-show-playlist") === "1";
+
 			var audio = root.querySelector("[data-music-audio]");
 			var coverBg = root.querySelector("[data-music-cover-bg]");
-			var coverImgs = root.querySelectorAll("[data-music-cover]");
 			var titleEl = root.querySelector("[data-music-title]");
-			var heroArtistEl = root.querySelector("[data-music-hero-artist]");
-			var toggleButtons = root.querySelectorAll("[data-music-toggle]");
+			var artistEl = root.querySelector("[data-music-artist]");
+			var toggleBtn = root.querySelector("[data-music-toggle]");
+			var prevBtn = root.querySelector("[data-music-prev]");
 			var nextBtn = root.querySelector("[data-music-next]");
-			var playerbarEl = root.querySelector(".glintide-music-playerbar");
-			var progressTrackEl = root.querySelector("[data-music-progress-track]");
-			var progressBaseEl = root.querySelector("[data-music-progress-base]");
-			var progressFillEl = root.querySelector("[data-music-progress-fill]");
-			var progressTooltipEl = root.querySelector("[data-music-progress-tooltip]");
-			var currentTitleEl = root.querySelector("[data-music-current-title]");
-			var currentArtistEl = root.querySelector("[data-music-current-artist]");
+			var muteBtn = root.querySelector("[data-music-mute]");
+			var modeBtn = root.querySelector("[data-music-mode]");
+			var volTrack = root.querySelector("[data-music-vol-track]");
+			var volFill = root.querySelector("[data-music-vol-fill]");
+			var trackEl = root.querySelector("[data-music-track]");
+			var fillEl = root.querySelector("[data-music-fill]");
+			var currentEl = root.querySelector("[data-music-current]");
+			var durationEl = root.querySelector("[data-music-duration]");
 			var playlistEl = root.querySelector("[data-music-playlist]");
 			var errorEl = root.querySelector("[data-music-error]");
 
 			var playlist = [];
 			var index = 0;
 			var isPlaying = false;
-			var progressGeometryLength = 0;
-			var coverRequest = 0;
+			var volume = defaultVolume;
+			var isMuted = false;
+			var modes = ["sequential", "shuffle", "repeat", "repeat-one"];
+			var mode = 0;
+			var shuffleHistory = [];
 
-			function esc(value) {
-				var node = document.createElement("div");
-				node.textContent = value || "";
-				return node.innerHTML;
+			function esc(s) {
+				var d = document.createElement("div");
+				d.textContent = s || "";
+				return d.innerHTML;
 			}
 
-			function fmt(seconds) {
-				if (!isFinite(seconds) || seconds <= 0) return "0:00";
-				var minutes = Math.floor(seconds / 60);
-				var secs = Math.floor(seconds % 60);
-				return minutes + ":" + (secs < 10 ? "0" : "") + secs;
+			function fmt(t) {
+				if (!isFinite(t) || t <= 0) return "0:00";
+				var m = Math.floor(t / 60);
+				var s = Math.floor(t % 60);
+				return m + ":" + (s < 10 ? "0" : "") + s;
 			}
 
-			function currentTrack() {
-				return playlist[index] || null;
-			}
+			function currentTrack() { return playlist[index] || null; }
 
 			function setCover(url) {
-				var nextCover = url || fallbackCover;
-				var request = ++coverRequest;
-
-				function applyCover() {
-					if (request !== coverRequest) return;
-					for (var i = 0; i < coverImgs.length; i++) {
-						if (coverImgs[i].getAttribute("src") !== nextCover) {
-							coverImgs[i].setAttribute("src", nextCover);
-						}
-					}
-					if (coverBg) {
-						coverBg.style.backgroundImage = "url(" + JSON.stringify(nextCover) + ")";
-					}
-				}
-
-			var preload = new Image();
-			preload.onload = applyCover;
-			preload.onerror = function(){
-				if (nextCover === fallbackCover) return;
-				var fallback = new Image();
-				fallback.onload = function(){
-					if (request !== coverRequest) return;
-					for (var i = 0; i < coverImgs.length; i++) coverImgs[i].setAttribute("src", fallbackCover);
-					if (coverBg) coverBg.style.backgroundImage = "url(" + JSON.stringify(fallbackCover) + ")";
-				};
-				fallback.src = fallbackCover;
-			};
-			preload.src = nextCover;
-			}
-
-			function roundedRectPath(width, height, radius, inset) {
-				var x = inset;
-				var y = inset;
-				var right = width - inset;
-				var bottom = height - inset;
-				var maxRadius = Math.min((width - inset * 2) / 2, (height - inset * 2) / 2);
-				var safeRadius = Math.max(0, Math.min(radius - inset, maxRadius));
-				var rx = safeRadius;
-				var ry = safeRadius;
-				var curve = 0.55228475;
-
-				function n(value) {
-					return Number(value.toFixed(3));
-				}
-
-				return [
-					"M", n(x + rx), n(y),
-					"H", n(right - rx),
-					"C", n(right - rx + rx * curve), n(y), n(right), n(y + ry - ry * curve), n(right), n(y + ry),
-					"V", n(bottom - ry),
-					"C", n(right), n(bottom - ry + ry * curve), n(right - rx + rx * curve), n(bottom), n(right - rx), n(bottom),
-					"H", n(x + rx),
-					"C", n(x + rx - rx * curve), n(bottom), n(x), n(bottom - ry + ry * curve), n(x), n(bottom - ry),
-					"V", n(y + ry),
-					"C", n(x), n(y + ry - ry * curve), n(x + rx - rx * curve), n(y), n(x + rx), n(y),
-					"Z"
-				].join(" ");
-			}
-
-			function syncProgressPath() {
-				if (!progressTrackEl || !playerbarEl) return;
-				var bounds = progressTrackEl.getBoundingClientRect();
-				if (!bounds.width || !bounds.height) return;
-				var computed = window.getComputedStyle(playerbarEl);
-				var radius = parseFloat(computed.borderTopLeftRadius) || 0;
-				progressTrackEl.setAttribute("viewBox", "0 0 " + bounds.width + " " + bounds.height);
-				var path = roundedRectPath(bounds.width, bounds.height, radius, 0.8);
-				if (progressBaseEl) progressBaseEl.setAttribute("d", path);
-				if (progressFillEl) {
-					progressFillEl.setAttribute("d", path);
-					if (typeof progressFillEl.getTotalLength === "function") {
-						progressGeometryLength = progressFillEl.getTotalLength();
-						progressFillEl.style.strokeDasharray = "0 " + (progressGeometryLength + 1);
-						progressFillEl.style.strokeDashoffset = "0";
-					}
-				}
-			}
-
-			function updateProgress() {
-				if (!progressGeometryLength) syncProgressPath();
-				var track = currentTrack();
-				var duration = audio.duration || (track && track.duration) || 0;
-				var current = isFinite(audio.currentTime) ? audio.currentTime : 0;
-				var percent = duration > 0 ? Math.min(100, Math.max(0, current / duration * 100)) : 0;
-				var hasProgress = duration > 0 && current > 0.01;
-				root.classList.toggle("is-progressing", hasProgress);
-				if (progressFillEl) progressFillEl.style.opacity = hasProgress ? "1" : "0";
-				if (progressFillEl && progressGeometryLength) {
-					var elapsedLength = progressGeometryLength * percent / 100;
-					progressFillEl.style.strokeDasharray = elapsedLength + " " + (progressGeometryLength + 1);
-					progressFillEl.style.strokeDashoffset = "0";
-				}
-				if (progressTrackEl) {
-					progressTrackEl.setAttribute("aria-valuemin", "0");
-					progressTrackEl.setAttribute("aria-valuemax", "100");
-					progressTrackEl.setAttribute("aria-valuenow", String(Math.round(percent)));
-				}
-			}
-
-			function progressDuration() {
-				var track = currentTrack();
-				return audio.duration || (track && track.duration) || 0;
-			}
-
-			function progressHit(event) {
-				if (!progressTrackEl || !progressFillEl || !progressGeometryLength || typeof progressFillEl.getPointAtLength !== "function") return null;
-				var matrix = progressTrackEl.getScreenCTM();
-				if (!matrix) return null;
-
-				var pointer = progressTrackEl.createSVGPoint();
-				pointer.x = event.clientX;
-				pointer.y = event.clientY;
-				var local = pointer.matrixTransform(matrix.inverse());
-				var total = progressGeometryLength;
-				var samples = 72;
-				var bestLength = 0;
-				var bestDistance = Infinity;
-
-				function consider(length) {
-					var point = progressFillEl.getPointAtLength(length);
-					var dx = point.x - local.x;
-					var dy = point.y - local.y;
-					var distance = dx * dx + dy * dy;
-					if (distance < bestDistance) {
-						bestDistance = distance;
-						bestLength = length;
-					}
-				}
-
-				for (var i = 0; i <= samples; i++) consider(total * i / samples);
-				var searchRange = total / samples;
-				for (var pass = 0; pass < 5; pass++) {
-					var start = Math.max(0, bestLength - searchRange);
-					var end = Math.min(total, bestLength + searchRange);
-					for (var step = 0; step <= 8; step++) consider(start + (end - start) * step / 8);
-					searchRange = Math.max((end - start) / 8, 0.01);
-				}
-
-				return {
-					ratio: Math.min(1, Math.max(0, bestLength / total)),
-					distance: Math.sqrt(bestDistance)
-				};
-			}
-
-			function showProgressTooltip(event) {
-				var duration = progressDuration();
-				if (!duration || !progressTooltipEl) return;
-				var hit = progressHit(event);
-				if (!hit || hit.distance > 12) {
-					hideProgressTooltip();
+				if (!coverBg) return;
+				if (!url) {
+					coverBg.style.backgroundImage = "";
 					return;
 				}
-				var rect = playerbarEl.getBoundingClientRect();
-				var tooltipLeft = Math.min(94, Math.max(6, (event.clientX - rect.left) / rect.width * 100));
-				progressTooltipEl.textContent = fmt(duration * hit.ratio);
-				progressTooltipEl.style.left = tooltipLeft + "%";
-				progressTooltipEl.classList.add("is-visible");
-			}
-
-			function hideProgressTooltip() {
-				if (progressTooltipEl) progressTooltipEl.classList.remove("is-visible");
-			}
-
-			function setToggleIcons() {
-				for (var i = 0; i < toggleButtons.length; i++) {
-					toggleButtons[i].innerHTML = isPlaying
-						? \'<i class="iconfont icon-icon_pause_linear_light1" aria-hidden="true"></i>\'
-						: \'<i class="iconfont icon-icon_play_facial_light" aria-hidden="true"></i>\';
-				}
-				root.classList.toggle("is-playing", isPlaying);
+				coverBg.style.backgroundImage = "url(\'" + url + "\')";
+				coverBg.classList.remove("is-changing");
+				void coverBg.offsetWidth;
+				coverBg.classList.add("is-changing");
 			}
 
 			function renderPlaylist() {
 				if (!playlistEl) return;
 				if (!playlist.length) {
-					playlistEl.innerHTML = \'<div class="glintide-music-empty">暂无歌曲</div>\';
+					playlistEl.innerHTML = \'<div class="pix-music-empty">暂无歌曲</div>\';
 					return;
 				}
-
 				var html = "";
 				for (var i = 0; i < playlist.length; i++) {
-					var track = playlist[i] || {};
+					var t = playlist[i];
 					var active = i === index;
-					html += \'<button type="button" class="glintide-music-track-item\' + (active ? " is-active" : "") + \'" data-index="\' + i + \'">\';
-					html += active && isPlaying
-						? \'<span class="glintide-music-eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span>\'
-						: \'<span class="glintide-music-idx">\' + (i + 1) + \'</span>\';
-					html += \'<span class="glintide-music-trk-title">\' + esc(track.title || "Untitled") + \'</span>\';
-					html += \'<span class="glintide-music-trk-artist">\' + esc(track.artist || "") + \'</span>\';
+					html += \'<button type="button" class="pix-music-track-item\' + (active ? " is-active" : "") + \'" data-index="\' + i + \'">\';
+					if (active && isPlaying) {
+						html += \'<span class="pix-music-eq"><span></span><span></span><span></span></span>\';
+					} else {
+						html += \'<span class="pix-music-idx">\' + (i + 1) + \'</span>\';
+					}
+					html += \'<span class="pix-music-trk-title">\' + esc(t.title) + \'</span>\';
 					html += \'</button>\';
 				}
 				playlistEl.innerHTML = html;
 			}
 
 			function updateUI() {
-				var track = currentTrack();
-				var trackTitle = track ? (track.title || "Untitled") : "Daydream Coast";
-				var artist = track ? (track.artist || "Unknown artist") : "Luna Marina";
-
-				titleEl.textContent = trackTitle;
-				heroArtistEl.textContent = artist;
-				currentTitleEl.textContent = trackTitle;
-				currentArtistEl.textContent = artist;
-				setCover(track && track.cover ? track.cover : fallbackCover);
-				setToggleIcons();
-				updateProgress();
+				var t = currentTrack();
+				titleEl.textContent = t ? t.title : "暂无歌曲";
+				artistEl.textContent = t ? t.artist : "";
+				setCover(t ? t.cover : "");
+				toggleBtn.innerHTML = isPlaying ? \'<i class="ri-pause-line"></i>\' : \'<i class="ri-play-line"></i>\';
+				var modeIcons = ["ri-repeat-line", "ri-shuffle-line", "ri-repeat-line", "ri-repeat-one-line"];
+				var modeLabels = ["顺序播放", "随机播放", "循环播放", "单曲循环"];
+				modeBtn.innerHTML = \'<i class="\' + modeIcons[mode] + \'"></i>\';
+				modeBtn.title = modeLabels[mode];
 				renderPlaylist();
 			}
 
-			function setError(message) {
-				if (!errorEl) return;
-				errorEl.textContent = message || "";
-				root.classList.toggle("has-error", Boolean(message));
+			function loadPlaylist() {
+				if (!playlistUrl) {
+					titleEl.textContent = "请配置歌单链接";
+					return;
+				}
+				titleEl.textContent = "加载歌单中...";
+				fetch(apiUrl + "?url=" + encodeURIComponent(playlistUrl))
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.tracks && data.tracks.length) {
+							playlist = data.tracks;
+							index = 0;
+							isPlaying = false;
+							if (data.title) titleEl.textContent = data.title;
+							updateUI();
+						} else {
+							titleEl.textContent = "歌单为空或解析失败";
+						}
+					})
+					.catch(function() {
+						titleEl.textContent = "歌单加载失败";
+					});
 			}
 
 			function play() {
-				var track = currentTrack();
-				if (!track) {
-					setError("请先配置歌单链接");
-					return;
-				}
-				if (!track.audioUrl) {
-					setError("该歌曲暂无可用音频");
+				var t = currentTrack();
+				if (!t) return;
+				if (t.audioUrl) {
+					audio.src = t.audioUrl;
+					audio.play().then(function() {
+						isPlaying = true;
+						errorEl.textContent = "";
+						updateUI();
+					}).catch(function() {
+						isPlaying = false;
+						errorEl.textContent = "播放失败，请重试";
+						updateUI();
+					});
+				} else {
+					errorEl.textContent = "该歌曲无可用音频";
 					isPlaying = false;
 					updateUI();
-					return;
 				}
-
-				if (audio.src !== track.audioUrl) audio.src = track.audioUrl;
-				audio.play().then(function(){
-					isPlaying = true;
-					setError("");
-					updateUI();
-				}).catch(function(){
-					isPlaying = false;
-					setError("播放失败，请重试");
-					updateUI();
-				});
 			}
 
 			function pause() {
@@ -397,106 +242,140 @@ class Glintide_Widget_Music extends Glintide_Widget {
 			}
 
 			function toggle() {
-				if (isPlaying) {
-					pause();
-				} else {
-					play();
-				}
+				if (!currentTrack()) return;
+				if (isPlaying) { pause(); } else { play(); }
+			}
+
+			function getShuffleIndex() {
+				var len = playlist.length;
+				if (len <= 1) return -1;
+				var available = [];
+				for (var i = 0; i < len; i++) if (i !== index) available.push(i);
+				var recent = shuffleHistory.slice(-2);
+				var candidates = available.filter(function(i) { return recent.indexOf(i) === -1; });
+				var pool = candidates.length ? candidates : available;
+				var idx = pool[Math.floor(Math.random() * pool.length)];
+				shuffleHistory.push(idx);
+				if (shuffleHistory.length > 10) shuffleHistory.shift();
+				return idx;
 			}
 
 			function nextTrack() {
-				if (!playlist.length) {
-					setError("请先配置歌单链接");
-					return;
+				if (!playlist.length) return;
+				if (mode === 1) {
+					var n = getShuffleIndex();
+					if (n >= 0) index = n;
+				} else if (mode === 2) {
+					index = (index + 1) % playlist.length;
+				} else if (mode === 3) {
+					// 单曲循环：重播当前
+				} else {
+					if (index >= playlist.length - 1) {
+						index = 0;
+						isPlaying = false;
+						updateUI();
+						return;
+					}
+					index = index + 1;
 				}
-				index = (index + 1) % playlist.length;
-				isPlaying = false;
-				updateUI();
+				isPlaying = true;
 				play();
 			}
 
-			function selectTrack(nextIndex) {
-				if (!playlist[nextIndex]) return;
-				index = nextIndex;
-				isPlaying = false;
-				setError("");
-				updateUI();
+			function prevTrack() {
+				if (!playlist.length) return;
+				if (mode === 1) {
+					var n = getShuffleIndex();
+					if (n >= 0) index = n;
+				} else if (mode === 3) {
+					// 单曲循环：重播当前
+				} else {
+					index = (index - 1 + playlist.length) % playlist.length;
+				}
+				isPlaying = true;
 				play();
 			}
 
-			for (var i = 0; i < toggleButtons.length; i++) {
-				toggleButtons[i].addEventListener("click", toggle);
+			function selectTrack(i) {
+				index = i;
+				isPlaying = true;
+				play();
 			}
-			if (nextBtn) nextBtn.addEventListener("click", nextTrack);
-			if (playerbarEl) {
-				playerbarEl.addEventListener("pointermove", showProgressTooltip);
-				playerbarEl.addEventListener("pointerleave", hideProgressTooltip);
-				playerbarEl.addEventListener("click", function(event){
-					if (event.target.closest && event.target.closest("button")) return;
-					if (event.detail === 0) return;
-					var duration = progressDuration();
-					if (!duration) return;
-					var hit = progressHit(event);
-					if (!hit || hit.distance > 14) return;
-					audio.currentTime = duration * hit.ratio;
-					updateProgress();
-					showProgressTooltip(event);
-				});
+
+			function seek(ratio) {
+				if (audio && isFinite(audio.duration) && audio.duration > 0) {
+					audio.currentTime = Math.max(0, Math.min(1, ratio)) * audio.duration;
+				}
 			}
-			if (progressTrackEl) {
-				progressTrackEl.addEventListener("keydown", function(event){
-					if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-					var duration = progressDuration();
-					if (!duration) return;
-					event.preventDefault();
-					audio.currentTime = Math.min(duration, Math.max(0, audio.currentTime + (event.key === "ArrowRight" ? 5 : -5)));
-					updateProgress();
-				});
+
+			function updateProgress() {
+				var d = isFinite(audio.duration) ? audio.duration : 0;
+				var ratio = d > 0 ? Math.min(audio.currentTime / d, 1) : 0;
+				fillEl.style.width = (ratio * 100) + "%";
+				currentEl.textContent = fmt(audio.currentTime);
+				durationEl.textContent = d > 0 ? fmt(d) : "0:00";
 			}
-			if (window.ResizeObserver && playerbarEl) {
-				new ResizeObserver(function(){
-					syncProgressPath();
-					updateProgress();
-				}).observe(playerbarEl);
+
+			function syncVolume() {
+				audio.volume = volume;
+				audio.muted = isMuted;
+				var icon = isMuted || volume === 0 ? "ri-volume-mute-line" : (volume < 0.5 ? "ri-volume-down-line" : "ri-volume-up-line");
+				muteBtn.innerHTML = \'<i class="\' + icon + \'"></i>\';
+				volFill.style.width = (isMuted ? 0 : volume * 100) + "%";
 			}
+
+			function setVolumeFromEvent(e) {
+				var rect = volTrack.getBoundingClientRect();
+				var ratio = (e.clientX - rect.left) / rect.width;
+				volume = Math.max(0, Math.min(1, ratio));
+				isMuted = volume === 0;
+				syncVolume();
+			}
+
+			// 事件绑定
+			toggleBtn.addEventListener("click", toggle);
+			prevBtn.addEventListener("click", prevTrack);
+			nextBtn.addEventListener("click", nextTrack);
+			modeBtn.addEventListener("click", function() {
+				mode = (mode + 1) % modes.length;
+				updateUI();
+			});
+			muteBtn.addEventListener("click", function() {
+				isMuted = !isMuted;
+				syncVolume();
+			});
+			volTrack.addEventListener("click", setVolumeFromEvent);
+			volTrack.addEventListener("mousedown", function(e) {
+				setVolumeFromEvent(e);
+				var onMove = function(ev) { setVolumeFromEvent(ev); };
+				var onUp = function() {
+					document.removeEventListener("mousemove", onMove);
+					document.removeEventListener("mouseup", onUp);
+				};
+				document.addEventListener("mousemove", onMove);
+				document.addEventListener("mouseup", onUp);
+			});
+			trackEl.addEventListener("click", function(e) {
+				var rect = trackEl.getBoundingClientRect();
+				seek((e.clientX - rect.left) / rect.width);
+			});
 			if (playlistEl) {
-				playlistEl.addEventListener("click", function(event){
-					var item = event.target.closest("[data-index]");
-					if (item) selectTrack(parseInt(item.getAttribute("data-index"), 10));
+				playlistEl.addEventListener("click", function(e) {
+					var btn = e.target.closest("[data-index]");
+					if (btn) selectTrack(parseInt(btn.getAttribute("data-index"), 10));
 				});
 			}
-			audio.addEventListener("loadedmetadata", function(){
-				updateProgress();
-			});
 			audio.addEventListener("timeupdate", updateProgress);
+			audio.addEventListener("loadedmetadata", updateProgress);
 			audio.addEventListener("ended", nextTrack);
-			audio.addEventListener("error", function(){
+			audio.addEventListener("error", function() {
 				isPlaying = false;
-				setError("音频加载失败");
+				errorEl.textContent = "音频加载失败";
 				updateUI();
 			});
 
-			if (audio) audio.volume = defaultVolume;
-			updateUI();
-
-			function loadPlaylist() {
-				if (!playlistUrl) return;
-				fetch(apiUrl + "?url=" + encodeURIComponent(playlistUrl))
-					.then(function(response){ return response.json(); })
-					.then(function(data){
-						if (data.tracks && data.tracks.length) {
-							playlist = data.tracks;
-							index = 0;
-							isPlaying = false;
-							setError("");
-							updateUI();
-						} else {
-							setError("歌单为空或解析失败");
-						}
-					})
-					.catch(function(){ setError("歌单加载失败"); });
-			}
-
+			// 初始化
+			syncVolume();
 			loadPlaylist();
 		})();
 		</script>';

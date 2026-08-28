@@ -98,7 +98,13 @@ add_action( 'widgets_init', 'glintide_widgets_init' );
  */
 function glintide_scripts() {
 	// 主样式
-	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array(), GLINTIDE_VERSION );
+	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array(), filemtime( GLINTIDE_DIR . '/style.css' ) );
+	wp_enqueue_style(
+		'glintide-music-backup',
+		GLINTIDE_URL . '/assets/css/glintide-music-backup.css',
+		array( 'glintide-style' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-music-backup.css' )
+	);
 
 	// 图标字体(remixicon)
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
@@ -111,6 +117,13 @@ function glintide_scripts() {
 		array(),
 		filemtime( GLINTIDE_DIR . '/assets/js/theme-controls.js' ),
 		false
+	);
+	wp_enqueue_script(
+		'glintide-card-masonry',
+		GLINTIDE_URL . '/assets/js/glintide-card-masonry.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-masonry.js' ),
+		true
 	);
 }
 add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
@@ -179,6 +192,8 @@ function glintide_custom_css_vars() {
 }
 add_action( 'wp_head', 'glintide_custom_css_vars', 99 );
 require_once GLINTIDE_DIR . '/inc/options/home-option.php';
+require_once GLINTIDE_DIR . '/inc/frontend/home-banner.php';
+require_once GLINTIDE_DIR . '/inc/mod/glintide-content-cards.php';
 
 /**
  * 内容宽度

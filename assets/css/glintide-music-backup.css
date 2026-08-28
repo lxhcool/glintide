@@ -1,0 +1,353 @@
+/* 备份版音乐播放器：保留 reference 中的原始视觉与交互尺寸 */
+.pix-music-immersive {
+	position: relative;
+	border-radius: 18px;
+	overflow: hidden;
+	background: #0f1220;
+	color: #fff;
+	user-select: none;
+}
+
+.pix-music-cover-bg {
+	position: absolute;
+	inset: 0;
+	background-size: cover;
+	background-position: center;
+	transform: scale(1.08);
+	filter: blur(1.5px) saturate(1.2);
+	z-index: 0;
+}
+
+.pix-music-cover-bg.is-changing {
+	animation: pix-cover-in .9s ease;
+}
+
+@keyframes pix-cover-in {
+	from {
+		opacity: .35;
+		transform: scale(1.2);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1.12);
+	}
+}
+
+.pix-music-cover-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(180deg, rgba(10, 12, 24, .35) 0%, rgba(10, 12, 24, .72) 55%, rgba(8, 10, 20, .95) 100%);
+}
+
+.pix-music-body {
+	position: relative;
+	z-index: 2;
+	padding: 14px 14px 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+}
+
+.pix-music-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	min-width: 0;
+}
+
+.pix-music-title {
+	flex: 1;
+	min-width: 0;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.3;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, .4);
+}
+
+.pix-music-ctrls {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.pix-music-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .1);
+	color: #fff;
+	cursor: pointer;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	transition: transform .15s, background .15s, box-shadow .15s;
+}
+
+.pix-music-btn:hover {
+	background: rgba(255, 255, 255, .2);
+	transform: scale(1.06);
+}
+
+.pix-music-btn:active {
+	transform: scale(.94);
+}
+
+.pix-music-btn.is-main {
+	width: 36px;
+	height: 36px;
+	background: linear-gradient(135deg, #7c5cff, #4facfe);
+	box-shadow: 0 4px 16px rgba(124, 92, 255, .45);
+	font-size: 16px;
+}
+
+.pix-music-btn.is-main:hover {
+	box-shadow: 0 6px 20px rgba(124, 92, 255, .6);
+	transform: scale(1.05);
+}
+
+.pix-music-sub {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	min-width: 0;
+}
+
+.pix-music-artist {
+	flex: 1;
+	min-width: 0;
+	color: rgba(255, 255, 255, .72);
+	font-size: 11px;
+	line-height: 1.3;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pix-music-vol {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	flex-shrink: 0;
+}
+
+.pix-music-mini {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border: 0;
+	border-radius: 4px;
+	background: transparent;
+	color: rgba(255, 255, 255, .7);
+	cursor: pointer;
+	opacity: .6;
+	transition: opacity .15s;
+}
+
+.pix-music-mini:hover {
+	opacity: 1;
+}
+
+.pix-music-vol-track {
+	width: 64px;
+	height: 4px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .18);
+	cursor: pointer;
+	overflow: hidden;
+	transition: height .15s;
+}
+
+.pix-music-vol-track:hover {
+	height: 6px;
+}
+
+.pix-music-vol-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .85);
+	width: 0;
+}
+
+.pix-music-progress {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.pix-music-time {
+	flex-shrink: 0;
+	min-width: 28px;
+	text-align: center;
+	color: rgba(255, 255, 255, .6);
+	font-size: 9px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+}
+
+.pix-music-track {
+	flex: 1;
+	min-width: 0;
+	height: 4px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .18);
+	cursor: pointer;
+	overflow: hidden;
+	transition: height .15s;
+}
+
+.pix-music-track:hover {
+	height: 6px;
+}
+
+.pix-music-fill {
+	height: 100%;
+	border-radius: 999px;
+	background: linear-gradient(90deg, #7c5cff, #4facfe);
+	box-shadow: 0 0 10px rgba(124, 92, 255, .6);
+	width: 0;
+}
+
+.pix-music-error {
+	position: relative;
+	z-index: 2;
+	margin: 0;
+	padding: 0 18px 10px;
+	color: #ff9d9d;
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+.pix-music-playlist {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	max-height: 150px;
+	overflow-y: auto;
+	scrollbar-width: none;
+	padding: 0 6px 8px;
+}
+
+.pix-music-playlist::-webkit-scrollbar {
+	display: none;
+}
+
+.pix-music-track-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	border: 0;
+	border-radius: 8px;
+	background: transparent;
+	padding: 5px 6px;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+	transition: background .15s;
+}
+
+.pix-music-track-item:hover {
+	background: rgba(255, 255, 255, .08);
+}
+
+.pix-music-track-item.is-active {
+	background: rgba(255, 255, 255, .14);
+}
+
+.pix-music-idx {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, .1);
+	color: rgba(255, 255, 255, .7);
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.pix-music-track-item.is-active .pix-music-idx {
+	background: linear-gradient(135deg, #7c5cff, #4facfe);
+	color: #fff;
+}
+
+.pix-music-eq {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 2px;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	padding: 4px 2px;
+}
+
+.pix-music-eq span {
+	display: block;
+	width: 2px;
+	border-radius: 1px;
+	background: linear-gradient(180deg, #7c5cff, #4facfe);
+	animation: pix-eq 1s ease-in-out infinite;
+}
+
+.pix-music-eq span:nth-child(2) {
+	animation-delay: -.3s;
+}
+
+.pix-music-eq span:nth-child(3) {
+	animation-delay: -.6s;
+}
+
+@keyframes pix-eq {
+	0%, 100% {
+		height: 30%;
+	}
+	50% {
+		height: 100%;
+	}
+}
+
+.pix-music-trk-title {
+	flex: 1;
+	min-width: 0;
+	color: rgba(255, 255, 255, .9);
+	font-size: 12px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pix-music-empty {
+	padding: 16px 8px;
+	color: rgba(255, 255, 255, .5);
+	text-align: center;
+	font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pix-music-immersive *,
+	.pix-music-immersive *::before,
+	.pix-music-immersive *::after {
+		animation-duration: .01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: .01ms !important;
+	}
+}

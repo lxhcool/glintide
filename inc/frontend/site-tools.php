@@ -41,6 +41,15 @@ function glintide_render_right_tools() {
     $html .= $user_html;
     $html .= '</a>';
     $html .= '</div>';
+
+    if ( is_active_sidebar( 'sidebar-right' ) ) {
+        $html .= '<div class="glintide-right-widget-stack">';
+        ob_start();
+        dynamic_sidebar( 'sidebar-right' );
+        $html .= ob_get_clean();
+        $html .= '</div>';
+    }
+
     $html .= '</div>';
 
     return $html;

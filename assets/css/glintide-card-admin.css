@@ -1,0 +1,169 @@
+/* Glintide 内容卡片后台编辑器 */
+.glintide-card-editor {
+	max-width: 920px;
+	padding: 4px 0 8px;
+}
+
+.glintide-card-editor-intro {
+	margin: 0 0 18px;
+	color: #50575e;
+	font-size: 13px;
+}
+
+.glintide-card-type-fieldset {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.glintide-card-type-fieldset legend {
+	margin-bottom: 10px;
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.glintide-card-type-options {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.glintide-card-type-option {
+	position: relative;
+	display: block;
+	min-width: 0;
+	padding: 0;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	background: #fff;
+	cursor: pointer;
+	transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.glintide-card-type-option:hover {
+	border-color: #8c8f94;
+	background: #f6f7f7;
+}
+
+.glintide-card-type-option:focus-within {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 2px rgb(34 113 177 / 20%);
+}
+
+.glintide-card-type-option.is-selected {
+	border-color: #2271b1;
+	background: #f0f6fc;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+}
+
+.glintide-card-type-option input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+.glintide-card-type-option-content {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-height: 78px;
+	padding: 13px 14px;
+}
+
+.glintide-card-type-option-title {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	color: #1d2327;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.glintide-card-type-option-title i {
+	color: #2271b1;
+	font-size: 17px;
+}
+
+.glintide-card-type-option-description {
+	color: #646970;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.glintide-card-field-group {
+	display: none;
+	margin-top: 18px;
+	padding: 16px;
+	border-radius: 8px;
+	background: #f6f7f7;
+}
+
+.glintide-card-field-group.is-active {
+	display: block;
+}
+
+.glintide-card-field-group > label,
+.glintide-card-field-row > label {
+	display: block;
+	margin-bottom: 7px;
+	color: #1d2327;
+	font-size: 13px;
+}
+
+.glintide-card-field-group input[type="url"],
+.glintide-card-field-group input[type="text"],
+.glintide-card-field-group textarea {
+	width: 100%;
+	max-width: 720px;
+}
+
+.glintide-card-field-group textarea {
+	min-height: 112px;
+	resize: vertical;
+}
+
+.glintide-card-field-row + .glintide-card-field-row {
+	margin-top: 16px;
+}
+
+.glintide-card-media-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 10px 0;
+}
+
+.glintide-admin-card-type {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+	padding: 0 8px;
+	border-radius: 999px;
+	background: #f0f6fc;
+	color: #2271b1;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+@media (max-width: 782px) {
+	.glintide-card-type-options {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 420px) {
+	.glintide-card-type-options {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-card-type-option {
+		transition-duration: .01ms;
+	}
+}
