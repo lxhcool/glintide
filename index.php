@@ -33,7 +33,7 @@ $glintide_card_query = glintide_get_card_feed_query( $glintide_card_page );
 				</header>
 
 				<?php if ( $glintide_card_query->have_posts() ) : ?>
-					<div class="glintide-post-list glintide-card-grid" data-glintide-masonry>
+					<div class="glintide-card-grid">
 						<?php
 						while ( $glintide_card_query->have_posts() ) :
 							$glintide_card_query->the_post();

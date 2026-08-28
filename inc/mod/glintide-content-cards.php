@@ -145,7 +145,7 @@ function glintide_seed_content_cards() {
 			'title'   => '雨停之后，城市开始发亮',
 			'content' => '记录一束从窗边落下来的光，也记录城市安静下来的几分钟。',
 			'meta'    => array(
-				'_glintide_card_gallery' => GLINTIDE_URL . '/assets/images/banner.jpg',
+				'_glintide_card_gallery' => GLINTIDE_URL . '/assets/images/banner.jpg' . "\n" . GLINTIDE_URL . '/assets/images/banner.jpg?v=2' . "\n" . GLINTIDE_URL . '/assets/images/banner.jpg?v=3',
 			),
 		),
 		'music' => array(
@@ -271,6 +271,8 @@ function glintide_render_content_card_meta_box( $post ) {
 	$type_options = glintide_card_type_options();
 	$selected     = glintide_card_get_type( $post->ID );
 	$artist       = get_post_meta( $post->ID, '_glintide_card_music_artist', true );
+	$music_title  = get_post_meta( $post->ID, '_glintide_card_music_title', true );
+	$music_cover  = get_post_meta( $post->ID, '_glintide_card_music_cover', true );
 	$music_url    = get_post_meta( $post->ID, '_glintide_card_music_url', true );
 	$video_url    = get_post_meta( $post->ID, '_glintide_card_video_url', true );
 	$link_url      = get_post_meta( $post->ID, '_glintide_card_link_url', true );
@@ -305,23 +307,74 @@ function glintide_render_content_card_meta_box( $post ) {
 		</div>
 
 		<div class="glintide-card-field-group<?php echo 'photo' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="photo" aria-hidden="<?php echo 'photo' === $selected ? 'false' : 'true'; ?>">
-			<label for="glintide-card-gallery"><strong>照片组（可选）</strong></label>
-			<p class="description">右侧“特色图片”作为首图；需要多张照片时，每行填写一个图片地址，或使用媒体库选择。</p>
-			<div class="glintide-card-media-actions">
-				<button type="button" class="button" data-glintide-card-media-select>从媒体库选择照片</button>
+			<label><strong>照片组（可多选）</strong></label>
+			<p class="description">支持上传或选择多张图片，自动轮播展示；也可以继续使用右侧“特色图片”作为首图。</p>
+			<div class="glintide-card-gallery" data-glintide-card-gallery>
+				<ul class="glintide-card-gallery-list">
+					<?php
+					$seed_ids = array_filter( array_map( 'trim', preg_split( '/[\r\n,]+/', (string) $gallery ) ) );
+					foreach ( $seed_ids as $seed_entry ) {
+						if ( is_numeric( $seed_entry ) ) {
+							$thumb = wp_get_attachment_image_src( (int) $seed_entry, 'thumbnail' );
+							$thumb = $thumb ? $thumb[0] : '';
+						} else {
+							$thumb = $seed_entry;
+						}
+						if ( $thumb ) {
+							echo '<li><img src="' . esc_url( $thumb ) . '" alt=""></li>';
+						}
+					}
+					?>
+				</ul>
+				<p class="glintide-card-gallery-actions">
+					<button type="button" class="button glintide-card-gallery-add"><?php echo empty( $gallery ) ? '添加图片' : '编辑图片'; ?></button>
+					<button type="button" class="button glintide-card-gallery-clear"<?php echo empty( $gallery ) ? ' style="display:none"' : ''; ?>>清除</button>
+				</p>
+				<input type="hidden" class="glintide-card-gallery-input" name="glintide_card_gallery" value="<?php echo esc_attr( $gallery ); ?>">
 			</div>
-			<textarea id="glintide-card-gallery" name="glintide_card_gallery" rows="5" placeholder="https://example.com/photo-1.jpg&#10;https://example.com/photo-2.jpg"><?php echo esc_textarea( $gallery ); ?></textarea>
 		</div>
 
 		<div class="glintide-card-field-group<?php echo 'music' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="music" aria-hidden="<?php echo 'music' === $selected ? 'false' : 'true'; ?>">
+			<div class="glintide-card-field-row">
+				<label for="glintide-card-music-title"><strong>歌名</strong></label>
+				<input type="text" id="glintide-card-music-title" name="glintide_card_music_title" value="<?php echo esc_attr( $music_title ); ?>" placeholder="留空则使用文章标题">
+			</div>
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-music-artist"><strong>音乐人 / 作者</strong></label>
 				<input type="text" id="glintide-card-music-artist" name="glintide_card_music_artist" value="<?php echo esc_attr( $artist ); ?>" placeholder="例如：坂本龙一">
 			</div>
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-music-url"><strong>音频地址</strong></label>
-				<input type="url" id="glintide-card-music-url" name="glintide_card_music_url" value="<?php echo esc_attr( $music_url ); ?>" placeholder="https://example.com/track.mp3">
-				<p class="description">建议使用 mp3、m4a、ogg 或 wav 文件地址。</p>
+				<input type="url" id="glintide-card-music-url" name="glintide_card_music_url" value="<?php echo esc_attr( $music_url ); ?>" placeholder="https://example.com/track.mp3 或网易云歌曲链接">
+				<p class="description">支持 mp3、m4a、ogg、wav 直链；网易云歌曲链接会自动识别并以嵌入播放器播放。</p>
+			</div>
+			<div class="glintide-card-field-row glintide-card-field-row--cover">
+				<label><strong>封面</strong></label>
+				<div class="glintide-card-cover-picker" data-glintide-cover>
+					<div class="glintide-card-cover-preview">
+						<?php
+						$cover_preview_url = '';
+						if ( $music_cover ) {
+							if ( is_numeric( $music_cover ) ) {
+								$cover_preview_url = wp_get_attachment_image_url( absint( $music_cover ), 'thumbnail' );
+							} else {
+								$cover_preview_url = $music_cover;
+							}
+						}
+						if ( $cover_preview_url ) {
+							echo '<img src="' . esc_url( $cover_preview_url ) . '" alt="">';
+						} else {
+							echo '<span class="glintide-card-cover-empty"><i class="ri-image-line" aria-hidden="true"></i></span>';
+						}
+						?>
+					</div>
+					<p class="glintide-card-cover-actions">
+						<button type="button" class="button glintide-card-cover-add"><?php echo $cover_preview_url ? '更换封面' : '选择封面'; ?></button>
+						<button type="button" class="button glintide-card-cover-clear"<?php echo $cover_preview_url ? '' : ' style="display:none"'; ?>>清除</button>
+					</p>
+					<p class="description">不选择则使用文章特色图或图组第一张,都没有则使用默认封面。</p>
+					<input type="hidden" class="glintide-card-cover-input" name="glintide_card_music_cover" value="<?php echo esc_attr( $music_cover ); ?>">
+				</div>
 			</div>
 		</div>
 
@@ -405,8 +458,11 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 	$type         = isset( $type_options[ $type ] ) ? $type : 'text';
 	update_post_meta( $post_id, '_glintide_card_type', $type );
 
-	$artist    = isset( $_POST['glintide_card_music_artist'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_artist'] ) ) : '';
-	$music_url = isset( $_POST['glintide_card_music_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_music_url'] ) ) : '';
+	$artist       = isset( $_POST['glintide_card_music_artist'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_artist'] ) ) : '';
+	$music_url    = isset( $_POST['glintide_card_music_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_music_url'] ) ) : '';
+	$music_title  = isset( $_POST['glintide_card_music_title'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_title'] ) ) : '';
+	$music_cover  = isset( $_POST['glintide_card_music_cover'] ) ? wp_unslash( $_POST['glintide_card_music_cover'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	$music_cover  = is_numeric( $music_cover ) ? absint( $music_cover ) : esc_url_raw( $music_cover );
 	$video_url = isset( $_POST['glintide_card_video_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_video_url'] ) ) : '';
 	$link_url      = isset( $_POST['glintide_card_link_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_link_url'] ) ) : '';
 	$link_label    = isset( $_POST['glintide_card_link_label'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_link_label'] ) ) : '';
@@ -415,24 +471,24 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_artist', $artist );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_url', $music_url );
+	glintide_update_content_card_meta( $post_id, '_glintide_card_music_title', $music_title );
+	glintide_update_content_card_meta( $post_id, '_glintide_card_music_cover', $music_cover );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_video_url', $video_url );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_link_url', $link_url );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_link_label', $link_label );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_quote_source', $quote_source );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_code_language', $code_language );
 
-	$gallery_raw   = isset( $_POST['glintide_card_gallery'] ) ? (string) wp_unslash( $_POST['glintide_card_gallery'] ) : '';
-	$gallery_urls  = array();
-	$gallery_lines = preg_split( '/\r\n|\r|\n/', $gallery_raw );
+	$gallery_raw = isset( $_POST['glintide_card_gallery'] ) ? (string) wp_unslash( $_POST['glintide_card_gallery'] ) : '';
+	$gallery_raw = trim( preg_replace( '/\s+/', ' ', $gallery_raw ) );
 
-	foreach ( $gallery_lines as $gallery_line ) {
-		$gallery_url = esc_url_raw( trim( $gallery_line ) );
-		if ( $gallery_url && ! in_array( $gallery_url, $gallery_urls, true ) ) {
-			$gallery_urls[] = $gallery_url;
-		}
+	$gallery_ids = $gallery_raw ? array_filter( array_map( 'trim', explode( ',', $gallery_raw ) ), 'strlen' ) : array();
+	if ( count( $gallery_ids ) > 9 ) {
+		$gallery_ids = array_slice( $gallery_ids, 0, 9 );
 	}
+	$gallery_raw = implode( ',', $gallery_ids );
 
-	glintide_update_content_card_meta( $post_id, '_glintide_card_gallery', implode( "\n", $gallery_urls ) );
+	glintide_update_content_card_meta( $post_id, '_glintide_card_gallery', $gallery_raw );
 }
 add_action( 'save_post_glintide_card', 'glintide_save_content_card_meta', 10, 2 );
 
@@ -549,16 +605,22 @@ function glintide_card_get_image_urls( $post_id = 0 ) {
 	}
 
 	$gallery = get_post_meta( $post_id, '_glintide_card_gallery', true );
-	$gallery = is_array( $gallery ) ? $gallery : preg_split( '/\r\n|\r|\n/', (string) $gallery );
+	$gallery = is_array( $gallery ) ? $gallery : preg_split( '/[\r\n,]+/', (string) $gallery );
 
 	foreach ( $gallery as $image ) {
-		if ( is_numeric( $image ) ) {
-			$image = wp_get_attachment_image_url( absint( $image ), 'large' );
+		$image = trim( (string) $image );
+		if ( '' === $image ) {
+			continue;
 		}
 
-		$image = esc_url_raw( trim( (string) $image ) );
+		if ( is_numeric( $image ) ) {
+			$image = wp_get_attachment_image_url( absint( $image ), 'large' );
+		} else {
+			$image = esc_url_raw( $image );
+		}
+
 		if ( $image && ! in_array( $image, $images, true ) ) {
-			$images[] = $image;
+			$images[] = esc_url_raw( $image );
 		}
 	}
 
@@ -567,6 +629,10 @@ function glintide_card_get_image_urls( $post_id = 0 ) {
 		if ( $legacy_thumb ) {
 			$images[] = esc_url_raw( $legacy_thumb );
 		}
+	}
+
+	if ( empty( $images ) ) {
+		$images[] = esc_url_raw( GLINTIDE_URL . '/assets/images/banner.jpg' );
 	}
 
 	return array_values( array_filter( $images ) );
@@ -608,6 +674,104 @@ function glintide_card_get_music_url( $post_id = 0 ) {
 function glintide_card_get_music_artist( $post_id = 0 ) {
 	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
 	return sanitize_text_field( (string) get_post_meta( $post_id, '_glintide_card_music_artist', true ) );
+}
+
+/**
+ * 获取歌曲名称。
+ *
+ * @param int $post_id 文章 ID。
+ * @return string
+ */
+function glintide_card_get_music_title( $post_id = 0 ) {
+	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
+	$title   = trim( (string) get_post_meta( $post_id, '_glintide_card_music_title', true ) );
+	if ( ! $title ) {
+		$title = get_the_title( $post_id );
+	}
+	return sanitize_text_field( $title );
+}
+
+/**
+ * 获取音乐封面 URL(可为附件 ID、URL 或空)。
+ *
+ * @param int $post_id 文章 ID。
+ * @return string
+ */
+function glintide_card_get_music_cover_url( $post_id = 0 ) {
+	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
+	$cover   = (string) get_post_meta( $post_id, '_glintide_card_music_cover', true );
+
+	if ( $cover ) {
+		if ( is_numeric( $cover ) ) {
+			$url = wp_get_attachment_image_url( absint( $cover ), 'large' );
+			if ( $url ) {
+				return $url;
+			}
+		} else {
+			return esc_url_raw( $cover );
+		}
+	}
+
+	// 退化:使用第一张 gallery 图
+	$images = glintide_card_get_image_urls( $post_id );
+	if ( ! empty( $images[0] ) ) {
+		return $images[0];
+	}
+
+	// 退化:使用特色图
+	if ( has_post_thumbnail( $post_id ) ) {
+		$thumb = wp_get_attachment_image_url( get_post_thumbnail_id( $post_id ), 'large' );
+		if ( $thumb ) {
+			return $thumb;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * 获取音乐来源(网易云 / 自上传)。
+ *
+ * @param int $post_id 文章 ID。
+ * @return string
+ */
+function glintide_card_get_music_source( $post_id = 0 ) {
+	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
+	$url     = glintide_card_get_music_url( $post_id );
+	if ( $url && ( stripos( $url, 'music.163.com' ) !== false || stripos( $url, '163.com' ) !== false ) ) {
+		return 'netease';
+	}
+	return 'upload';
+}
+
+/**
+ * 解析网易云歌曲 ID 并返回嵌入播放器 URL。
+ *
+ * @param string $url 网易云链接。
+ * @return string iframe URL,无则返回空。
+ */
+function glintide_card_get_netease_embed_url( $url ) {
+	$url = (string) $url;
+	if ( ! $url ) {
+		return '';
+	}
+
+	// 直接带 id 参数
+	if ( preg_match( '/[?&]id=(\d+)/', $url, $m ) ) {
+		return 'https://music.163.com/outchain/player?type=2&id=' . $m[1] . '&auto=0&height=66';
+	}
+
+	// /song?id=xxx 形式
+	if ( preg_match( '#/song/(\d+)#', $url, $m ) ) {
+		return 'https://music.163.com/outchain/player?type=2&id=' . $m[1] . '&auto=0&height=66';
+	}
+
+	// 纯 ID
+	if ( preg_match( '/^\d+$/', $url ) ) {
+		return 'https://music.163.com/outchain/player?type=2&id=' . $url . '&auto=0&height=66';
+	}
+
+	return '';
 }
 
 /**
@@ -789,6 +953,42 @@ function glintide_card_get_video_embed_url( $url ) {
 }
 
 /**
+ * 媒体空状态占位。
+ *
+ * 所有类型的空数据统一走这里,保证占位比例、图标与文案结构一致。
+ *
+ * @param string $base  媒体容器 class。
+ * @param string $icon  图标 class。
+ * @param string $label 提示文案。
+ * @return string
+ */
+function glintide_card_media_empty( $base, $icon, $label ) {
+	return '<div class="' . esc_attr( $base ) . ' glintide-card-media--empty">'
+		. '<span class="glintide-card-media-empty-icon"><i class="' . esc_attr( $icon ) . '" aria-hidden="true"></i></span>'
+		. '<span class="glintide-card-media-empty-text">' . esc_html( $label ) . '</span>'
+		. '</div>';
+}
+
+/**
+ * 输出点赞(爱心)按钮。
+ *
+ * @param int    $post_id 文章 ID。
+ * @param string $extra   附加 class。
+ * @return string
+ */
+function glintide_card_like_button( $post_id = 0, $extra = '' ) {
+	$post_id   = $post_id ? absint( $post_id ) : get_the_ID();
+	$likes     = absint( get_post_meta( $post_id, 'likes_count', true ) );
+	$class     = 'post-likes glintide-card-like' . ( $extra ? ' ' . $extra : '' );
+	$liked     = isset( $_COOKIE[ 'glintide_liked_' . $post_id ] ) ? ' is-liked' : '';
+	$icon      = $liked ? 'ri-heart-3-fill' : 'ri-heart-3-line';
+
+	return '<button type="button" class="' . esc_attr( $class . $liked ) . '" data-glintide-like="' . esc_attr( $post_id ) . '" aria-pressed="' . ( $liked ? 'true' : 'false' ) . '">'
+		. '<i class="ri-heart-3-icon ' . esc_attr( $icon ) . '" aria-hidden="true"></i>'
+		. '</button>';
+}
+
+/**
  * 输出卡片媒体内容。
  *
  * @param int    $post_id 文章 ID。
@@ -805,58 +1005,116 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 	$base    = 'glintide-card-media glintide-card-media--' . $type;
 
 	if ( 'text' === $type ) {
-		return '<div class="' . esc_attr( $base ) . ' glintide-card-media--text-mark" aria-hidden="true"><i class="' . esc_attr( $data['icon'] ) . '"></i></div>';
+		$permalink = get_permalink( $post_id );
+		$hero      = $images[0];
+
+		return '<a class="' . esc_attr( $base ) . ' glintide-card-media--text-hero" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $title ) . '">'
+			. '<img src="' . esc_url( $hero ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" decoding="async">'
+			. '</a>';
 	}
 
 	if ( 'photo' === $type ) {
 		if ( empty( $images ) ) {
-			return '<div class="' . esc_attr( $base ) . ' glintide-card-media--empty"><i class="ri-image-line" aria-hidden="true"></i><span>暂未添加照片</span></div>';
+			return glintide_card_media_empty( $base, 'ri-image-line', '暂未添加照片' );
 		}
 
-		$visible_count = min( 4, count( $images ) );
-		$html          = '<div class="' . esc_attr( $base ) . '"><div class="glintide-card-photo-grid glintide-card-photo-grid--' . absint( $visible_count ) . '">';
-		$permalink     = get_permalink( $post_id );
+		$total      = count( $images );
+		$swiper_uid = 'glintide-photo-' . absint( $post_id ) . '-' . wp_generate_uuid4();
+		$base_cls   = $base . ' glintide-card-media--photo glintide-photo-frame';
+		$html       = '<div class="' . esc_attr( $base_cls ) . '" data-glintide-photo>';
+		$html      .= '<div class="glintide-photo-swiper">';
+		$html      .= '<div class="swiper" id="' . esc_attr( $swiper_uid ) . '">';
+		$html      .= '<div class="swiper-wrapper">';
 
-		foreach ( array_slice( $images, 0, 4 ) as $index => $image ) {
-			$image_href = 'single' === $context ? $image : $permalink;
-			$target     = 'single' === $context ? ' target="_blank" rel="noopener"' : '';
-			$html      .= '<a class="glintide-card-photo-link" href="' . esc_url( $image_href ) . '"' . $target . ' aria-label="' . esc_attr( '查看' . $title ) . '">';
-			$html      .= '<img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" width="640" height="480" loading="lazy" decoding="async">';
-			if ( 3 === $index && count( $images ) > 4 ) {
-				$html .= '<span class="glintide-card-photo-more">+' . absint( count( $images ) - 4 ) . '</span>';
-			}
-			$html .= '</a>';
+		foreach ( $images as $image ) {
+			$html .= '<div class="swiper-slide"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" decoding="async"></div>';
 		}
 
-		$html .= '</div></div>';
+		$html .= '</div></div>'; // /swiper
+		$html .= '</div>';       // /glintide-photo-swiper
+		$html .= '<div class="glintide-photo-caption"><span>' . esc_html( $title ) . '</span></div>';
+		$veil_first = isset( $images[0] ) ? $images[0] : '';
+		$veil_style = $veil_first ? ' style="background-image: url(' . esc_url( $veil_first ) . ');"' : '';
+		$html      .= '<div class="glintide-photo-veil" aria-hidden="true">'
+			. '<span class="glintide-photo-veil-layer"' . $veil_style . '></span>'
+			. '<span class="glintide-photo-veil-tint"></span>'
+			. '</div>';
+
+		if ( $total > 1 ) {
+			$html .= '<div class="swiper-pagination glintide-photo-pagination" data-glintide-photo-pagination></div>';
+		}
+
+		$html .= glintide_card_like_button( $post_id, 'glintide-photo-like' );
+
+		$html .= '</div>'; // /base
 		return $html;
 	}
 
 	if ( 'music' === $type ) {
-		$music_url = glintide_card_get_music_url( $post_id );
-		$artist    = glintide_card_get_music_artist( $post_id );
-		$cover     = isset( $images[0] ) ? $images[0] : '';
-		$html      = '<div class="' . esc_attr( $base ) . '"><div class="glintide-card-music-cover">';
+		$music_url   = glintide_card_get_music_url( $post_id );
+		$artist      = glintide_card_get_music_artist( $post_id );
+		$music_title = glintide_card_get_music_title( $post_id );
+		$cover       = glintide_card_get_music_cover_url( $post_id );
+		$source      = glintide_card_get_music_source( $post_id );
 
-		if ( $cover ) {
-			$html .= '<img src="' . esc_url( $cover ) . '" alt="' . esc_attr( $title ) . '" width="160" height="160" loading="lazy" decoding="async">';
-		} else {
-			$html .= '<i class="ri-music-2-line" aria-hidden="true"></i>';
+		$html  = '<div class="' . esc_attr( $base ) . ' glintide-card-media--music-new" data-glintide-music>';
+
+		// 左侧:文字 + 播放按钮
+		$html .= '<div class="glintide-card-music-info">';
+		if ( $music_title ) {
+			$html .= '<h4 class="glintide-card-music-title">' . esc_html( $music_title ) . '</h4>';
 		}
-
-		$html .= '</div><div class="glintide-card-music-content">';
 		if ( $artist ) {
-			$html .= '<span class="glintide-card-music-artist">' . esc_html( $artist ) . '</span>';
+			$html .= '<p class="glintide-card-music-artist">' . esc_html( $artist ) . '</p>';
+		} else {
+			$html .= '<p class="glintide-card-music-artist glintide-card-music-artist--empty">未知音乐人</p>';
 		}
 
-		if ( $music_url ) {
-			$mime  = glintide_card_get_audio_mime( $music_url );
-			$html .= '<audio class="glintide-card-audio" controls preload="none"><source src="' . esc_url( $music_url ) . '"' . ( $mime ? ' type="' . esc_attr( $mime ) . '"' : '' ) . '><span>当前浏览器不支持音频播放。</span></audio>';
-		} else {
+		$html .= '<div class="glintide-card-music-controls">';
+		$has_audio = false;
+		if ( 'netease' === $source ) {
+			$embed = glintide_card_get_netease_embed_url( $music_url );
+			if ( $embed ) {
+				$has_audio = true;
+				$html .= '<button type="button" class="glintide-card-music-toggle" data-glintide-music-toggle aria-label="播放" data-state="paused">'
+					. '<i class="ri-play-fill" aria-hidden="true"></i>'
+					. '</button>';
+				$html .= '<iframe class="glintide-card-music-netease" data-glintide-music-netease src="' . esc_url( $embed ) . '" frameborder="0" loading="lazy"></iframe>';
+			}
+		} elseif ( $music_url ) {
+			$has_audio = true;
+			$html .= '<button type="button" class="glintide-card-music-toggle" data-glintide-music-toggle aria-label="播放" data-state="paused">'
+				. '<i class="ri-play-fill" aria-hidden="true"></i>'
+				. '</button>';
+			$html .= '<audio class="glintide-card-music-audio" data-glintide-music-audio preload="none"><source src="' . esc_url( $music_url ) . '"></audio>';
+		}
+
+		if ( ! $has_audio ) {
+			$html .= '<button type="button" class="glintide-card-music-toggle" disabled aria-label="无音频">'
+				. '<i class="ri-play-fill" aria-hidden="true"></i>'
+				. '</button>';
 			$html .= '<span class="glintide-card-media-note">音频地址未设置</span>';
 		}
 
-		$html .= '</div></div>';
+		$html .= '</div>'; // /controls
+		$html .= '</div>'; // /info
+
+		// 右侧:封面 + 底部模糊衔接
+		$html .= '<div class="glintide-card-music-cover-wrap">';
+		if ( $cover ) {
+			$html .= '<img class="glintide-card-music-cover-img" src="' . esc_url( $cover ) . '" alt="' . esc_attr( $music_title ) . '" loading="lazy" decoding="async">';
+		} else {
+			$html .= '<div class="glintide-card-music-cover-img glintide-card-music-cover-img--default" aria-hidden="true">'
+				. '<i class="ri-music-2-line"></i>'
+				. '</div>';
+		}
+		$html .= '<div class="glintide-photo-veil" aria-hidden="true">'
+			. '<span class="glintide-photo-veil-layer"></span>'
+			. '<span class="glintide-photo-veil-tint"></span>'
+			. '</div>';
+		$html .= '</div>';
+
+		$html .= '</div>'; // /base
 		return $html;
 	}
 
@@ -867,7 +1125,7 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		$link_host  = $link_host ? preg_replace( '/^www\./', '', $link_host ) : '';
 
 		if ( ! $link_url ) {
-			return '<div class="' . esc_attr( $base ) . ' glintide-card-media--empty"><i class="ri-links-line" aria-hidden="true"></i><span>链接地址未设置</span></div>';
+			return glintide_card_media_empty( $base, 'ri-links-line', '链接地址未设置' );
 		}
 
 		$link_label = $link_label ? $link_label : '打开链接';
@@ -914,7 +1172,7 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		$poster    = isset( $images[0] ) ? $images[0] : '';
 
 		if ( ! $video_url ) {
-			return '<div class="' . esc_attr( $base ) . ' glintide-card-media--empty"><i class="ri-video-line" aria-hidden="true"></i><span>视频地址未设置</span></div>';
+			return glintide_card_media_empty( $base, 'ri-video-line', '视频地址未设置' );
 		}
 
 		if ( glintide_card_is_direct_video_url( $video_url ) ) {
@@ -987,3 +1245,73 @@ function glintide_card_feed_pagination( $query, $paged = 1 ) {
 		echo '<nav class="glintide-card-pagination" aria-label="内容卡片分页">' . wp_kses_post( $links ) . '</nav>';
 	}
 }
+
+/**
+ * 处理内容卡片点赞(支持登录用户与游客)。
+ */
+function glintide_card_handle_like() {
+	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+	$post    = get_post( $post_id );
+
+	if ( ! $post || 'glintide_card' !== $post->post_type ) {
+		wp_send_json_error( array( 'msg' => '内容不存在' ), 404 );
+	}
+
+	$cookie_key = 'glintide_liked_' . $post_id;
+	$liked      = false;
+
+	if ( isset( $_COOKIE[ $cookie_key ] ) && '1' === $_COOKIE[ $cookie_key ] ) {
+		$liked = true;
+	} else {
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			$user_like = get_user_meta( $user_id, 'glintide_card_likes', true );
+			$user_like = is_array( $user_like ) ? array_map( 'absint', $user_like ) : array();
+			$liked     = in_array( $post_id, $user_like, true );
+		}
+	}
+
+	$count = absint( get_post_meta( $post_id, 'likes_count', true ) );
+
+	if ( $liked ) {
+		$count = max( 0, $count - 1 );
+		$state = false;
+	} else {
+		$count ++;
+		$state = true;
+	}
+
+	update_post_meta( $post_id, 'likes_count', $count );
+
+	if ( $state ) {
+		if ( ! headers_sent() ) {
+			setcookie( $cookie_key, '1', time() + YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, false );
+		}
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			$user_like = get_user_meta( $user_id, 'glintide_card_likes', true );
+			$user_like = is_array( $user_like ) ? array_map( 'absint', $user_like ) : array();
+			$user_like[] = $post_id;
+			update_user_meta( $user_id, 'glintide_card_likes', array_values( array_unique( $user_like ) ) );
+		}
+	} else {
+		if ( ! headers_sent() ) {
+			setcookie( $cookie_key, '0', time() - YEAR_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, false );
+		}
+		$user_id = get_current_user_id();
+		if ( $user_id ) {
+			$user_like = get_user_meta( $user_id, 'glintide_card_likes', true );
+			$user_like = is_array( $user_like ) ? array_map( 'absint', $user_like ) : array();
+			if ( ( $key = array_search( $post_id, $user_like, true ) ) !== false ) {
+				unset( $user_like[ $key ] );
+			}
+			update_user_meta( $user_id, 'glintide_card_likes', array_values( array_unique( $user_like ) ) );
+		}
+	}
+
+	wp_send_json_success( array( 'count' => $count, 'liked' => $state ) );
+}
+
+add_action( 'wp_ajax_glintide_card_like', 'glintide_card_handle_like' );
+add_action( 'wp_ajax_nopriv_glintide_card_like', 'glintide_card_handle_like' );
+

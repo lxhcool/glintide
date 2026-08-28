@@ -116,26 +116,49 @@
 }
 
 .glintide-card-field-group input[type="url"],
-.glintide-card-field-group input[type="text"],
-.glintide-card-field-group textarea {
+.glintide-card-field-group input[type="text"] {
 	width: 100%;
 	max-width: 720px;
-}
-
-.glintide-card-field-group textarea {
-	min-height: 112px;
-	resize: vertical;
 }
 
 .glintide-card-field-row + .glintide-card-field-row {
 	margin-top: 16px;
 }
 
-.glintide-card-media-actions {
+.glintide-card-gallery {
+	margin-top: 8px;
+}
+
+.glintide-card-gallery-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+	gap: 8px;
+	margin: 0 0 10px;
+	padding: 0;
+	list-style: none;
+}
+
+.glintide-card-gallery-list li {
+	position: relative;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #fff;
+}
+
+.glintide-card-gallery-list li img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.glintide-card-gallery-actions {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	margin: 10px 0;
+	margin: 0;
 }
 
 .glintide-admin-card-type {

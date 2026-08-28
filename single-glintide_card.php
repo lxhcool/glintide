@@ -22,6 +22,7 @@ get_header();
 				$type_data = glintide_card_get_type_data( $post_id );
 				?>
 					<article id="post-<?php the_ID(); ?>" <?php post_class( array( 'glintide-card-single', 'glintide-card-single--' . $type ) ); ?>>
+					<?php if ( 'photo' !== $type ) : ?>
 					<header class="glintide-card-single-header">
 						<span class="glintide-card-type glintide-card-type--<?php echo esc_attr( $type ); ?>">
 							<i class="<?php echo esc_attr( $type_data['icon'] ); ?>" aria-hidden="true"></i>
@@ -33,10 +34,11 @@ get_header();
 							<span><i class="ri-user-3-line" aria-hidden="true"></i><?php echo esc_html( get_the_author() ); ?></span>
 						</div>
 					</header>
+					<?php endif; ?>
 
 					<?php echo glintide_card_media_html( $post_id, 'single' ); ?>
 
-						<?php if ( ! in_array( $type, array( 'quote', 'code' ), true ) ) : ?>
+						<?php if ( ! in_array( $type, array( 'quote', 'code', 'photo' ), true ) ) : ?>
 							<div class="glintide-card-single-content">
 								<?php
 								the_content();

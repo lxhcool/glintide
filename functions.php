@@ -99,6 +99,24 @@ add_action( 'widgets_init', 'glintide_widgets_init' );
 function glintide_scripts() {
 	// 主样式
 	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array(), filemtime( GLINTIDE_DIR . '/style.css' ) );
+
+	// 照片卡片轮播 (Swiper)
+	wp_enqueue_style( 'glintide-swiper', GLINTIDE_URL . '/inc/assets/css/swiper-bundle.min.css', array(), GLINTIDE_VERSION );
+	wp_enqueue_script( 'glintide-swiper-bundle', GLINTIDE_URL . '/inc/assets/js/swiper-bundle.min.js', array(), GLINTIDE_VERSION, true );
+	wp_enqueue_script(
+		'glintide-photo-swiper',
+		GLINTIDE_URL . '/assets/js/glintide-photo-swiper.js',
+		array( 'glintide-swiper-bundle', 'jquery' ),
+		GLINTIDE_VERSION,
+		true
+	);
+	wp_localize_script(
+		'glintide-photo-swiper',
+		'glintide_card_ajax',
+		array(
+			'url' => admin_url( 'admin-ajax.php' ),
+		)
+	);
 	wp_enqueue_style(
 		'glintide-music-backup',
 		GLINTIDE_URL . '/assets/css/glintide-music-backup.css',
@@ -117,13 +135,6 @@ function glintide_scripts() {
 		array(),
 		filemtime( GLINTIDE_DIR . '/assets/js/theme-controls.js' ),
 		false
-	);
-	wp_enqueue_script(
-		'glintide-card-masonry',
-		GLINTIDE_URL . '/assets/js/glintide-card-masonry.js',
-		array(),
-		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-masonry.js' ),
-		true
 	);
 }
 add_action( 'wp_enqueue_scripts', 'glintide_scripts' );
