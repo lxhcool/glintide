@@ -38,7 +38,7 @@ get_header();
 
 					<?php echo glintide_card_media_html( $post_id, 'single' ); ?>
 
-						<?php if ( ! in_array( $type, array( 'quote', 'code', 'photo' ), true ) ) : ?>
+						<?php if ( 'photo' !== $type ) : ?>
 							<div class="glintide-card-single-content">
 								<?php
 								the_content();

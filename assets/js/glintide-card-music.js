@@ -487,4 +487,7 @@
 	} else {
 		initAll();
 	}
+
+	// 无限瀑布流追加新卡片后,为新内容的音乐卡片重新绑定
+	document.addEventListener('glintide:cards-appended', initAll);
 }());

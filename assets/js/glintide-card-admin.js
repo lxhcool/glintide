@@ -26,7 +26,8 @@
 		}
 
 		for (index = 0; index < fieldGroups.length; index += 1) {
-			var isActive = fieldGroups[index].getAttribute('data-glintide-card-fields') === selectedType;
+			var fieldTypes = fieldGroups[index].getAttribute('data-glintide-card-fields').split(/\s*,\s*/);
+			var isActive = fieldTypes.indexOf(selectedType) !== -1;
 			fieldGroups[index].classList.toggle('is-active', isActive);
 			fieldGroups[index].setAttribute('aria-hidden', isActive ? 'false' : 'true');
 		}

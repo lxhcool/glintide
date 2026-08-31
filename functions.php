@@ -140,6 +140,42 @@ function glintide_scripts() {
 		)
 	);
 
+	// 视频卡片播放交互
+	wp_enqueue_script(
+		'glintide-card-video',
+		GLINTIDE_URL . '/assets/js/glintide-card-video.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-video.js' ),
+		true
+	);
+
+	// 首页卡片无限瀑布流加载(依赖 glintide-photo-swiper 提供的 glintide_card_ajax)
+	wp_enqueue_script(
+		'glintide-card-feed',
+		GLINTIDE_URL . '/assets/js/glintide-card-feed.js',
+		array( 'glintide-photo-swiper', 'jquery' ),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-feed.js' ),
+		true
+	);
+
+	// PJAX 无刷新导航(尽早加载以便拦截链接点击)
+	wp_enqueue_script(
+		'glintide-pjax',
+		GLINTIDE_URL . '/assets/js/glintide-pjax.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-pjax.js' ),
+		false
+	);
+
+	// 内容卡片详情弹窗
+	wp_enqueue_script(
+		'glintide-card-modal',
+		GLINTIDE_URL . '/assets/js/glintide-card-modal.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-modal.js' ),
+		true
+	);
+
 	// 图标字体(remixicon)
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
 

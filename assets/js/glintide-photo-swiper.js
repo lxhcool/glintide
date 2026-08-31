@@ -42,6 +42,9 @@
 		initPhotoSwipers();
 	}
 
+	// 无限瀑布流追加新卡片后,为新内容重新初始化轮播
+	document.addEventListener('glintide:cards-appended', initPhotoSwipers);
+
 	// 内容卡片点赞(爱心)按钮
 	function initCardLikes() {
 		var buttons = document.querySelectorAll('[data-glintide-like]');
@@ -106,5 +109,8 @@
 	} else {
 		initCardLikes();
 	}
+
+	// 无限瀑布流追加新卡片后,为新内容的点赞按钮重新绑定
+	document.addEventListener('glintide:cards-appended', initCardLikes);
 
 }(window.jQuery));
