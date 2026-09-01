@@ -343,7 +343,7 @@ function glintide_render_content_card_meta_box( $post ) {
 
 		<div class="glintide-card-field-group<?php echo $gallery_active ? ' is-active' : ''; ?>" data-glintide-card-fields="photo,moment" aria-hidden="<?php echo $gallery_active ? 'false' : 'true'; ?>">
 			<label><strong>照片组 / 动态背景图（可多选）</strong></label>
-			<p class="description">照片卡片会自动轮播；动态卡片使用第一张作为背景。也可以继续使用右侧“特色图片”。</p>
+			<p class="description">照片卡片最多显示 9 张，作为背景图轮播；动态卡片使用第一张作为背景。也可以继续使用右侧“特色图片”。</p>
 			<div class="glintide-card-gallery" data-glintide-card-gallery>
 				<ul class="glintide-card-gallery-list">
 					<?php
@@ -1080,7 +1080,7 @@ function glintide_card_like_button( $post_id = 0, $extra = '' ) {
 	$liked     = isset( $_COOKIE[ 'glintide_liked_' . $post_id ] ) ? ' is-liked' : '';
 	$icon      = $liked ? 'ri-heart-3-fill' : 'ri-heart-3-line';
 
-	return '<button type="button" class="' . esc_attr( $class . $liked ) . '" data-glintide-like="' . esc_attr( $post_id ) . '" aria-pressed="' . ( $liked ? 'true' : 'false' ) . '">'
+	return '<button type="button" class="' . esc_attr( $class . $liked ) . '" data-glintide-like="' . esc_attr( $post_id ) . '" aria-label="点赞" title="点赞" aria-pressed="' . ( $liked ? 'true' : 'false' ) . '">'
 		. '<i class="ri-heart-3-icon ' . esc_attr( $icon ) . '" aria-hidden="true"></i>'
 		. '</button>';
 }
@@ -1111,35 +1111,46 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 			return glintide_card_media_empty( $base, 'ri-image-line', '暂未添加照片' );
 		}
 
-		$total      = count( $images );
-		$swiper_uid = 'glintide-photo-' . absint( $post_id ) . '-' . wp_generate_uuid4();
-		$base_cls   = $base . ' glintide-card-media--photo glintide-photo-frame';
-		$html       = '<div class="' . esc_attr( $base_cls ) . '" data-glintide-photo>';
-		$html      .= '<div class="glintide-photo-swiper">';
-		$html      .= '<div class="swiper" id="' . esc_attr( $swiper_uid ) . '">';
-		$html      .= '<div class="swiper-wrapper">';
+		$images          = array_slice( $images, 0, 9 );
+		$total           = count( $images );
+		$summary         = glintide_card_get_summary( $post_id, 18 );
+		$author_id       = (int) get_post_field( 'post_author', $post_id );
+		$author          = $author_id ? get_the_author_meta( 'display_name', $author_id ) : '';
+		$author          = $author ? $author : get_bloginfo( 'name' );
+		$author_avatar   = ( $author_id && function_exists( 'glintide_get_avatar_url' ) ) ? glintide_get_avatar_url( $author_id ) : '';
+		$avatar_fallback = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
+		$photo_detail    = ( $summary && $summary !== $title ) ? $summary : $title;
+		$base_cls        = $base . ' glintide-card-media--photo glintide-photo-frame';
+		$html            = '<div class="' . esc_attr( $base_cls ) . '" data-glintide-photo-carousel>';
+		$html           .= '<div class="glintide-photo-viewport swiper" data-glintide-photo-viewport role="region" aria-roledescription="carousel" aria-label="照片轮播">';
+		$html           .= '<div class="glintide-photo-track swiper-wrapper" data-glintide-photo-track aria-live="polite">';
 
-		foreach ( $images as $image ) {
-			$html .= '<div class="swiper-slide"><img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" decoding="async"></div>';
+		foreach ( $images as $index => $image ) {
+			$is_active = 0 === $index;
+			$html     .= '<figure class="glintide-photo-slide swiper-slide' . ( $is_active ? ' is-active' : '' ) . '" data-glintide-photo-slide data-glintide-photo-index="' . absint( $index ) . '" aria-hidden="' . ( $is_active ? 'false' : 'true' ) . '">';
+			$html     .= '<img src="' . esc_url( $image ) . '" alt="' . esc_attr( $title . ' - 第 ' . ( $index + 1 ) . ' 张照片' ) . '" loading="lazy" decoding="async">';
+			$html     .= '</figure>';
 		}
 
-		$html .= '</div></div>'; // /swiper
-		$html .= '</div>';       // /glintide-photo-swiper
-		$html .= '<div class="glintide-photo-caption"><span>' . esc_html( $title ) . '</span></div>';
-		$veil_first = isset( $images[0] ) ? $images[0] : '';
-		$veil_style = $veil_first ? ' style="background-image: url(' . esc_url( $veil_first ) . ');"' : '';
-		$html      .= '<div class="glintide-photo-veil" aria-hidden="true">'
-			. '<span class="glintide-photo-veil-layer"' . $veil_style . '></span>'
-			. '<span class="glintide-photo-veil-tint"></span>'
-			. '</div>';
-
+		$html .= '</div>';
+		$html .= '<div class="glintide-photo-shade" aria-hidden="true"></div>';
+		$html .= '<div class="glintide-photo-overlay">';
 		if ( $total > 1 ) {
-			$html .= '<div class="swiper-pagination glintide-photo-pagination" data-glintide-photo-pagination></div>';
+			$html .= '<div class="glintide-photo-dots swiper-pagination" data-glintide-photo-pagination aria-label="照片切换"></div>';
 		}
-
+		$html .= '<div class="glintide-photo-bottom">';
+		$html .= '<div class="glintide-photo-profile">';
+		$html .= '<img class="glintide-photo-avatar" src="' . esc_url( $author_avatar ? $author_avatar : $avatar_fallback ) . '" alt="" loading="lazy" decoding="async" data-glintide-avatar data-glintide-avatar-fallback="' . esc_url( $avatar_fallback ) . '">';
+		$html .= '<span class="glintide-photo-copy">';
+		$html .= '<strong class="glintide-photo-title">' . esc_html( $author ) . '</strong>';
+		$html .= '<small class="glintide-photo-summary">' . esc_html( $photo_detail ) . '</small>';
+		$html .= '</span>';
+		$html .= '</div>';
 		$html .= glintide_card_like_button( $post_id, 'glintide-photo-like' );
+		$html .= '</div>';
+		$html .= '</div>';
+		$html .= '</div>';
 
-		$html .= '</div>'; // /base
 		return $html;
 	}
 
@@ -1343,19 +1354,25 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		if ( glintide_card_is_direct_video_url( $video_url ) ) {
 			$mime = glintide_card_get_video_mime( $video_url );
 
-			// 沉浸式视频卡片:视频满铺,中央播放按钮,底部模糊蒙层 + 标题 + 点赞,与照片卡片同一设计语言
-			$html = '<div class="' . esc_attr( $base ) . ' glintide-video-frame" data-glintide-video>';
+			// 自定义视频播放器:标题、全屏、跳转、播放、进度和音量均保持在视频表面上
+			$html  = '<div class="' . esc_attr( $base ) . ' glintide-video-frame" data-glintide-video>';
 			$html .= '<video class="glintide-card-video" playsinline preload="metadata"' . ( $poster ? ' poster="' . esc_url( $poster ) . '"' : '' ) . '><source src="' . esc_url( $video_url ) . '"' . ( $mime ? ' type="' . esc_attr( $mime ) . '"' : '' ) . '><span>当前浏览器不支持视频播放。</span></video>';
-			$html .= '<div class="glintide-video-veil" aria-hidden="true">';
-			if ( $poster ) {
-				$html .= '<span class="glintide-video-veil-layer" style="background-image: url(' . esc_url( $poster ) . ');"></span>';
-			}
-			$html .= '<span class="glintide-video-veil-tint"></span></div>';
-			$html .= '<button type="button" class="glintide-video-play" data-glintide-video-toggle aria-label="播放视频">'
-				. '<i class="ri-play-fill" aria-hidden="true"></i>'
-				. '</button>';
-			$html .= '<div class="glintide-video-caption"><span>' . esc_html( $title ) . '</span></div>';
-			$html .= glintide_card_like_button( $post_id, 'glintide-video-like' );
+			$html .= '<div class="glintide-video-scrim" aria-hidden="true"></div>';
+			$html .= '<div class="glintide-video-ui">';
+			$html .= '<div class="glintide-video-topbar">';
+			$html .= '<h3 class="glintide-video-title">' . esc_html( $title ) . '</h3>';
+			$html .= '<button type="button" class="glintide-video-control glintide-video-fullscreen" data-glintide-video-fullscreen aria-label="全屏播放" title="全屏播放"><i class="ri-fullscreen-line" aria-hidden="true"></i></button>';
+			$html .= '</div>';
+			$html .= '<div class="glintide-video-center">';
+			$html .= '<button type="button" class="glintide-video-play" data-glintide-video-toggle aria-label="播放视频" title="播放视频"><i class="ri-play-fill" aria-hidden="true"></i></button>';
+			$html .= '</div>';
+			$html .= '<div class="glintide-video-bottom">';
+			$html .= '<span class="glintide-video-time" data-glintide-video-current>00:00</span>';
+			$html .= '<input type="range" class="glintide-video-progress" data-glintide-video-progress min="0" max="0" step="0.1" value="0" aria-label="视频播放进度">';
+			$html .= '<span class="glintide-video-time" data-glintide-video-duration>00:00</span>';
+			$html .= '<button type="button" class="glintide-video-control glintide-video-volume" data-glintide-video-volume aria-label="静音" title="静音"><i class="ri-volume-up-line" aria-hidden="true"></i></button>';
+			$html .= '</div>';
+			$html .= '</div>';
 			$html .= '</div>';
 
 			return $html;

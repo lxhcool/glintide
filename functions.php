@@ -97,17 +97,30 @@ add_action( 'widgets_init', 'glintide_widgets_init' );
  * 加载样式与脚本
  */
 function glintide_scripts() {
-	// 主样式
-	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array(), filemtime( GLINTIDE_DIR . '/style.css' ) );
+	// 照片轮播组件
+	wp_enqueue_style(
+		'glintide-swiper-style',
+		GLINTIDE_URL . '/inc/assets/css/swiper-bundle.min.css',
+		array(),
+		filemtime( GLINTIDE_DIR . '/inc/assets/css/swiper-bundle.min.css' )
+	);
 
-	// 照片卡片轮播 (Swiper)
-	wp_enqueue_style( 'glintide-swiper', GLINTIDE_URL . '/inc/assets/css/swiper-bundle.min.css', array(), GLINTIDE_VERSION );
-	wp_enqueue_script( 'glintide-swiper-bundle', GLINTIDE_URL . '/inc/assets/js/swiper-bundle.min.js', array(), GLINTIDE_VERSION, true );
+	// 主样式
+	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array( 'glintide-swiper-style' ), filemtime( GLINTIDE_DIR . '/style.css' ) );
+
+	// 内容卡片交互(点赞、无限加载所需的 AJAX 配置)
+	wp_enqueue_script(
+		'glintide-swiper',
+		GLINTIDE_URL . '/inc/assets/js/swiper-bundle.min.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/inc/assets/js/swiper-bundle.min.js' ),
+		true
+	);
 	wp_enqueue_script(
 		'glintide-photo-swiper',
 		GLINTIDE_URL . '/assets/js/glintide-photo-swiper.js',
-		array( 'glintide-swiper-bundle', 'jquery' ),
-		GLINTIDE_VERSION,
+		array( 'glintide-swiper', 'jquery' ),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-photo-swiper.js' ),
 		true
 	);
 	wp_localize_script(
@@ -149,7 +162,7 @@ function glintide_scripts() {
 		true
 	);
 
-	// 首页卡片无限瀑布流加载(依赖 glintide-photo-swiper 提供的 glintide_card_ajax)
+	// 首页卡片无限瀑布流加载(依赖内容卡片交互脚本提供的 glintide_card_ajax)
 	wp_enqueue_script(
 		'glintide-card-feed',
 		GLINTIDE_URL . '/assets/js/glintide-card-feed.js',

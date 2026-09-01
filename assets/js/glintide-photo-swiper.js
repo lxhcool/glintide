@@ -1,51 +1,67 @@
 /**
- * 照片卡片轮播初始化。
- * 对 [data-glintide-photo] 容器内嵌的 Swiper 进行分页/自动播放配置。
+ * 内容卡片交互。
+ * 使用 Swiper 处理照片背景轮播和点赞，并为无限加载追加的卡片重新绑定事件。
  */
 (function ($) {
 	'use strict';
 
-	function initPhotoSwipers() {
-		if (typeof window.Swiper === 'undefined') {
+	function initPhotoCarousels() {
+		var carousels = document.querySelectorAll('[data-glintide-photo-carousel]');
+		if (!window.Swiper) {
 			return;
 		}
 
-		var roots = document.querySelectorAll('[data-glintide-photo]');
-		roots.forEach(function (root) {
-			if (root.__glintidePhotoInited) {
-				return;
-			}
-			root.__glintidePhotoInited = true;
-
-			var swiperEl = root.querySelector('.swiper');
-			if (!swiperEl) {
+		carousels.forEach(function (carousel) {
+			if (carousel.__glintidePhotoSwiperInited) {
 				return;
 			}
 
-			var paginationEl = root.querySelector('[data-glintide-photo-pagination]');
+			var container  = carousel.querySelector('[data-glintide-photo-viewport]');
+			var pagination = carousel.querySelector('[data-glintide-photo-pagination]');
+			var slides     = Array.prototype.slice.call(carousel.querySelectorAll('[data-glintide-photo-slide]'));
 
-			new window.Swiper(swiperEl, {
-				lazy: false,
-				loop: true,
-				speed: 500,
+			if (!container || slides.length < 2) {
+				return;
+			}
+
+			function updateSlideState(swiper) {
+				slides.forEach(function (slide, index) {
+					slide.setAttribute('aria-hidden', index === swiper.activeIndex ? 'false' : 'true');
+				});
+			}
+
+			var swiper = new window.Swiper(container, {
+				slidesPerView: 1,
+				spaceBetween: 0,
+				speed: 260,
+				threshold: 4,
 				grabCursor: true,
+				simulateTouch: true,
 				allowTouchMove: true,
-				autoplay: paginationEl ? { delay: 3500, disableOnInteraction: false } : false,
-				pagination: paginationEl ? { el: paginationEl, clickable: true } : false
+				resistance: true,
+				resistanceRatio: 0.75,
+				watchOverflow: true,
+				observer: true,
+				observeParents: true,
+				a11y: {
+					enabled: true
+				},
+				pagination: pagination ? {
+					el: pagination,
+					clickable: true
+				} : undefined,
+				on: {
+					init: updateSlideState,
+					slideChange: updateSlideState
+				}
 			});
+
+			carousel.__glintidePhotoSwiperInited = true;
+			updateSlideState(swiper);
 		});
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initPhotoSwipers);
-	} else {
-		initPhotoSwipers();
-	}
-
-	// 无限瀑布流追加新卡片后,为新内容重新初始化轮播
-	document.addEventListener('glintide:cards-appended', initPhotoSwipers);
-
-	// 内容卡片点赞(爱心)按钮
+	// 内容卡片点赞(爱心)
 	function initCardLikes() {
 		var buttons = document.querySelectorAll('[data-glintide-like]');
 		buttons.forEach(function (btn) {
@@ -77,8 +93,11 @@
 				}
 
 				if (window.jQuery && window.jQuery.post) {
+					var ajaxUrl = window.glintide_card_ajax && window.glintide_card_ajax.url
+						? window.glintide_card_ajax.url
+						: '/wp-admin/admin-ajax.php';
 					window.jQuery.post(
-						glintide_card_ajax.url,
+						ajaxUrl,
 						{ action: 'glintide_card_like', post_id: postId },
 						function (res) {
 							if (res && res.success && iconEl) {
@@ -104,13 +123,18 @@
 		});
 	}
 
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initCardLikes);
-	} else {
+	function initCardInteractions() {
+		initPhotoCarousels();
 		initCardLikes();
 	}
 
-	// 无限瀑布流追加新卡片后,为新内容的点赞按钮重新绑定
-	document.addEventListener('glintide:cards-appended', initCardLikes);
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initCardInteractions);
+	} else {
+		initCardInteractions();
+	}
+
+	// 无限瀑布流追加新卡片后,为新内容重新绑定轮播和点赞
+	document.addEventListener('glintide:cards-appended', initCardInteractions);
 
 }(window.jQuery));
