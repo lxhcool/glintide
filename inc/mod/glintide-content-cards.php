@@ -1136,7 +1136,7 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		$html .= '<div class="glintide-photo-shade" aria-hidden="true"></div>';
 		$html .= '<div class="glintide-photo-overlay">';
 		if ( $total > 1 ) {
-			$html .= '<div class="glintide-photo-dots swiper-pagination" data-glintide-photo-pagination aria-label="照片切换"></div>';
+			$html .= '<span class="glintide-photo-counter" data-glintide-photo-counter aria-live="polite">1/' . absint( $total ) . '</span>';
 		}
 		$html .= '<div class="glintide-photo-bottom">';
 		$html .= '<div class="glintide-photo-profile">';
