@@ -81,6 +81,32 @@
 		bar.classList.toggle('is-loading', !!show);
 	}
 
+	function syncCurrentThemeStyle() {
+		var current = document.getElementById('glintide-style-css');
+		var version = window.glintideStyleVersion || '';
+
+		if (!current || !version) {
+			return;
+		}
+
+		var url = new URL(current.href, window.location.href);
+		if (url.searchParams.get('ver') !== version) {
+			url.searchParams.set('ver', version);
+			current.href = url.toString();
+		}
+	}
+
+	function syncThemeStyles(newDoc) {
+		var incoming = newDoc.getElementById('glintide-style-css');
+		var href = incoming ? incoming.getAttribute('href') : '';
+		var current = document.getElementById('glintide-style-css');
+
+		if (current && href && current.getAttribute('href') !== href) {
+			current.setAttribute('href', href);
+		}
+		syncCurrentThemeStyle();
+	}
+
 	function pauseMedia() {
 		document.querySelectorAll('video, audio').forEach(function (media) {
 			if (!media.paused) {
@@ -107,6 +133,7 @@
 			pair[0].innerHTML = pair[1].innerHTML;
 		});
 
+		syncThemeStyles(newDoc);
 		document.title = newDoc.title || document.title;
 
 		if (push) {
@@ -162,6 +189,8 @@
 			window.location.href = url;
 		});
 	}
+
+	syncCurrentThemeStyle();
 
 	document.addEventListener('click', function (event) {
 		var link = event.target && event.target.closest ? event.target.closest('a') : null;

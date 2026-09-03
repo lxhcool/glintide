@@ -141,7 +141,7 @@ html[data-glintide-theme="dark"] {
 	--color-glintide-inverse: #ffffff;
 	--color-glintide-overlay: rgba(17, 24, 39, 0.75);
 
-	--glintide-shadow-card: 0 1px 3px rgba(17, 24, 39, 0.36), 0 4px 14px rgba(17, 24, 39, 0.3);
+	--glintide-shadow-card: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.12) 0px 8px 40px -12px;
 	--glintide-shadow-float: 0 8px 30px rgba(17, 24, 39, 0.48);
 	--glintide-article-callout: #1f2937;
 	--glintide-moment-ink: #e5ede7;
@@ -1100,17 +1100,17 @@ button {
 
 /* 瀑布流容器:纯 CSS columns,列数按视口自适应,不依赖 JS 计算高度 */
 .glintide-card-grid {
-	--glintide-masonry-gap: 16px;
+	--glintide-card-gap: 20px;
 	display: block;
 	column-count: 3;
-	column-gap: var(--glintide-masonry-gap);
+	column-gap: var(--glintide-card-gap);
 	column-fill: balance;
 }
 
 .glintide-card-grid>.glintide-card {
 	display: flex;
 	width: 100%;
-	margin: 0 0 var(--glintide-masonry-gap);
+	margin: 0 0 var(--glintide-card-gap);
 	vertical-align: top;
 	break-inside: avoid;
 	page-break-inside: avoid;
@@ -1125,19 +1125,13 @@ button {
 	border: 0;
 	border-radius: var(--glintide-radius);
 	background: var(--color-glintide-surface);
-	box-shadow: none;
 	transition: transform .2s ease, box-shadow .2s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
 	.glintide-card:hover {
 		transform: translateY(-2px);
-		box-shadow: none;
 	}
-}
-
-.glintide-card:focus-within {
-	box-shadow: none;
 }
 
 .glintide-card--photo,
@@ -1145,7 +1139,6 @@ button {
 .glintide-card--photo:focus-within {
 	border: 0;
 	background: transparent;
-	box-shadow: none;
 	transform: none;
 }
 
@@ -1229,8 +1222,8 @@ html[data-glintide-theme="dark"] .glintide-card-type--video {
 	width: 100%;
 }
 
-/* img 铺满规则只作用于照片轮播,避免压过各卡片模块内部的小尺寸图片(如头像) */
-.glintide-card-media--photo .glintide-photo-slide img {
+/* 照片缩略图统一铺满各自的拼贴格 */
+.glintide-card-media--photo .glintide-photo-tile img {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -1653,7 +1646,129 @@ html[data-glintide-theme="dark"] .glintide-card-type--video {
 	box-shadow: 0 0 0 3px rgb(49 87 255 / 18%);
 }
 
-/* 动态卡片:真实背景图 + 模糊洗底 + 玻璃面板 */
+/* 文章卡片:紧凑内容预览 */
+.glintide-card--article {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: auto;
+	padding: 12px;
+	background: var(--color-glintide-surface);
+}
+
+.glintide-article-cover-link {
+	display: block;
+	width: 100%;
+	margin: 0;
+	aspect-ratio: 3 / 2;
+	overflow: hidden;
+	border-radius: 12px;
+	background: var(--color-glintide-surface-soft);
+	line-height: 0;
+}
+
+.glintide-article-cover {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform .25s ease, filter .25s ease;
+}
+
+.glintide-article-cover-link:hover .glintide-article-cover {
+	transform: scale(1.02);
+	filter: saturate(1.04);
+}
+
+.glintide-article-heading {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	min-width: 0;
+	margin-top: 16px;
+}
+
+.glintide-article-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0;
+	color: var(--color-glintide-ink);
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.35;
+	letter-spacing: 0;
+}
+
+.glintide-article-title a {
+	color: inherit;
+	text-decoration: none;
+	transition: color .2s ease;
+}
+
+.glintide-article-title a:hover {
+	color: var(--color-glintide-primary);
+}
+
+.glintide-article-date {
+	flex: 0 0 auto;
+	color: var(--color-glintide-muted-soft);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.glintide-article-summary {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	max-width: 100%;
+	margin: 8px 0 0;
+	overflow: hidden;
+	color: var(--color-glintide-muted);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.6;
+	letter-spacing: .01em;
+}
+
+.glintide-article-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: 16px;
+	padding: 0;
+	border-top: 0;
+}
+
+.glintide-article-stats {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	min-width: 0;
+}
+
+.glintide-article-stat {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: var(--color-glintide-muted);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.glintide-article-stat i {
+	flex: 0 0 auto;
+	color: var(--color-glintide-primary-muted);
+	font-size: 13px;
+	line-height: 1;
+}
+
 .glintide-card--moment {
 	padding: 0;
 	background: transparent;
@@ -1802,17 +1917,27 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 @media (hover: hover) and (pointer: fine) {
 	.glintide-card--article:hover,
 	.glintide-card--moment:hover {
-		box-shadow: var(--glintide-shadow-float);
+		box-shadow: var(--glintide-shadow-card);
 	}
 }
 
 @media (max-width: 640px) {
 	.glintide-card--article {
-		padding: 15px;
+		padding: 12px;
 	}
 
-	.glintide-article-title {
-		font-size: 18px;
+	.glintide-article-heading {
+		gap: 8px;
+		margin-top: 14px;
+	}
+
+	.glintide-article-summary {
+		margin-top: 8px;
+		font-size: 12px;
+	}
+
+	.glintide-article-footer {
+		margin-top: 14px;
 	}
 
 	.glintide-moment-glass {
@@ -1862,66 +1987,187 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	}
 }
 
-/* ---------- 照片卡片 (背景图轮播) ---------- */
+/* ---------- 照片卡片 (自适应拼贴网格) ---------- */
+.glintide-card--photo {
+	align-items: flex-start;
+}
+
 .glintide-photo-frame {
 	position: relative;
-	display: block;
+	display: flex;
+	flex-direction: column;
 	width: 100%;
-	aspect-ratio: 1 / 1;
-	padding: 0;
+	max-width: none;
+	aspect-ratio: auto;
+	padding: 12px;
 	overflow: hidden;
 	border: 0;
-	border-radius: inherit;
-	background: transparent;
+	border-radius: 16px;
+	background: #fff;
 	box-shadow: none;
 	z-index: 0;
 	container: glintide-photo / inline-size;
 }
 
-.glintide-photo-viewport {
+.glintide-photo-grid {
 	position: relative;
+	inset: auto;
+	display: grid;
 	width: 100%;
-	height: 100%;
+	height: auto;
+	flex: 0 0 auto;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	gap: 8px;
 	overflow: hidden;
-	border-radius: 16px;
-	background: var(--color-glintide-media-dark);
+	border-radius: inherit;
 	z-index: 0;
-	touch-action: pan-y;
 }
 
-.glintide-photo-track {
-	display: flex;
-	width: 100%;
-	height: 100%;
-	cursor: grab;
-	user-select: none;
-	will-change: transform;
+.glintide-photo-frame--count-1 .glintide-photo-grid {
+	aspect-ratio: 1 / 1;
 }
 
-.glintide-photo-viewport.swiper-grab-cursor,
-.glintide-photo-viewport.swiper-grab-cursor .glintide-photo-track {
-	cursor: grab;
+.glintide-photo-frame--count-2 .glintide-photo-grid {
+	aspect-ratio: 2 / 1;
 }
 
-.glintide-photo-viewport.swiper-grabbing,
-.glintide-photo-viewport.swiper-grabbing .glintide-photo-track {
-	cursor: grabbing;
+.glintide-photo-frame--count-3 .glintide-photo-grid {
+	aspect-ratio: 3 / 2;
 }
 
-.glintide-photo-slide {
+.glintide-photo-frame--count-4 .glintide-photo-grid,
+.glintide-photo-frame--count-8 .glintide-photo-grid,
+.glintide-photo-frame--count-9 .glintide-photo-grid {
+	aspect-ratio: 1 / 1;
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-grid {
+	aspect-ratio: 2 / 1;
+}
+
+.glintide-photo-frame--count-6 .glintide-photo-grid {
+	aspect-ratio: 3 / 2;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-grid {
+	aspect-ratio: 5 / 3;
+}
+
+.glintide-photo-frame--count-2 .glintide-photo-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-rows: 1fr;
+}
+
+.glintide-photo-frame--count-3 .glintide-photo-grid {
+	grid-template-columns: 2fr 1fr;
+	grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.glintide-photo-frame--count-3 .glintide-photo-tile:first-child {
+	grid-row: 1 / span 2;
+}
+
+.glintide-photo-frame--count-4 .glintide-photo-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-grid {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-tile:first-child {
+	grid-column: 1 / span 2;
+	grid-row: 1 / span 2;
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-tile:nth-child(2) {
+	grid-column: 3;
+	grid-row: 1;
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-tile:nth-child(3) {
+	grid-column: 4;
+	grid-row: 1;
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-tile:nth-child(4) {
+	grid-column: 3;
+	grid-row: 2;
+}
+
+.glintide-photo-frame--count-5 .glintide-photo-tile:nth-child(5) {
+	grid-column: 4;
+	grid-row: 2;
+}
+
+.glintide-photo-frame--count-6 .glintide-photo-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-grid {
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:first-child {
+	grid-column: 1 / span 3;
+	grid-row: 1 / span 3;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(2) {
+	grid-column: 4;
+	grid-row: 1;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(3) {
+	grid-column: 5;
+	grid-row: 1;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(4) {
+	grid-column: 4;
+	grid-row: 2;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(5) {
+	grid-column: 5;
+	grid-row: 2;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(6) {
+	grid-column: 4;
+	grid-row: 3;
+}
+
+.glintide-photo-frame--count-7 .glintide-photo-tile:nth-child(7) {
+	grid-column: 5;
+	grid-row: 3;
+}
+
+.glintide-photo-frame--count-8 .glintide-photo-grid,
+.glintide-photo-frame--count-9 .glintide-photo-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.glintide-photo-tile {
 	position: relative;
-	flex: 0 0 100%;
-	width: 100%;
-	height: 100%;
-	margin: 0;
+	display: block;
+	min-width: 0;
+	min-height: 0;
+	padding: 0;
 	overflow: hidden;
+	border: 0;
+	border-radius: 10px;
+	color: inherit;
+	cursor: zoom-in;
 }
 
-.glintide-photo-slide.is-active {
-	z-index: 1;
-}
-
-.glintide-photo-slide img {
+.glintide-photo-tile img {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -1929,44 +2175,37 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	background: var(--color-glintide-media-dark);
 	pointer-events: none;
 	user-select: none;
+	transition: transform .24s ease, filter .24s ease;
 }
 
-.glintide-photo-shade {
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	pointer-events: none;
-	background: linear-gradient(to bottom,
-		transparent 42%,
-		rgb(0 0 0 / 10%) 62%,
-		rgb(0 0 0 / 72%) 100%);
+@media (hover: hover) and (pointer: fine) {
+	.glintide-photo-tile:hover img {
+		transform: scale(1.045);
+	}
+}
+
+.glintide-photo-tile:focus-visible {
+	z-index: 5;
+	outline: 3px solid #fff;
+	outline-offset: -3px;
+	box-shadow: 0 0 0 2px var(--color-glintide-primary);
+}
+
+.glintide-photo-tile:active img {
+	transform: scale(1.02);
 }
 
 .glintide-photo-overlay {
 	position: absolute;
-	inset: 0;
+	inset: auto;
 	z-index: 3;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	padding: 16px;
+	display: block;
+	/* margin-top: -8px; */
+	padding: 0;
 	pointer-events: none;
-}
-
-.glintide-photo-counter {
-	display: inline-flex;
-	align-items: center;
-	align-self: flex-end;
-	min-height: 16px;
-	margin: 0;
-	color: #fff;
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 1;
-	font-variant-numeric: tabular-nums;
-	white-space: nowrap;
-	text-shadow: 0 1px 4px rgb(0 0 0 / 35%);
-	pointer-events: none;
+	width: 100%;
+	bottom: 0;
+	left: 0;
 }
 
 .glintide-photo-like:focus-visible {
@@ -1979,31 +2218,54 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 }
 
 .glintide-photo-bottom {
+	position: relative;
 	display: flex;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
-	gap: 12px;
+	gap: 10px;
 	min-width: 0;
-	margin-top: auto;
+	margin: 0;
+	padding: 12px 10px 8px;
+	border-radius: 0 0 8px 8px;
+	color: var(--color-glintide-ink);
+	pointer-events: auto;
+}
+
+.glintide-photo-bottom::before {
+	position: absolute;
+	inset: -18px -4px -4px;
+	z-index: 0;
+	content: '';
+	background: rgba(255, 255, 255, 0.8);
+	-webkit-backdrop-filter: blur(4px) saturate(140%);
+	backdrop-filter: blur(4px) saturate(140%);
+	-webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 48%, #000 100%);
+	mask-image: linear-gradient(to bottom, transparent 0%, #000 48%, #000 100%);
 	pointer-events: none;
+}
+
+.glintide-photo-bottom > * {
+	position: relative;
+	z-index: 1;
 }
 
 .glintide-photo-profile {
 	display: flex;
+	align-items: center;
 	flex: 0 1 calc(100% - 46px);
-	flex-direction: column;
-	align-items: flex-start;
 	gap: 8px;
 	width: calc(100% - 46px);
 	min-width: 0;
 	max-width: calc(100% - 46px);
+	position: relative;
+	z-index: 6;
 }
 
 .glintide-photo-avatar {
-	flex: 0 0 36px;
-	width: 36px;
-	height: 36px;
-	min-width: 36px;
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
+	min-width: 32px;
 	aspect-ratio: 1;
 	border: 2px solid rgb(255 255 255 / 94%);
 	border-radius: 50%;
@@ -2017,8 +2279,8 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	flex-direction: column;
 	width: 100%;
 	min-width: 0;
-	color: #fff;
-	text-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+	color: var(--color-glintide-ink);
+	text-shadow: none;
 }
 
 .glintide-photo-title,
@@ -2029,34 +2291,40 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 }
 
 .glintide-photo-title {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 700;
-	line-height: 1.45;
+	line-height: 1.4;
 }
 
 .glintide-photo-summary {
 	margin-top: 1px;
-	color: rgb(255 255 255 / 86%);
-	font-size: 12px;
-	line-height: 1.45;
+	color: var(--color-glintide-muted);
+	font-size: 11px;
+	line-height: 1.4;
 }
 
 @container glintide-photo (max-width: 240px) {
 	.glintide-photo-frame {
-		padding: 0;
-	}
-
-	.glintide-photo-viewport {
 		border-radius: 12px;
 	}
 
-	.glintide-photo-overlay {
-		padding: 12px;
+	.glintide-photo-grid {
+		gap: 8px;
 	}
 
-	.glintide-photo-counter {
-		min-height: 14px;
-		font-size: 11px;
+	.glintide-photo-tile {
+		border-radius: 8px;
+	}
+
+	.glintide-photo-overlay {
+		padding: 0;
+	}
+
+	.glintide-photo-avatar {
+		flex-basis: 28px;
+		width: 28px;
+		height: 28px;
+		min-width: 28px;
 	}
 
 	.glintide-photo-title {
@@ -2064,13 +2332,15 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	}
 
 	.glintide-photo-summary {
-		font-size: 11px;
+		font-size: 10px;
 	}
 }
 
 .glintide-card-single--photo .glintide-photo-frame {
+	width: min(720px, 100%);
 	padding: 0;
 }
+
 /* 点赞按钮 */
 .glintide-photo-like {
 	display: inline-flex;
@@ -2084,11 +2354,11 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	border: 0;
 	border-radius: 50%;
 	background: transparent;
-	color: #fff;
+	color: var(--color-glintide-ink);
 	line-height: 1;
 	cursor: pointer;
 	pointer-events: auto;
-	text-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+	text-shadow: none;
 	transition: transform .2s ease, color .2s ease, background-color .2s ease;
 }
 
@@ -2114,6 +2384,216 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	0%   { transform: scale(.6); }
 	50%  { transform: scale(1.25); }
 	100% { transform: scale(1); }
+}
+
+/* ---------- 照片大图预览 ---------- */
+.glintide-photo-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 100001;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background: rgb(3 8 7 / 88%);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity .24s ease, visibility .24s ease;
+}
+
+.glintide-photo-lightbox.is-open {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.glintide-photo-lightbox-backdrop {
+	position: absolute;
+	inset: 0;
+}
+
+.glintide-photo-lightbox-dialog {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	width: min(920px, 100%);
+	height: min(760px, 90vh);
+	min-height: 0;
+	padding: 12px;
+	border-radius: 16px;
+	background: rgb(17 24 39 / 96%);
+	box-shadow: 0 24px 64px rgb(0 0 0 / 40%);
+	transform: translateY(12px) scale(.98);
+	transition: transform .24s ease;
+}
+
+.glintide-photo-lightbox.is-open .glintide-photo-lightbox-dialog {
+	transform: none;
+}
+
+.glintide-photo-lightbox-swiper {
+	position: relative;
+	flex: 1 1 auto;
+	width: 100%;
+	min-height: 0;
+	overflow: hidden;
+	border-radius: 10px;
+	background: var(--color-glintide-media-dark);
+}
+
+.glintide-photo-lightbox-swiper .swiper-wrapper {
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.glintide-photo-lightbox-swiper .swiper-slide {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.glintide-photo-lightbox-swiper img {
+	display: block;
+	width: auto;
+	max-width: 100%;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
+	user-select: none;
+}
+
+.glintide-photo-lightbox-close,
+.glintide-photo-lightbox-nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgb(0 0 0 / 42%);
+	color: #fff;
+	cursor: pointer;
+	transition: background-color .2s ease, color .2s ease, transform .2s ease, opacity .2s ease;
+}
+
+.glintide-photo-lightbox-close {
+	position: absolute;
+	top: 18px;
+	right: 18px;
+	z-index: 5;
+	width: 34px;
+	height: 34px;
+	font-size: 20px;
+}
+
+.glintide-photo-lightbox-close:hover {
+	background: var(--color-glintide-primary);
+	transform: rotate(90deg);
+}
+
+.glintide-photo-lightbox-nav {
+	position: absolute;
+	top: 50%;
+	z-index: 4;
+	width: 38px;
+	height: 38px;
+	margin-top: -19px;
+	font-size: 20px;
+}
+
+.glintide-photo-lightbox-nav--prev {
+	left: 24px;
+}
+
+.glintide-photo-lightbox-nav--next {
+	right: 24px;
+}
+
+.glintide-photo-lightbox-nav:hover {
+	background: var(--color-glintide-primary);
+}
+
+.glintide-photo-lightbox.is-single .glintide-photo-lightbox-nav {
+	opacity: .25;
+	pointer-events: none;
+}
+
+.glintide-photo-lightbox-close:focus-visible,
+.glintide-photo-lightbox-nav:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
+.glintide-photo-lightbox-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	min-width: 0;
+	padding: 12px 4px 2px;
+	color: #fff;
+}
+
+.glintide-photo-lightbox-count {
+	flex: 0 0 auto;
+	color: rgb(255 255 255 / 72%);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+
+.glintide-photo-lightbox-caption {
+	overflow: hidden;
+	color: rgb(255 255 255 / 92%);
+	font-size: 13px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+body.glintide-photo-lightbox-open {
+	overflow: hidden;
+}
+
+@media (max-width: 640px) {
+	.glintide-photo-lightbox {
+		padding: 10px;
+	}
+
+	.glintide-photo-lightbox-dialog {
+		height: min(720px, 92vh);
+		padding: 8px;
+		border-radius: 12px;
+	}
+
+	.glintide-photo-lightbox-close {
+		top: 14px;
+		right: 14px;
+	}
+
+	.glintide-photo-lightbox-nav--prev {
+		left: 14px;
+	}
+
+	.glintide-photo-lightbox-nav--next {
+		right: 14px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-photo-tile img,
+	.glintide-photo-lightbox,
+	.glintide-photo-lightbox-dialog,
+	.glintide-photo-lightbox-close,
+	.glintide-photo-lightbox-nav {
+		transition-duration: .01ms;
+	}
 }
 
 /* ---------- 视频卡片 ---------- */
@@ -2527,16 +3007,16 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	transform: scale(1.1);
 }
 
-/* ---------- 音乐卡片(封面色渐变整体卡片) ---------- */
-/* 卡片外壳:渐变卡片即整卡,去掉白底描边 */
+/* ---------- 音乐卡片(唱片播放器) ---------- */
+/* 卡片外壳:浅色播放器面板,保持内容卡片的独立层级 */
 .glintide-card--music {
 	background: transparent;
 	border: 0;
-	box-shadow: none;
+	box-shadow: var(--glintide-shadow-card);
 }
 
 .glintide-card--music:hover {
-	box-shadow: 0 12px 32px -12px rgba(29, 78, 216, 0.45);
+	box-shadow: var(--glintide-shadow-card);
 }
 
 .glintide-music-card {
@@ -2546,29 +3026,10 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	gap: 14px;
 	padding: 20px;
 	border-radius: var(--glintide-radius);
-	background: linear-gradient(135deg, #58a6f6 0%, #3b82f6 45%, #2563eb 100%);
+	background: var(--color-glintide-surface);
 	color: #fff;
 	overflow: hidden;
 	isolation: isolate;
-}
-
-/* 背景:封面图放大模糊作为渐变底,无封面时保留默认蓝渐变 */
-.glintide-music-card-bg {
-	position: absolute;
-	inset: -48px;
-	z-index: -2;
-	background-size: cover;
-	background-position: center;
-	filter: blur(42px) saturate(1.5) brightness(0.92);
-	transform: scale(1.15);
-}
-
-/* 蓝色渐变罩:统一色调,保证白色文字对比度 */
-.glintide-music-card-tint {
-	position: absolute;
-	inset: 0;
-	z-index: -1;
-	background: linear-gradient(135deg, rgba(91, 157, 246, 0.82) 0%, rgba(59, 118, 240, 0.88) 55%, rgba(33, 84, 214, 0.92) 100%);
 }
 
 .glintide-music-card-head {
@@ -2607,7 +3068,7 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 .glintide-music-card-meta {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 8px;
 	min-width: 0;
 	flex: 1 1 auto;
 	padding-right: 8px;
@@ -2657,7 +3118,7 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 }
 
 .glintide-music-card-play i {
-	font-size: 22px;
+	font-size: 12px;
 	line-height: 1;
 	margin-left: 1px;
 }
@@ -2734,7 +3195,6 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 /* 时间标签:进度条两侧 00:00 / 总时长 */
 .glintide-music-card-time {
 	flex: 0 0 auto;
-	min-width: 36px;
 	color: rgba(255, 255, 255, 0.85);
 	font-size: 11px;
 	line-height: 1.4;
@@ -2898,207 +3358,376 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	border: 0;
 }
 
+/* ---------- 音乐卡片(唱片播放器) ---------- */
+.glintide-music-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	padding: 12px;
+	height: 120px;
+	border-radius: var(--glintide-radius);
+	background: linear-gradient(135deg, var(--color-glintide-primary) 0%, var(--color-glintide-primary-gradient-end) 100%);
+	color: #fff;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.glintide-music-card-main {
+	display: flex;
+	align-items: stretch;
+	gap: 0;
+	width: 100%;
+	height: 96px;
+	min-width: 0;
+	min-height: 0;
+	flex: 0 0 96px;
+}
+
+.glintide-music-card-art {
+	position: relative;
+	flex: 0 0 96px;
+	width: 96px;
+	height: 96px;
+	min-width: 96px;
+	isolation: isolate;
+}
+
+.glintide-music-card-vinyl {
+	position: absolute;
+	top: 57%;
+	left: 0px;
+	z-index: 2;
+	display: block;
+	width: 96px;
+	height: 96px;
+	object-fit: contain;
+	filter: drop-shadow(0 5px 8px rgb(17 24 39 / 18%));
+	transform: translateY(-50%);
+	transition: transform .25s ease;
+}
+
+.glintide-music-card.is-playing .glintide-music-card-vinyl {
+	animation: glintide-music-vinyl-spin 5s linear infinite;
+}
+
+.glintide-music-card.is-playing .glintide-music-card-cover {
+	animation: glintide-music-cover-spin 5s linear infinite;
+}
+
+.glintide-music-card-tonearm {
+	position: absolute;
+	top: -8%;
+	left: 42px;
+	z-index: 3;
+	display: block;
+	height: 60%;
+	width: auto;
+	max-width: none;
+	pointer-events: none;
+	filter: drop-shadow(0 5px 8px rgb(17 24 39 / 16%));
+	transform: rotate(-72deg);
+	transform-origin: 28% 12%;
+	transition: transform .3s ease;
+}
+
+.glintide-music-card.is-playing .glintide-music-card-tonearm {
+	transform: rotate(-24deg);
+}
+
+@keyframes glintide-music-vinyl-spin {
+	from {
+		transform: translateY(-50%) rotate(0deg);
+	}
+	to {
+		transform: translateY(-50%) rotate(360deg);
+	}
+}
+
+@keyframes glintide-music-cover-spin {
+	from {
+		transform: translate(-50%, -50%) rotate(0deg);
+	}
+	to {
+		transform: translate(-50%, -50%) rotate(360deg);
+	}
+}
+
+.glintide-music-card-cover {
+	position: absolute;
+    top: 55%;
+    left: 50%;
+    z-index: 1;
+    display: block;
+    width: 55px;
+    height: 55px;
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: none;
+    transform: translate(-50%, -50%);
+}
+
+.glintide-music-card-cover-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.glintide-music-card-cover-img--placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #292929;
+	color: rgb(255 255 255 / 86%);
+	font-size: 22px;
+	line-height: 1;
+}
+
+.glintide-music-card-info {
+	position: relative;
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+	width: auto;
+	height: 96px;
+	min-width: 0;
+	margin-left: 12px;
+}
+
+.glintide-music-card-top {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	min-width: 0;
+}
+
+.glintide-music-card-top-actions {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	flex: 0 0 auto;
+	margin-left: auto;
+}
+
+.glintide-music-card-top-actions .glintide-music-card-action {
+	width: 20px;
+	height: 20px;
+}
+
+.glintide-music-card-top-actions .glintide-music-card-action i {
+	font-size: 12px;
+}
+
+.glintide-music-card-meta {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+	width: auto;
+	padding: 0;
+}
+
+.glintide-music-card-title {
+	margin: 0;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.1;
+	text-shadow: 0 1px 2px rgb(17 24 39 / 16%);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-music-card-artist {
+	order: -1;
+	margin: 0;
+	color: rgb(255 255 255 / 76%);
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.15;
+	text-shadow: 0 1px 2px rgb(17 24 39 / 14%);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-music-card-play {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 24px;
+	width: 24px;
+	height: 24px;
+	margin-top: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: #fff;
+	color: var(--color-glintide-primary);
+	box-shadow: 0 3px 7px rgb(17 24 39 / 18%);
+	cursor: pointer;
+	transition: background-color .2s ease, transform .2s ease;
+}
+
+.glintide-music-card-play i {
+	font-size: 12px;
+	line-height: 1;
+	margin-left: 1px;
+}
+
+.glintide-music-card-play:hover:not(:disabled) {
+	background: #fff;
+	color: var(--color-glintide-primary-hover);
+	transform: translateY(-1px);
+}
+
+.glintide-music-card-play:focus-visible {
+	outline-color: #fff;
+}
+
+.glintide-music-card-note {
+	position: absolute;
+	right: 0;
+	bottom: 26px;
+	left: 0;
+	margin: 0;
+	overflow: hidden;
+	color: rgb(255 255 255 / 84%);
+	font-size: 10px;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	text-shadow: 0 1px 2px rgb(17 24 39 / 14%);
+	white-space: nowrap;
+}
+
+.glintide-music-card-seek::-webkit-slider-runnable-track {
+	background: linear-gradient(
+		to right,
+		rgb(255 255 255 / 95%) var(--glintide-music-seek-fill),
+		rgb(255 255 255 / 32%) var(--glintide-music-seek-fill)
+	);
+}
+
+.glintide-music-card-seek::-webkit-slider-thumb {
+	background: #fff;
+}
+
+.glintide-music-card-seek::-moz-range-track {
+	background: rgb(255 255 255 / 32%);
+}
+
+.glintide-music-card-seek::-moz-range-progress {
+	background: rgb(255 255 255 / 95%);
+}
+
+.glintide-music-card-seek::-moz-range-thumb {
+	background: #fff;
+}
+
+.glintide-music-card-play-row {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 24px;
+	min-width: 0;
+	flex: 0 0 24px;
+	margin-top: 12px;
+}
+
+.glintide-music-card-bottom {
+	position: static;
+	right: auto;
+	bottom: auto;
+	left: auto;
+	z-index: auto;
+	display: flex;
+	align-items: center;
+	align-self: stretch;
+	width: 100%;
+	height: 22px;
+	min-width: 0;
+	flex: 0 0 22px;
+	gap: 6px;
+	margin-top: 6px;
+	transform: none;
+}
+
+.glintide-music-card-time {
+	color: rgb(255 255 255 / 80%);
+	text-shadow: 0 1px 2px rgb(17 24 39 / 14%);
+}
+
+.glintide-music-card-action {
+	color: rgb(255 255 255 / 90%);
+}
+
+.glintide-music-card-action:hover:not(:disabled) {
+	background: rgb(255 255 255 / 18%);
+	color: #fff;
+}
+
 @media (max-width: 540px) {
 	.glintide-music-card {
-		padding: 16px;
-		gap: 12px;
+		height: 120px;
+		gap: 0;
+		padding: 12px;
+	}
+
+	.glintide-music-card-main {
+		height: 96px;
+		flex-basis: 96px;
+	}
+
+	.glintide-music-card-art {
+		flex-basis: 96px;
+		width: 96px;
+		height: 96px;
+		min-width: 96px;
+	}
+
+	.glintide-music-card-vinyl {
+		left: 4px;
+		width: 96px;
+		height: 96px;
 	}
 
 	.glintide-music-card-cover {
-		width: 40px;
-		height: 40px;
-	}
-
-	.glintide-music-card-title {
-		font-size: 14px;
-	}
-
-	.glintide-music-card-artist {
-		font-size: 12px;
+		left: 26px;
+		width: 52px;
+		height: 52px;
 	}
 
 	.glintide-music-card-play {
-		width: 38px;
-		height: 38px;
+		width: 24px;
+		height: 24px;
+		margin-top: 0;
 	}
 
 	.glintide-music-card-play i {
-		font-size: 20px;
-	}
-
-	.glintide-music-card-lyrics {
-		font-size: 14px;
+		font-size: 12px;
 	}
 
 	.glintide-music-card-time {
-		min-width: 32px;
 		font-size: 10px;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.glintide-music-card-vinyl,
+	.glintide-music-card-cover,
+	.glintide-music-card-tonearm,
 	.glintide-music-card-play,
 	.glintide-music-card-action,
 	.glintide-music-card-seek::-webkit-slider-thumb {
+		animation: none;
 		transition: none;
 	}
-}
-
-/* ---------- 代码卡片(终端窗口式整卡) ---------- */
-/* 整卡即终端:深色底,圆角由卡片裁切 */
-.glintide-card--code {
-	background: #0d1424;
-}
-
-html.glintide-dark .glintide-card--code,
-html[data-glintide-theme="dark"] .glintide-card--code {
-	background: #111a2e;
-}
-
-.glintide-code-window {
-	display: flex;
-	flex-direction: column;
-	min-height: 240px;
-}
-
-.glintide-code-head {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 12px 16px;
-	border-bottom: 1px solid rgb(255 255 255 / 8%);
-}
-
-.glintide-code-dots {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-}
-
-.glintide-code-dots i {
-	width: 11px;
-	height: 11px;
-	border-radius: 50%;
-}
-
-.glintide-code-dots i:nth-child(1) {
-	background: #ff5f57;
-}
-
-.glintide-code-dots i:nth-child(2) {
-	background: #febc2e;
-}
-
-.glintide-code-dots i:nth-child(3) {
-	background: #28c840;
-}
-
-.glintide-code-lang {
-	margin-left: 4px;
-	padding: 2px 9px;
-	border-radius: 999px;
-	background: rgb(96 165 250 / 16%);
-	color: #7db4f8;
-	font-size: 10.5px;
-	font-weight: 700;
-	letter-spacing: .08em;
-	line-height: 1.6;
-}
-
-.glintide-code-count {
-	margin-left: auto;
-	color: rgb(255 255 255 / 40%);
-	font-size: 11px;
-	font-variant-numeric: tabular-nums;
-}
-
-.glintide-code-body {
-	flex: 1 1 auto;
-	min-height: 0;
-	overflow: auto;
-	max-height: 260px;
-	margin: 0;
-	padding: 14px 0;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-	font-size: 12.5px;
-	line-height: 1.7;
-	tab-size: 2;
-}
-
-.glintide-code-body code {
-	display: block;
-	min-width: max-content;
-	padding: 0 16px 0 0;
-	white-space: pre;
-}
-
-.glintide-code-line {
-	display: block;
-	padding-right: 16px;
-	color: #dbe4f3;
-}
-
-.glintide-code-line i {
-	display: inline-block;
-	width: 2.4em;
-	margin-right: 14px;
-	color: rgb(255 255 255 / 24%);
-	font-style: normal;
-	text-align: right;
-	user-select: none;
-}
-
-.glintide-code-line:hover {
-	background: rgb(255 255 255 / 4%);
-}
-
-.glintide-code-empty {
-	color: rgb(255 255 255 / 40%);
-}
-
-.glintide-code-foot {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 16px;
-	border-top: 1px solid rgb(255 255 255 / 8%);
-}
-
-/* 媒体区通用 img 规则(.glintide-card-media img)优先级更高,这里需连同父级选择器抬升 */
-.glintide-card-media .glintide-code-avatar,
-.glintide-code-avatar {
-	flex: 0 0 auto;
-	width: 22px;
-	height: 22px;
-	border-radius: 50%;
-	object-fit: cover;
-}
-
-.glintide-code-author {
-	overflow: hidden;
-	color: rgb(255 255 255 / 55%);
-	font-size: 12px;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-/* 深色代码块内的滚动条 */
-.glintide-code-body {
-	scrollbar-width: thin;
-	scrollbar-color: rgb(255 255 255 / 25%) transparent;
-}
-
-.glintide-code-body::-webkit-scrollbar {
-	height: 8px;
-}
-
-.glintide-code-body::-webkit-scrollbar-track {
-	background: rgb(255 255 255 / 6%);
-}
-
-.glintide-code-body::-webkit-scrollbar-thumb {
-	border-radius: 999px;
-	background: rgb(255 255 255 / 22%);
 }
 
 /* ---------- 空状态 ---------- */
@@ -3797,16 +4426,6 @@ body.glintide-modal-open {
 	margin-top: 0;
 }
 
-/* 可弹窗的代码卡片:悬停提示可点击 */
-.glintide-code-window[data-glintide-modal] {
-	transition: transform .2s ease, box-shadow .2s ease;
-}
-
-.glintide-code-window[data-glintide-modal]:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 10px 28px rgb(2 6 23 / 35%);
-}
-
 /* ---------- 单页详情 ---------- */
 .glintide-card-single {
 	padding: 32px 24px 48px;
@@ -3871,14 +4490,14 @@ body.glintide-modal-open {
 
 @media (max-width: 860px) {
 	.glintide-card-grid {
-		--glintide-masonry-gap: 14px;
+		--glintide-card-gap: 16px;
 		column-count: 2;
 	}
 }
 
 @media (max-width: 640px) {
 	.glintide-card-grid {
-		--glintide-masonry-gap: 12px;
+		--glintide-card-gap: 12px;
 		column-count: 1;
 	}
 
@@ -3908,8 +4527,7 @@ body.glintide-modal-open {
 @media (prefers-reduced-motion: reduce) {
 
 	.glintide-card,
-	.glintide-photo-track,
-	.glintide-photo-slide,
+	.glintide-photo-tile img,
 	.glintide-photo-like,
 	.glintide-video-control,
 	.glintide-video-play,
@@ -5960,7 +6578,6 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 		height: 100vh;
 		min-height: 0;
 		overflow: hidden;
-		background-color: var(--color-glintide-surface);
 	}
 
 	.glintide-site-column--left {

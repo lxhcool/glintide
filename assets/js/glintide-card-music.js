@@ -26,8 +26,8 @@
 
 		var icon = toggle.querySelector('i');
 		if (icon) {
-			icon.classList.toggle('ri-play-fill', !playing);
-			icon.classList.toggle('ri-pause-fill', playing);
+			icon.classList.toggle('icon-icon_play-01', !playing);
+			icon.classList.toggle('icon-icon_pause_linear_light1', playing);
 		}
 
 		toggle.setAttribute('data-state', playing ? 'playing' : 'paused');
@@ -131,7 +131,7 @@
 	}
 
 	/**
-	 * 用网易云返回的封面 URL 替换占位元素,并同步渐变背景
+	 * 用网易云返回的封面 URL 替换占位元素。
 	 */
 	function applyCover(root, url) {
 		var el = q(root, '[data-glintide-music-cover]');
@@ -158,12 +158,6 @@
 			img.setAttribute('alt', titleText);
 
 			el.parentNode.replaceChild(img, el);
-		}
-
-		var bg = q(root, '[data-glintide-music-bg]');
-		if (bg && bg.getAttribute('data-glintide-music-bg-loaded') !== '1') {
-			bg.setAttribute('data-glintide-music-bg-loaded', '1');
-			bg.style.backgroundImage = 'url("' + url + '")';
 		}
 	}
 
@@ -234,9 +228,29 @@
 	}
 
 	/**
+	 * 直接音频播放前确保使用卡片上的最新地址。
+	 */
+	function prepareDirectAudio(root, audio) {
+		if (!audio || root.getAttribute('data-music-source') === 'netease') {
+			return;
+		}
+
+		var source = root.getAttribute('data-music-url') || '';
+		if (!source) {
+			return;
+		}
+
+		if (audio.getAttribute('src') !== source || audio.error) {
+			audio.setAttribute('src', source);
+			audio.load();
+		}
+	}
+
+	/**
 	 * 执行播放
 	 */
 	function doPlay(root, audio) {
+		prepareDirectAudio(root, audio);
 		pauseOthers(audio);
 
 		var promise = audio.play();

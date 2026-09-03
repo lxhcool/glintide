@@ -20,6 +20,21 @@ if ( ! defined( 'PIX_VERSION' ) ) {
 }
 
 /**
+ * 本地开发时禁止前台页面缓存,确保主题资源和模板改动立即生效。
+ */
+function glintide_local_no_cache_headers() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$environment = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : '';
+	if ( 'local' === $environment ) {
+		nocache_headers();
+	}
+}
+add_action( 'send_headers', 'glintide_local_no_cache_headers', 1 );
+
+/**
  * 主题基础设置
  */
 function glintide_setup() {
@@ -106,7 +121,9 @@ function glintide_scripts() {
 	);
 
 	// 主样式
-	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array( 'glintide-swiper-style' ), filemtime( GLINTIDE_DIR . '/style.css' ) );
+	$glintide_style_file    = GLINTIDE_DIR . '/style.css';
+	$glintide_style_version = filemtime( $glintide_style_file ) . '-' . substr( md5_file( $glintide_style_file ), 0, 12 );
+	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array( 'glintide-swiper-style' ), $glintide_style_version );
 
 	// 内容卡片交互(点赞、无限加载所需的 AJAX 配置)
 	wp_enqueue_script(
@@ -178,6 +195,11 @@ function glintide_scripts() {
 		array(),
 		filemtime( GLINTIDE_DIR . '/assets/js/glintide-pjax.js' ),
 		false
+	);
+	wp_add_inline_script(
+		'glintide-pjax',
+		'window.glintideStyleVersion = ' . wp_json_encode( $glintide_style_version ) . ';',
+		'before'
 	);
 
 	// 内容卡片详情弹窗

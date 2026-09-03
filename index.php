@@ -22,7 +22,7 @@ $glintide_card_query = glintide_get_card_feed_query( $glintide_card_page );
 					<div class="glintide-card-stream-heading">
 						<span class="glintide-card-stream-kicker">CONTENT STREAM</span>
 						<h1 class="glintide-card-stream-title">内容卡片</h1>
-						<p class="glintide-card-stream-description">文章、照片、音乐、视频、链接、动态和代码，在这里自然流动。</p>
+						<p class="glintide-card-stream-description">文章、照片、音乐、视频、链接和动态，在这里自然流动。</p>
 					</div>
 					<?php if ( current_user_can( 'publish_posts' ) ) : ?>
 						<a class="glintide-card-publish-link" href="<?php echo esc_url( admin_url( 'post-new.php?post_type=glintide_card' ) ); ?>">
@@ -52,7 +52,7 @@ $glintide_card_query = glintide_get_card_feed_query( $glintide_card_page );
 					<div class="glintide-card-empty">
 						<i class="ri-layout-masonry-line" aria-hidden="true"></i>
 						<strong>还没有内容卡片</strong>
-						<span>发布第一篇文章、照片、音乐、视频、链接、动态或代码。</span>
+						<span>发布第一篇文章、照片、音乐、视频、链接或动态。</span>
 						<?php if ( current_user_can( 'publish_posts' ) ) : ?>
 							<a href="<?php echo esc_url( admin_url( 'post-new.php?post_type=glintide_card' ) ); ?>">现在发布</a>
 						<?php endif; ?>

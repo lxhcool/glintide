@@ -148,51 +148,57 @@
 		});
 	}
 
-	// 音乐封面选择
-	var coverRoot = editor.querySelector('[data-glintide-cover]');
-	if (coverRoot && window.wp && wp.media) {
-		var coverInput  = coverRoot.querySelector('.glintide-card-cover-input');
-		var coverAdd    = coverRoot.querySelector('.glintide-card-cover-add');
-		var coverClear  = coverRoot.querySelector('.glintide-card-cover-clear');
-		var coverPrev   = coverRoot.querySelector('.glintide-card-cover-preview');
-		var coverFrame;
-
-		function coverShow(url) {
-			if (url) {
-				coverPrev.innerHTML = '<img src="' + url + '" alt="">';
-				coverClear.style.display = '';
-				coverAdd.textContent = '更换封面';
-			} else {
-				coverPrev.innerHTML = '<span class="glintide-card-cover-empty"><i class="ri-image-line" aria-hidden="true"></i></span>';
-				coverClear.style.display = 'none';
-				coverAdd.textContent = '选择封面';
-			}
-		}
-
-		coverAdd.addEventListener('click', function (event) {
-			event.preventDefault();
-			if (coverFrame) {
-				coverFrame.open();
+	// 封面选择(文章 / 音乐)
+	var coverRoots = editor.querySelectorAll('[data-glintide-cover]');
+	for (var coverIndex = 0; coverIndex < coverRoots.length; coverIndex += 1) {
+		(function (coverRoot) {
+			if (!coverRoot || !window.wp || !wp.media) {
 				return;
 			}
-			coverFrame = wp.media({
-				title: '选择封面',
-				library: { type: 'image' },
-				multiple: false,
-				button: { text: '使用此封面' }
-			});
-			coverFrame.on('select', function () {
-				var att = coverFrame.state().get('selection').first().toJSON();
-				coverInput.value = String(att.id);
-				coverShow(att.sizes && att.sizes.thumbnail ? att.sizes.thumbnail.url : att.url);
-			});
-			coverFrame.open();
-		});
 
-		coverClear.addEventListener('click', function (event) {
-			event.preventDefault();
-			coverInput.value = '';
-			coverShow('');
-		});
+			var coverInput = coverRoot.querySelector('.glintide-card-cover-input');
+			var coverAdd   = coverRoot.querySelector('.glintide-card-cover-add');
+			var coverClear = coverRoot.querySelector('.glintide-card-cover-clear');
+			var coverPrev  = coverRoot.querySelector('.glintide-card-cover-preview');
+			var coverFrame;
+
+			function coverShow(url) {
+				if (url) {
+					coverPrev.innerHTML = '<img src="' + url + '" alt="">';
+					coverClear.style.display = '';
+					coverAdd.textContent = '更换封面';
+				} else {
+					coverPrev.innerHTML = '<span class="glintide-card-cover-empty"><i class="ri-image-line" aria-hidden="true"></i></span>';
+					coverClear.style.display = 'none';
+					coverAdd.textContent = '选择封面';
+				}
+			}
+
+			coverAdd.addEventListener('click', function (event) {
+				event.preventDefault();
+				if (coverFrame) {
+					coverFrame.open();
+					return;
+				}
+				coverFrame = wp.media({
+					title: '选择封面',
+					library: { type: 'image' },
+					multiple: false,
+					button: { text: '使用此封面' }
+				});
+				coverFrame.on('select', function () {
+					var att = coverFrame.state().get('selection').first().toJSON();
+					coverInput.value = String(att.id);
+					coverShow(att.sizes && att.sizes.thumbnail ? att.sizes.thumbnail.url : att.url);
+				});
+				coverFrame.open();
+			});
+
+			coverClear.addEventListener('click', function (event) {
+				event.preventDefault();
+				coverInput.value = '';
+				coverShow('');
+			});
+		}(coverRoots[coverIndex]));
 	}
 }(window.jQuery));
