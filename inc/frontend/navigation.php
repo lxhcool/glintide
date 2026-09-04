@@ -35,6 +35,14 @@ function glintide_render_left_navigation() {
         $html .= '<nav class="glintide-left-rail-menu" aria-label="主导航">' . $menu . '</nav>';
     }
 
+    if ( is_active_sidebar( 'sidebar-left' ) ) {
+        $html .= '<div class="glintide-left-widget-stack">';
+        ob_start();
+        dynamic_sidebar( 'sidebar-left' );
+        $html .= ob_get_clean();
+        $html .= '</div>';
+    }
+
     $html .= '<div class="glintide-left-rail-footer">';
     $html .= '<span class="glintide-left-rail-copyright">&copy; 2026 Glintide All rights reserved.</span>';
     $html .= '</div>';

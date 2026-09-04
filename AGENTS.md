@@ -5,7 +5,8 @@
 ## 1. 当前项目边界
 
 - 当前运行代码是仓库根目录：`functions.php`、`style.css`、`header.php`、`footer.php`、`index.php`、`single.php`、`tpl/`、`inc/` 和 `assets/`。
-- `reference/` 是旧主题/参考实现，`backup/` 是备份。除非任务明确要求“参考”或“移植”，只读，不把其中的文件当成当前实现，也不直接覆盖根目录文件。
+- `pix/` 与 `reference/` 都是参考主题目录，仅用于查阅、对比和按明确要求移植；它们不属于当前根目录的运行实现，不要直接改写或覆盖其中内容。
+- `backup/` 是备份。除非任务明确要求“参考”或“移植”，只读，不把其中的文件当成当前实现，也不直接覆盖根目录文件。
 - `inc/assets/codestar-framework/` 是随主题保存的 Codestar Framework 第三方代码。不要在里面重构、格式化或升级框架；通过现有配置接入。
 - `inc/mod/glintide-widget.php` 是旧的小工具实现，当前根目录 `functions.php` 不加载它。新增或修改小工具使用 `inc/widgets/` 的自动扫描机制；只有明确做旧功能移植时才处理旧模块。
 - `AGENTS.md` 与 `AI-DEVELOPMENT-RULES.md` 都可能包含历史规则；如果文档和当前根目录代码冲突，以用户要求和实际加载链路为准，并在交付时说明差异。
