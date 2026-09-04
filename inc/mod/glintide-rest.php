@@ -178,7 +178,7 @@ function glintide_netease_get_song_meta( $id, $headers ) {
 /**
  * 单曲解析 API
  *
- * 返回音频直链;受版权限制时 audioUrl 为空,由前端降级为官方嵌入播放器。
+ * 返回音频直链;受版权限制时 audioUrl 为空,由前端提供官方歌曲页播放入口。
  *
  * @param WP_REST_Request $request 请求对象
  * @return array|WP_Error
@@ -191,7 +191,7 @@ function glintide_netease_song_api( $request ) {
 		return new WP_Error( 'invalid_url', '无效的网易云歌曲链接', array( 'status' => 400 ) );
 	}
 
-	$cache_key = 'glintide_netease_song_' . $id;
+	$cache_key = 'glintide_netease_song_v2_' . $id;
 	$cached    = get_transient( $cache_key );
 
 	if ( is_array( $cached ) ) {
@@ -211,8 +211,12 @@ function glintide_netease_song_api( $request ) {
 		'cover'    => isset( $meta['cover'] ) ? $meta['cover'] : '',
 	);
 
-	// 直链有时效,短时间缓存;解析失败时缓存更久,避免频繁请求第三方
-	set_transient( $cache_key, $result, $audio_url ? 2 * HOUR_IN_SECONDS : 10 * MINUTE_IN_SECONDS );
+	// 直链有时效,最多缓存 10 分钟;失败结果不缓存,避免临时限制阻塞后续重试
+	if ( $audio_url ) {
+		set_transient( $cache_key, $result, 10 * MINUTE_IN_SECONDS );
+	} else {
+		delete_transient( $cache_key );
+	}
 
 	return $result;
 }

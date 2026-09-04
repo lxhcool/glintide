@@ -4,7 +4,7 @@
 
 ## 1. 当前项目边界
 
-- 当前运行代码是仓库根目录：`functions.php`、`style.css`、`header.php`、`footer.php`、`index.php`、`single-glintide_card.php`、`tpl/`、`inc/` 和 `assets/`。
+- 当前运行代码是仓库根目录：`functions.php`、`style.css`、`header.php`、`footer.php`、`index.php`、`single.php`、`tpl/`、`inc/` 和 `assets/`。
 - `reference/` 是旧主题/参考实现，`backup/` 是备份。除非任务明确要求“参考”或“移植”，只读，不把其中的文件当成当前实现，也不直接覆盖根目录文件。
 - `inc/assets/codestar-framework/` 是随主题保存的 Codestar Framework 第三方代码。不要在里面重构、格式化或升级框架；通过现有配置接入。
 - `inc/mod/glintide-widget.php` 是旧的小工具实现，当前根目录 `functions.php` 不加载它。新增或修改小工具使用 `inc/widgets/` 的自动扫描机制；只有明确做旧功能移植时才处理旧模块。
@@ -33,7 +33,7 @@ functions.php
 
 - `header.php` 和 `footer.php` 是最小页面骨架，必须保留 `wp_head()`、`wp_body_open()`、`wp_footer()` 以及现有容器 ID/class。
 - `index.php` 是当前首页内容卡片流，负责左栏导航、中栏卡片流、右栏工具和无限加载哨兵。
-- `single-glintide_card.php` 是 `glintide_card` 内容卡片的独立页面模板。
+- `single.php` 是统一文章和内容类型的独立页面模板。
 - `tpl/content-card.php` 负责单张卡片的结构，媒体输出统一调用 `glintide_card_media_html()`。
 - 根目录目前没有使用中的 `archive.php`、`single.php`、`page.php` 等模板；`reference/` 或 `backup/` 中有这些文件，不代表当前主题已加载它们。
 
@@ -54,20 +54,22 @@ functions.php
 
 ### 3.3 内容卡片数据模型
 
-- 自定义文章类型是 `glintide_card`，固定链接 slug 是 `content-card`，没有 archive，支持标题、正文、特色图、作者和评论，并使用 `category`、`post_tag`。
-- 卡片类型只有 `text`、`photo`、`music`、`video`、`link`、`moment`。未知类型回退为 `text`；旧的 `quote` 类型在读取时映射为 `moment`，不要删除这条兼容逻辑。
+- 统一内容实体是 WordPress 默认文章 `post`，文章编辑页通过 `_glintide_card_type` 选择文章、照片、音乐、视频或链接，并使用 `category`、`post_tag`。
+- 卡片类型只有 `text`、`photo`、`music`、`video`、`link`。未知类型回退为 `text`。
 - 关键 meta key 由 `inc/mod/glintide-content-cards.php` 统一读写：
 
   - `_glintide_card_type`
   - `_glintide_card_article_cover`
   - `_glintide_card_gallery`
-  - `_glintide_card_music_title`、`_glintide_card_music_artist`、`_glintide_card_music_url`、`_glintide_card_music_cover`
+  - `_glintide_card_music_source`、`_glintide_card_music_title`、`_glintide_card_music_artist`、`_glintide_card_music_url`、`_glintide_card_music_cover`
   - `_glintide_card_video_url`
+  - `_glintide_card_video_source`（`bilibili`、`youtube` 或 `upload`）
   - `_glintide_card_link_url`、`_glintide_card_link_label`
-  - `_glintide_card_moment_source`；读取时兼容 `_glintide_card_quote_source`
   - `likes_count` 以及登录用户的 `glintide_card_likes`
 
-- `glintide_card_rewrite_version`、`glintide_card_seed_version` 和 seed 标记用于固定链接刷新及演示卡片初始化。修改注册、seed 或版本标记前，先确认是否会触发重写刷新、补数据或影响已有文章。
+  - `music` 先选择音频地址或自己上传：网易云地址自动获取歌名、作者和封面，自上传音频再手动填写这些信息，且不要求正文；直链不可用时提供网易云官方歌曲页播放入口。`video` 先选择 Bilibili、YouTube 或自己上传，链接使用嵌入播放器，上传视频使用自定义控制层，视频类型不要求正文；`link` 使用网页 iframe 预览，悬停时缓慢滚动，点击在新窗口打开。
+
+- `glintide_card_seed_version` 和 seed 标记用于演示文章初始化。修改 seed 或版本标记前，先确认是否会补数据或影响已有文章。
 - 首次运行的演示卡片创建逻辑是幂等的，但可能写入站点数据。不要为了测试反复改变 seed 版本，也不要把演示数据逻辑复制到模板中。
 - 修改 meta、option 或卡片类型时，先用 `rg` 找出所有读写方；不能只改后台字段而忘记前台渲染器、单页、AJAX 和 JS。
 
@@ -75,7 +77,7 @@ functions.php
 
 - 主题功能挂在 WordPress 生命周期：主题支持和菜单用 `after_setup_theme`，小工具区域用 `widgets_init`，前台资源用 `wp_enqueue_scripts`，后台卡片资源用 `admin_enqueue_scripts`，REST 路由用 `rest_api_init`。
 - CSS/JS 必须通过 enqueue 加载。当前资源版本主要使用 `filemtime()`；修改资源加载时保留稳定 handle、依赖关系和加载位置。
-- 当前卡片后台只在 `glintide_card` 编辑/列表页面加载 `glintide-card-admin.css` 和 `glintide-card-admin.js`。不要把媒体库和后台卡片脚本无条件加载到所有后台页面。
+- 当前内容类型后台只在 `post` 编辑/列表页面加载 `glintide-card-admin.css` 和 `glintide-card-admin.js`。不要把媒体库和后台内容类型脚本无条件加载到所有后台页面。
 - 模板只组织结构；卡片类型判断、meta 读取、媒体 URL 解析、AJAX 输出放在 `inc/mod/glintide-content-cards.php` 或对应功能模块，不在模板里堆数据库查询和业务流程。
 - 被直接加载的 PHP 模块保留 `ABSPATH` 防护。输出边界按数据类型使用 `esc_html()`、`esc_attr()`、`esc_url()`、`wp_kses_post()`；写入前使用 `wp_unslash()`、`sanitize_key()`、`sanitize_text_field()`、`esc_url_raw()`、`absint()` 等合适处理。
 - 后台保存卡片必须保留 nonce、`current_user_can( 'edit_post', $post_id )` 和字段级校验。客户端隐藏字段或 JS 校验不能代替服务端校验。
@@ -131,7 +133,7 @@ glintide_card_like       # 点赞/取消点赞
 
 ### 7.2 各卡片类型
 
-- `text` 是文章/随笔排版卡片；`photo` 使用照片拼贴和 Swiper lightbox；`music` 支持自上传音频和网易云解析/官方播放器降级；`video` 使用自定义控制层并暂停其他视频；`link` 保持外部链接语义；`moment` 是动态文字/来源卡片。
+- `text` 是文章/随笔排版卡片；`photo` 使用照片拼贴和 Swiper lightbox；`music` 支持自上传音频和网易云解析/官方播放器降级；`video` 使用自定义控制层并暂停其他视频；`link` 使用网页 iframe 预览。
 - 媒体统一由 `glintide_card_media_html( $post_id, 'card'|'single' )` 输出。空媒体优先走 `glintide_card_media_empty()`，不要每种类型另造一套占位结构。
 - 照片画廊当前最多渲染 9 张。若改变数量、缩略图/大图字段或 `data-glintide-photo-*` 属性，要同步后台字段、PHP 输出、lightbox 和移动端布局。
 - 卡片中的 `<a>` 用于导航，`<button>` 用于播放、点赞、关闭、切换等动作；弹窗、照片预览、视频控制和主题切换必须保留键盘操作、焦点可见、`aria-label`/`aria-expanded`/`aria-pressed` 等状态。
@@ -165,7 +167,7 @@ glintide_card_like       # 点赞/取消点赞
 - 文档或 CSS 改动至少运行 `git diff --check`。
 - PHP 改动对每个变更文件运行 `php -l`；如果没有 WordPress 运行环境，不要声称已完成页面运行验证。
 - JS 改动对每个独立 JS 文件运行 `node --check`；PHP 内联脚本还需要在实际页面或浏览器控制台检查。
-- 前台改动应验证首页、`glintide_card` 单页、空数据、无限加载、PJAX 返回、照片预览、音乐直链/降级、视频控制、点赞/评论和主题切换；涉及后台时再验证卡片编辑器、媒体库、设置页和小工具注册。
+- 前台改动应验证首页、统一文章单页、空数据、无限加载、PJAX 返回、照片预览、音乐直链/降级、视频控制、点赞/评论和主题切换；涉及后台时再验证文章编辑器、媒体库、设置页和小工具注册。
 - 最终说明改了哪些文件、做了哪些验证、哪些部分没有真实运行条件。没有浏览器或 WordPress 页面证据时，不要把“语法通过”写成“页面已可用”。
 
 交付判断以当前产品契约为准：主题仍能被 WordPress 识别，`wp_head`/`wp_body_open`/`wp_footer` 完整，后台设置/小工具/REST/AJAX 契约未被意外破坏，卡片在桌面和移动端的正常、空、加载、失败状态都有明确行为。

@@ -2,7 +2,7 @@
 /**
  * Glintide 内容卡片
  *
- * 注册独立的内容卡片类型，提供后台发布字段和前台多媒体渲染能力。
+ * 为普通文章提供内容类型字段和前台多媒体渲染能力。
  *
  * @package glintide
  */
@@ -38,11 +38,6 @@ function glintide_card_type_options() {
 			'icon'        => 'ri-video-line',
 			'description' => '发布视频或视频链接',
 		),
-		'moment' => array(
-			'label'       => '动态',
-			'icon'        => 'ri-chat-3-line',
-			'description' => '发布一段动态文字,可配背景图',
-		),
 		'link'  => array(
 			'label'       => '链接',
 			'icon'        => 'ri-links-line',
@@ -52,75 +47,7 @@ function glintide_card_type_options() {
 }
 
 /**
- * 注册内容卡片自定义文章类型。
- */
-function glintide_register_content_card_type() {
-	$labels = array(
-		'name'               => '内容卡片',
-		'singular_name'      => '内容卡片',
-		'menu_name'          => '内容卡片',
-		'name_admin_bar'     => '内容卡片',
-		'add_new'            => '发布卡片',
-		'add_new_item'       => '发布内容卡片',
-		'new_item'           => '新内容卡片',
-		'edit_item'          => '编辑内容卡片',
-		'view_item'          => '查看内容卡片',
-		'all_items'          => '全部卡片',
-		'search_items'       => '搜索卡片',
-		'not_found'          => '暂无内容卡片',
-		'not_found_in_trash' => '回收站暂无内容卡片',
-	);
-
-	register_post_type(
-		'glintide_card',
-		array(
-			'labels'             => $labels,
-			'public'             => true,
-			'publicly_queryable' => true,
-			'show_ui'            => true,
-			'show_in_menu'       => true,
-			'show_in_rest'       => true,
-			'menu_position'      => 5,
-			'menu_icon'          => 'dashicons-format-gallery',
-			'capability_type'    => 'post',
-			'map_meta_cap'       => true,
-			'has_archive'        => false,
-			'rewrite'            => array(
-				'slug'       => 'content-card',
-				'with_front' => false,
-			),
-			'supports'           => array( 'title', 'editor', 'thumbnail', 'author', 'comments' ),
-			'taxonomies'         => array( 'category', 'post_tag' ),
-			'show_in_nav_menus'  => false,
-		)
-	);
-}
-add_action( 'init', 'glintide_register_content_card_type' );
-
-/**
- * 主题切换时刷新内容卡片的固定链接规则。
- */
-function glintide_flush_content_card_rewrites() {
-	glintide_register_content_card_type();
-	flush_rewrite_rules();
-}
-add_action( 'after_switch_theme', 'glintide_flush_content_card_rewrites' );
-
-/**
- * 主题已经启用时，为新加入的内容卡片规则做一次性刷新。
- */
-function glintide_maybe_flush_content_card_rewrites() {
-	$rewrite_version = get_option( 'glintide_card_rewrite_version', '' );
-
-	if ( GLINTIDE_VERSION !== $rewrite_version ) {
-		flush_rewrite_rules( false );
-		update_option( 'glintide_card_rewrite_version', GLINTIDE_VERSION );
-	}
-}
-add_action( 'init', 'glintide_maybe_flush_content_card_rewrites', 20 );
-
-/**
- * 首次运行时创建一组可直接预览的内容卡片。
+ * 首次运行时创建一组可直接预览的文章内容。
  *
  * 每种类型只补齐缺少的内容，不会覆盖已有卡片；使用固定标记避免重复创建。
  */
@@ -168,14 +95,6 @@ function glintide_seed_content_cards() {
 				'_glintide_card_link_label' => '阅读渐进增强的完整说明',
 			),
 		),
-		'moment' => array(
-			'title'   => '火车',
-			'content' => "去吧,愿您一路平安,桥都坚固,隧道都光明。",
-			'meta'    => array(
-				'_glintide_card_moment_source' => '塔朗吉',
-				'_glintide_card_gallery'       => GLINTIDE_URL . '/assets/images/banner.jpg',
-			),
-		),
 	);
 
 	$author_id = get_current_user_id();
@@ -191,11 +110,10 @@ function glintide_seed_content_cards() {
 	}
 
 	foreach ( $card_content as $type => $content ) {
-		// 动态类型需兼容存量引用卡片的 meta 值
-		$type_values = ( 'moment' === $type ) ? array( 'moment', 'quote' ) : array( $type );
+		$type_values = array( $type );
 		$existing    = get_posts(
 			array(
-				'post_type'      => 'glintide_card',
+				'post_type'      => 'post',
 				'post_status'    => array( 'publish', 'draft', 'pending', 'future', 'private' ),
 				'posts_per_page' => 1,
 				'meta_query'     => array(
@@ -223,7 +141,7 @@ function glintide_seed_content_cards() {
 				);
 			}
 			if ( $existing_seed !== $seed_version ) {
-				// 存量引用卡片正式迁移为动态类型
+				// 更新演示文章的内容类型和媒体字段
 				update_post_meta( $existing_id, '_glintide_card_type', $type );
 				foreach ( $content['meta'] as $meta_key => $meta_value ) {
 					if ( '_glintide_card_type' === $meta_key ) {
@@ -240,7 +158,7 @@ function glintide_seed_content_cards() {
 			'post_title'   => $content['title'],
 			'post_content' => $content['content'],
 			'post_status'  => 'publish',
-			'post_type'    => 'glintide_card',
+			'post_type'    => 'post',
 		);
 
 		if ( $author_id ) {
@@ -272,14 +190,43 @@ add_action( 'init', 'glintide_seed_content_cards', 30 );
 function glintide_add_content_card_meta_boxes() {
 	add_meta_box(
 		'glintide-card-details',
-		'卡片内容设置',
+		'内容类型与媒体设置',
 		'glintide_render_content_card_meta_box',
-		'glintide_card',
+		'post',
 		'normal',
 		'high'
 	);
 }
-add_action( 'add_meta_boxes_glintide_card', 'glintide_add_content_card_meta_boxes' );
+add_action( 'add_meta_boxes_post', 'glintide_add_content_card_meta_boxes' );
+
+/**
+ * 在文章标题上方输出内容类型选择器。
+ *
+ * @param WP_Post $post 当前文章对象。
+ */
+function glintide_render_content_card_type_above_title( $post ) {
+	if ( ! $post instanceof WP_Post || 'post' !== $post->post_type ) {
+		return;
+	}
+
+	$type_options = glintide_card_type_options();
+	$selected     = glintide_card_get_type( $post->ID );
+	?>
+	<div class="glintide-card-type-bar" data-glintide-card-editor>
+		<fieldset class="glintide-card-type-fieldset">
+			<div class="glintide-card-type-options">
+				<?php foreach ( $type_options as $type => $type_data ) : ?>
+					<label class="glintide-card-type-option<?php echo $selected === $type ? ' is-selected' : ''; ?>">
+						<input type="radio" name="glintide_card_type" value="<?php echo esc_attr( $type ); ?>" <?php checked( $selected, $type ); ?>>
+						<span class="glintide-card-type-option-title"><i class="<?php echo esc_attr( $type_data['icon'] ); ?>" aria-hidden="true"></i><?php echo esc_html( $type_data['label'] ); ?></span>
+					</label>
+				<?php endforeach; ?>
+			</div>
+		</fieldset>
+	</div>
+	<?php
+}
+add_action( 'edit_form_top', 'glintide_render_content_card_type_above_title' );
 
 /**
  * 输出内容卡片设置面板。
@@ -287,50 +234,28 @@ add_action( 'add_meta_boxes_glintide_card', 'glintide_add_content_card_meta_boxe
  * @param WP_Post $post 当前文章对象。
  */
 function glintide_render_content_card_meta_box( $post ) {
-	$type_options = glintide_card_type_options();
 	$selected     = glintide_card_get_type( $post->ID );
 	$artist       = get_post_meta( $post->ID, '_glintide_card_music_artist', true );
 	$music_title  = get_post_meta( $post->ID, '_glintide_card_music_title', true );
 	$music_cover  = get_post_meta( $post->ID, '_glintide_card_music_cover', true );
 	$article_cover = get_post_meta( $post->ID, '_glintide_card_article_cover', true );
-	$article_cover_preview_url = '';
-	if ( $article_cover ) {
-		$article_cover_preview_url = is_numeric( $article_cover ) ? wp_get_attachment_image_url( absint( $article_cover ), 'thumbnail' ) : esc_url( $article_cover );
-	}
+	$article_cover_preview_url = $article_cover ? ( is_numeric( $article_cover ) ? wp_get_attachment_image_url( absint( $article_cover ), 'thumbnail' ) : esc_url( $article_cover ) ) : '';
 	$music_url    = get_post_meta( $post->ID, '_glintide_card_music_url', true );
+	$music_source = get_post_meta( $post->ID, '_glintide_card_music_source', true );
+	$music_source = in_array( $music_source, array( 'remote', 'upload' ), true ) ? $music_source : ( false !== stripos( (string) $music_url, 'music.163.com' ) ? 'remote' : 'upload' );
 	$video_url    = get_post_meta( $post->ID, '_glintide_card_video_url', true );
+	$video_source = get_post_meta( $post->ID, '_glintide_card_video_source', true );
+	$video_source = in_array( $video_source, array( 'bilibili', 'youtube', 'upload' ), true ) ? $video_source : ( glintide_card_is_direct_video_url( $video_url ) ? 'upload' : 'youtube' );
 	$link_url      = get_post_meta( $post->ID, '_glintide_card_link_url', true );
 	$link_label    = get_post_meta( $post->ID, '_glintide_card_link_label', true );
-	$moment_source = get_post_meta( $post->ID, '_glintide_card_moment_source', true );
-	if ( ! $moment_source ) {
-		$moment_source = get_post_meta( $post->ID, '_glintide_card_quote_source', true );
-	}
 	$gallery       = get_post_meta( $post->ID, '_glintide_card_gallery', true );
 	$gallery       = is_array( $gallery ) ? implode( "\n", $gallery ) : (string) $gallery;
-	$gallery_active = in_array( $selected, array( 'photo', 'moment' ), true );
+	$gallery_active = 'photo' === $selected;
 
 	wp_nonce_field( 'glintide_save_content_card', 'glintide_content_card_nonce' );
 	?>
-	<div class="glintide-card-editor" data-glintide-card-editor>
-		<p class="glintide-card-editor-intro">选择卡片类型后填写对应内容。文章封面、照片组和音乐封面都可以从媒体库选择。</p>
-
-		<fieldset class="glintide-card-type-fieldset">
-			<legend>卡片类型</legend>
-			<div class="glintide-card-type-options">
-				<?php foreach ( $type_options as $type => $type_data ) : ?>
-					<label class="glintide-card-type-option<?php echo $selected === $type ? ' is-selected' : ''; ?>">
-						<input type="radio" name="glintide_card_type" value="<?php echo esc_attr( $type ); ?>" <?php checked( $selected, $type ); ?>>
-						<span class="glintide-card-type-option-content">
-							<span class="glintide-card-type-option-title"><i class="<?php echo esc_attr( $type_data['icon'] ); ?>" aria-hidden="true"></i><?php echo esc_html( $type_data['label'] ); ?></span>
-							<span class="glintide-card-type-option-description"><?php echo esc_html( $type_data['description'] ); ?></span>
-						</span>
-					</label>
-				<?php endforeach; ?>
-			</div>
-		</fieldset>
-
+	<div class="glintide-card-editor">
 		<div class="glintide-card-field-group<?php echo 'text' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="text" aria-hidden="<?php echo 'text' === $selected ? 'false' : 'true'; ?>">
-			<p class="description">文章标题和正文组成文章卡片，封面为可选项。</p>
 			<div class="glintide-card-field-row glintide-card-field-row--cover">
 				<label><strong>文章封面（可选）</strong></label>
 				<div class="glintide-card-cover-picker" data-glintide-cover>
@@ -345,15 +270,15 @@ function glintide_render_content_card_meta_box( $post ) {
 						<button type="button" class="button glintide-card-cover-add"><?php echo $article_cover_preview_url ? '更换封面' : '选择封面'; ?></button>
 						<button type="button" class="button glintide-card-cover-clear"<?php echo $article_cover_preview_url ? '' : ' style="display:none"'; ?>>清除</button>
 					</p>
-					<p class="description">非必填。不设置时使用特色图片、正文图片或主题默认图。</p>
+					<p class="description">不设置时使用特色图片、正文图片或主题默认图。</p>
 					<input type="hidden" class="glintide-card-cover-input" name="glintide_card_article_cover" value="<?php echo esc_attr( $article_cover ); ?>">
 				</div>
 			</div>
 		</div>
 
-		<div class="glintide-card-field-group<?php echo $gallery_active ? ' is-active' : ''; ?>" data-glintide-card-fields="photo,moment" aria-hidden="<?php echo $gallery_active ? 'false' : 'true'; ?>">
-			<label><strong>照片组 / 动态背景图（可多选）</strong></label>
-			<p class="description">照片卡片最多显示 9 张，作为背景图轮播；动态卡片使用第一张作为背景。也可以继续使用右侧“特色图片”。</p>
+		<div class="glintide-card-field-group<?php echo $gallery_active ? ' is-active' : ''; ?>" data-glintide-card-fields="photo" aria-hidden="<?php echo $gallery_active ? 'false' : 'true'; ?>">
+			<label><strong>照片组（可多选）</strong></label>
+			<p class="description">照片卡片最多显示 9 张，也可以继续使用右侧“特色图片”。</p>
 			<div class="glintide-card-gallery" data-glintide-card-gallery>
 				<ul class="glintide-card-gallery-list">
 					<?php
@@ -380,18 +305,34 @@ function glintide_render_content_card_meta_box( $post ) {
 		</div>
 
 		<div class="glintide-card-field-group<?php echo 'music' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="music" aria-hidden="<?php echo 'music' === $selected ? 'false' : 'true'; ?>">
+			<div class="glintide-card-music-source" data-glintide-music-source>
+				<label><strong>音乐来源</strong></label>
+				<div class="glintide-card-source-options">
+					<label class="glintide-card-source-option<?php echo 'remote' === $music_source ? ' is-selected' : ''; ?>">
+						<input type="radio" name="glintide_card_music_source" value="remote" <?php checked( $music_source, 'remote' ); ?>><span><i class="ri-link-m" aria-hidden="true"></i>音频地址</span>
+					</label>
+					<label class="glintide-card-source-option<?php echo 'upload' === $music_source ? ' is-selected' : ''; ?>">
+						<input type="radio" name="glintide_card_music_source" value="upload" <?php checked( $music_source, 'upload' ); ?>><span><i class="ri-upload-2-line" aria-hidden="true"></i>自己上传</span>
+					</label>
+				</div>
+			</div>
+			<div class="glintide-card-field-row">
+				<label for="glintide-card-music-url"><strong class="glintide-card-music-url-label">音频地址</strong></label>
+				<div class="glintide-card-music-url-control">
+					<input type="url" id="glintide-card-music-url" name="glintide_card_music_url" value="<?php echo esc_attr( $music_url ); ?>" placeholder="例如：https://music.163.com/#/song?id=287035">
+					<button type="button" class="button glintide-card-music-resolve">自动获取信息</button>
+					<button type="button" class="button glintide-card-music-upload">选择音频</button>
+				</div>
+				<p class="description glintide-card-music-status" aria-live="polite">音频地址会自动获取歌名、作者和封面。</p>
+			</div>
+			<div class="glintide-card-music-manual" data-glintide-music-manual<?php echo 'upload' === $music_source ? ' style="display:block"' : ''; ?>>
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-music-title"><strong>歌名</strong></label>
-				<input type="text" id="glintide-card-music-title" name="glintide_card_music_title" value="<?php echo esc_attr( $music_title ); ?>" placeholder="留空则使用文章标题">
+				<input type="text" id="glintide-card-music-title" name="glintide_card_music_title" value="<?php echo esc_attr( $music_title ); ?>" placeholder="例如：夜航">
 			</div>
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-music-artist"><strong>音乐人 / 作者</strong></label>
 				<input type="text" id="glintide-card-music-artist" name="glintide_card_music_artist" value="<?php echo esc_attr( $artist ); ?>" placeholder="例如：坂本龙一">
-			</div>
-			<div class="glintide-card-field-row">
-				<label for="glintide-card-music-url"><strong>音频地址</strong></label>
-				<input type="url" id="glintide-card-music-url" name="glintide_card_music_url" value="<?php echo esc_attr( $music_url ); ?>" placeholder="https://example.com/track.mp3 或网易云歌曲链接">
-				<p class="description">支持 mp3、m4a、ogg、wav 直链；网易云歌曲链接会自动识别并以嵌入播放器播放。</p>
 			</div>
 			<div class="glintide-card-field-row glintide-card-field-row--cover">
 				<label><strong>封面</strong></label>
@@ -421,18 +362,34 @@ function glintide_render_content_card_meta_box( $post ) {
 					<input type="hidden" class="glintide-card-cover-input" name="glintide_card_music_cover" value="<?php echo esc_attr( $music_cover ); ?>">
 				</div>
 			</div>
+			</div>
 		</div>
 
 		<div class="glintide-card-field-group<?php echo 'video' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="video" aria-hidden="<?php echo 'video' === $selected ? 'false' : 'true'; ?>">
-			<label for="glintide-card-video-url"><strong>视频地址</strong></label>
-			<input type="url" id="glintide-card-video-url" name="glintide_card_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="https://example.com/video.mp4 或 YouTube / Vimeo 链接">
-			<p class="description">支持 mp4、webm、ogg 直链，以及 YouTube、Vimeo 链接。</p>
+			<div class="glintide-card-video-source" data-glintide-video-source>
+				<label><strong>视频来源</strong></label>
+				<div class="glintide-card-source-options">
+					<?php foreach ( array( 'bilibili' => array( '哔哩哔哩', 'ri-live-line' ), 'youtube' => array( 'YouTube', 'ri-youtube-line' ), 'upload' => array( '自己上传', 'ri-upload-2-line' ) ) as $source_key => $source_data ) : ?>
+						<label class="glintide-card-source-option<?php echo $video_source === $source_key ? ' is-selected' : ''; ?>">
+							<input type="radio" name="glintide_card_video_source" value="<?php echo esc_attr( $source_key ); ?>" <?php checked( $video_source, $source_key ); ?>><span><i class="<?php echo esc_attr( $source_data[1] ); ?>" aria-hidden="true"></i><?php echo esc_html( $source_data[0] ); ?></span>
+						</label>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<div class="glintide-card-field-row">
+				<label for="glintide-card-video-url"><strong>视频地址</strong></label>
+				<div class="glintide-card-video-url-control">
+					<input type="url" id="glintide-card-video-url" name="glintide_card_video_url" value="<?php echo esc_attr( $video_url ); ?>" placeholder="<?php echo esc_attr( 'bilibili' === $video_source ? '例如：https://www.bilibili.com/video/BV1xx411c7mD/' : ( 'youtube' === $video_source ? '例如：https://www.youtube.com/watch?v=dQw4w9WgXcQ' : '选择媒体库中的视频文件' ) ); ?>">
+					<button type="button" class="button glintide-card-video-upload">选择视频</button>
+				</div>
+				<p class="description glintide-card-video-status">支持哔哩哔哩和 YouTube 视频链接。</p>
+			</div>
 		</div>
 
 		<div class="glintide-card-field-group<?php echo 'link' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="link" aria-hidden="<?php echo 'link' === $selected ? 'false' : 'true'; ?>">
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-link-url"><strong>链接地址</strong></label>
-				<input type="url" id="glintide-card-link-url" name="glintide_card_link_url" value="<?php echo esc_attr( $link_url ); ?>" placeholder="https://example.com/article">
+				<input type="url" id="glintide-card-link-url" name="glintide_card_link_url" value="<?php echo esc_attr( $link_url ); ?>" placeholder="例如：https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps">
 			</div>
 			<div class="glintide-card-field-row">
 				<label for="glintide-card-link-label"><strong>链接说明（可选）</strong></label>
@@ -440,11 +397,6 @@ function glintide_render_content_card_meta_box( $post ) {
 			</div>
 		</div>
 
-		<div class="glintide-card-field-group<?php echo 'moment' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="moment" aria-hidden="<?php echo 'moment' === $selected ? 'false' : 'true'; ?>">
-			<label for="glintide-card-moment-source"><strong>署名 / 来源（可选）</strong></label>
-			<input type="text" id="glintide-card-moment-source" name="glintide_card_moment_source" value="<?php echo esc_attr( $moment_source ); ?>" placeholder="例如：塔朗吉">
-			<p class="description">动态正文写在上方编辑器；背景图使用右侧“特色图片”或照片组第一张，没有配图时使用主题默认图。</p>
-		</div>
 	</div>
 	<?php
 }
@@ -484,7 +436,7 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 		return;
 	}
 
-	if ( wp_is_post_revision( $post_id ) || ( $post && 'glintide_card' !== $post->post_type ) ) {
+	if ( wp_is_post_revision( $post_id ) || ( $post && 'post' !== $post->post_type ) ) {
 		return;
 	}
 
@@ -499,25 +451,29 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 
 	$artist       = isset( $_POST['glintide_card_music_artist'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_artist'] ) ) : '';
 	$music_url    = isset( $_POST['glintide_card_music_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_music_url'] ) ) : '';
+	$music_source = isset( $_POST['glintide_card_music_source'] ) ? sanitize_key( wp_unslash( $_POST['glintide_card_music_source'] ) ) : 'upload';
+	$music_source = in_array( $music_source, array( 'remote', 'upload' ), true ) ? $music_source : 'upload';
 	$music_title  = isset( $_POST['glintide_card_music_title'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_title'] ) ) : '';
 	$music_cover  = isset( $_POST['glintide_card_music_cover'] ) ? wp_unslash( $_POST['glintide_card_music_cover'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	$music_cover  = is_numeric( $music_cover ) ? absint( $music_cover ) : esc_url_raw( $music_cover );
 	$article_cover = isset( $_POST['glintide_card_article_cover'] ) ? wp_unslash( $_POST['glintide_card_article_cover'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	$article_cover = is_numeric( $article_cover ) ? absint( $article_cover ) : esc_url_raw( $article_cover );
 	$video_url = isset( $_POST['glintide_card_video_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_video_url'] ) ) : '';
+	$video_source = isset( $_POST['glintide_card_video_source'] ) ? sanitize_key( wp_unslash( $_POST['glintide_card_video_source'] ) ) : 'youtube';
+	$video_source = in_array( $video_source, array( 'bilibili', 'youtube', 'upload' ), true ) ? $video_source : 'youtube';
 	$link_url      = isset( $_POST['glintide_card_link_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_link_url'] ) ) : '';
 	$link_label    = isset( $_POST['glintide_card_link_label'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_link_label'] ) ) : '';
-	$moment_source = isset( $_POST['glintide_card_moment_source'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_moment_source'] ) ) : '';
 
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_artist', $artist );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_url', $music_url );
+	glintide_update_content_card_meta( $post_id, '_glintide_card_music_source', $music_source );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_title', $music_title );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_music_cover', $music_cover );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_article_cover', $article_cover );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_video_url', $video_url );
+	glintide_update_content_card_meta( $post_id, '_glintide_card_video_source', $video_source );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_link_url', $link_url );
 	glintide_update_content_card_meta( $post_id, '_glintide_card_link_label', $link_label );
-	glintide_update_content_card_meta( $post_id, '_glintide_card_moment_source', $moment_source );
 
 	$gallery_raw = isset( $_POST['glintide_card_gallery'] ) ? (string) wp_unslash( $_POST['glintide_card_gallery'] ) : '';
 	$gallery_raw = trim( preg_replace( '/\s+/', ' ', $gallery_raw ) );
@@ -530,7 +486,7 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 
 	glintide_update_content_card_meta( $post_id, '_glintide_card_gallery', $gallery_raw );
 }
-add_action( 'save_post_glintide_card', 'glintide_save_content_card_meta', 10, 2 );
+add_action( 'save_post_post', 'glintide_save_content_card_meta', 10, 2 );
 
 /**
  * 加载内容卡片后台资源。
@@ -540,7 +496,7 @@ add_action( 'save_post_glintide_card', 'glintide_save_content_card_meta', 10, 2 
 function glintide_content_card_admin_assets( $hook_suffix ) {
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
 
-	if ( ! $screen || 'glintide_card' !== $screen->post_type ) {
+	if ( ! $screen || 'post' !== $screen->post_type ) {
 		return;
 	}
 
@@ -557,6 +513,13 @@ function glintide_content_card_admin_assets( $hook_suffix ) {
 		array( 'jquery' ),
 		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-admin.js' ),
 		true
+	);
+	wp_localize_script(
+		'glintide-card-admin',
+		'glintideMusicAdmin',
+		array(
+			'restUrl' => rest_url( 'glintide/v1/netease-song' ),
+		)
 	);
 }
 add_action( 'admin_enqueue_scripts', 'glintide_content_card_admin_assets' );
@@ -579,7 +542,7 @@ function glintide_content_card_admin_columns( $columns ) {
 
 	return $new_columns;
 }
-add_filter( 'manage_glintide_card_posts_columns', 'glintide_content_card_admin_columns' );
+add_filter( 'manage_post_posts_columns', 'glintide_content_card_admin_columns' );
 
 /**
  * 输出后台列表的卡片类型。
@@ -598,7 +561,55 @@ function glintide_content_card_admin_column( $column, $post_id ) {
 
 	echo '<span class="glintide-admin-card-type glintide-admin-card-type--' . esc_attr( $type ) . '">' . esc_html( $label ) . '</span>';
 }
-add_action( 'manage_glintide_card_posts_custom_column', 'glintide_content_card_admin_column', 10, 2 );
+add_action( 'manage_post_posts_custom_column', 'glintide_content_card_admin_column', 10, 2 );
+
+/**
+ * 在文章列表提供内容类型筛选。
+ *
+ * @param string $post_type 当前文章类型。
+ */
+function glintide_content_card_admin_type_filter( $post_type ) {
+	if ( 'post' !== $post_type ) {
+		return;
+	}
+
+	$selected = isset( $_GET['glintide_card_type'] ) ? sanitize_key( wp_unslash( $_GET['glintide_card_type'] ) ) : '';
+	$options  = glintide_card_type_options();
+
+	echo '<select name="glintide_card_type"><option value="">全部内容类型</option>';
+	foreach ( $options as $type => $data ) {
+		echo '<option value="' . esc_attr( $type ) . '"' . selected( $selected, $type, false ) . '>' . esc_html( $data['label'] ) . '</option>';
+	}
+	echo '</select>';
+}
+add_action( 'restrict_manage_posts', 'glintide_content_card_admin_type_filter' );
+
+/**
+ * 应用文章列表的内容类型筛选。
+ *
+ * @param WP_Query $query 当前查询。
+ */
+function glintide_content_card_admin_type_query( $query ) {
+	if ( ! is_admin() || ! $query->is_main_query() || 'post' !== $query->get( 'post_type' ) ) {
+		return;
+	}
+
+	$type = isset( $_GET['glintide_card_type'] ) ? sanitize_key( wp_unslash( $_GET['glintide_card_type'] ) ) : '';
+	if ( ! $type || ! isset( glintide_card_type_options()[ $type ] ) ) {
+		return;
+	}
+
+	$query->set(
+		'meta_query',
+		array(
+			array(
+				'key'   => '_glintide_card_type',
+				'value' => $type,
+			),
+		)
+	);
+}
+add_action( 'pre_get_posts', 'glintide_content_card_admin_type_query' );
 
 /**
  * 获取内容卡片类型。
@@ -611,11 +622,6 @@ add_action( 'manage_glintide_card_posts_custom_column', 'glintide_content_card_a
 function glintide_card_get_type( $post_id = 0 ) {
 	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
 	$type    = sanitize_key( (string) get_post_meta( $post_id, '_glintide_card_type', true ) );
-
-	// 旧版引用卡片并入动态类型
-	if ( 'quote' === $type ) {
-		$type = 'moment';
-	}
 
 	$options = glintide_card_type_options();
 
@@ -919,24 +925,6 @@ function glintide_card_get_link_label( $post_id = 0 ) {
 }
 
 /**
- * 获取动态署名/来源。
- *
- * 兼容旧版引用卡片的 meta 键。
- *
- * @param int $post_id 文章 ID。
- * @return string
- */
-function glintide_card_get_moment_source( $post_id = 0 ) {
-	$post_id = $post_id ? absint( $post_id ) : get_the_ID();
-	$source  = get_post_meta( $post_id, '_glintide_card_moment_source', true );
-	if ( '' === $source || null === $source ) {
-		$source = get_post_meta( $post_id, '_glintide_card_quote_source', true );
-	}
-
-	return sanitize_text_field( (string) $source );
-}
-
-/**
  * 获取正文的纯文本版本。
  *
  * @param int $post_id 文章 ID。
@@ -1006,7 +994,7 @@ function glintide_card_is_direct_video_url( $url ) {
 }
 
 /**
- * 将 YouTube / Vimeo 地址转换为安全的嵌入地址。
+ * 将 Bilibili / YouTube 地址转换为安全的嵌入地址。
  *
  * @param string $url 视频地址。
  * @return string
@@ -1015,6 +1003,20 @@ function glintide_card_get_video_embed_url( $url ) {
 	$parts = wp_parse_url( $url );
 	$host  = isset( $parts['host'] ) ? strtolower( preg_replace( '/^www\./', '', $parts['host'] ) ) : '';
 	$path  = isset( $parts['path'] ) ? trim( $parts['path'], '/' ) : '';
+
+	if ( in_array( $host, array( 'bilibili.com', 'm.bilibili.com', 'www.bilibili.com' ), true ) ) {
+		$video_id = '';
+		if ( preg_match( '#video/(BV[0-9A-Za-z]+)#', $path, $matches ) ) {
+			$video_id = $matches[1];
+		} elseif ( ! empty( $parts['query'] ) ) {
+			parse_str( $parts['query'], $query_args );
+			$video_id = isset( $query_args['bvid'] ) ? $query_args['bvid'] : '';
+		}
+
+		if ( $video_id && preg_match( '/^BV[0-9A-Za-z]+$/', $video_id ) ) {
+			return 'https://player.bilibili.com/player.html?bvid=' . rawurlencode( $video_id ) . '&page=1&high_quality=1&danmaku=0';
+		}
+	}
 
 	if ( in_array( $host, array( 'youtube.com', 'm.youtube.com', 'youtu.be' ), true ) ) {
 		$video_id = '';
@@ -1029,12 +1031,6 @@ function glintide_card_get_video_embed_url( $url ) {
 
 		if ( $video_id && preg_match( '/^[A-Za-z0-9_-]+$/', $video_id ) ) {
 			return 'https://www.youtube.com/embed/' . $video_id;
-		}
-	}
-
-	if ( 'vimeo.com' === $host || 'player.vimeo.com' === $host ) {
-		if ( preg_match( '/(?:video\/)?([0-9]+)/', $path, $matches ) ) {
-			return 'https://player.vimeo.com/video/' . $matches[1];
 		}
 	}
 
@@ -1223,7 +1219,7 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		$html .= '</div>';
 		$html .= '</div>';
 
-		// 降级容器:直链不可用时插入网易云官方嵌入播放器
+		// 网易云直链失败时由前端提供官方歌曲页播放入口
 		$html .= '<div class="glintide-music-card-fallback" data-glintide-music-fallback hidden></div>';
 
 		// 音频元素:自上传音频直接设置 src,网易云由 JS 解析后注入
@@ -1243,49 +1239,6 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 			return glintide_card_media_empty( $base, 'ri-links-line', '链接地址未设置' );
 		}
 		return '';
-	}
-
-	if ( 'moment' === $type ) {
-		$moment = trim( (string) wp_strip_all_tags( get_post_field( 'post_content', $post_id ) ) );
-		$source = glintide_card_get_moment_source( $post_id );
-
-		if ( '' === $moment ) {
-			$moment = '记录此刻的想法…';
-		} elseif ( 'card' === $context ) {
-			$moment = wp_trim_words( $moment, 52, '…' );
-		}
-
-		$bg    = isset( $images[0] ) ? $images[0] : '';
-		$day   = get_the_date( 'j', $post_id );
-		$month = strtoupper( get_post_time( 'F', false, $post_id, false ) );
-
-		// 动态卡:真实背景图 + 模糊洗底 + 玻璃面板;卡片上下文可点开弹窗
-		$moment_tag   = 'card' === $context ? 'a' : 'div';
-		$moment_attrs = ' class="' . esc_attr( $base . ' glintide-moment' ) . '"';
-		if ( 'card' === $context ) {
-			$moment_attrs .= ' href="' . esc_url( get_permalink( $post_id ) ) . '"';
-			$moment_attrs .= ' aria-label="' . esc_attr( '查看动态：' . $title ) . '" data-glintide-modal="' . esc_attr( $post_id ) . '" data-glintide-no-pjax';
-		}
-
-		$bg_style = $bg ? ' style="background-image: url(\'' . esc_url( $bg ) . '\');"' : '';
-		$html     = '<' . $moment_tag . $moment_attrs . '>';
-		$html    .= '<span class="glintide-moment-backdrop" aria-hidden="true"' . $bg_style . '></span>';
-		$html    .= '<span class="glintide-moment-glass">';
-		$html    .= '<span class="glintide-moment-top">';
-		$html    .= '<span class="glintide-moment-text">' . nl2br( esc_html( $moment ) ) . '</span>';
-		$html    .= '<time class="glintide-moment-date" datetime="' . esc_attr( get_the_date( 'c', $post_id ) ) . '"><small>' . esc_html( $month ) . '</small><strong>' . esc_html( $day ) . '</strong></time>';
-		$html    .= '</span>';
-		$html    .= '<span class="glintide-moment-bottom">';
-		$html    .= '<span class="glintide-moment-source"><strong>' . esc_html( $source ? $source : '动态记录' ) . '</strong>';
-		if ( $title && ( ! $source || false === strpos( $source, $title ) ) ) {
-			$html .= '<small>《' . esc_html( $title ) . '》</small>';
-		}
-		$html .= '</span>';
-		$html .= '</span>';
-		$html .= '</span>';
-		$html .= '</' . $moment_tag . '>';
-
-		return $html;
 	}
 
 	if ( 'video' === $type ) {
@@ -1345,25 +1298,13 @@ function glintide_get_card_feed_query( $paged = 1 ) {
 
 	return new WP_Query(
 		array(
-			'post_type'           => array( 'glintide_card', 'post' ),
+			'post_type'           => 'post',
 			'post_status'         => 'publish',
 			'posts_per_page'      => max( 1, $per_page ),
 			'paged'               => max( 1, absint( $paged ) ),
 			'ignore_sticky_posts' => true,
 			'orderby'             => 'date',
 			'order'               => 'DESC',
-			'meta_query'          => array(
-				'relation' => 'OR',
-				array(
-					'key'     => '_glintide_card_type',
-					'compare' => 'NOT EXISTS',
-				),
-				array(
-					'key'     => '_glintide_card_type',
-					'value'   => 'code',
-					'compare' => '!=',
-				),
-			),
 		)
 	);
 }
@@ -1469,7 +1410,7 @@ function glintide_card_detail_ajax() {
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	$post    = get_post( $post_id );
 
-	if ( ! $post || 'glintide_card' !== $post->post_type ) {
+	if ( ! $post || 'post' !== $post->post_type ) {
 		wp_send_json_error( array( 'msg' => '内容不存在' ), 404 );
 	}
 
@@ -1484,16 +1425,7 @@ function glintide_card_detail_ajax() {
 		$avatar = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
 	}
 
-	// 正文按类型渲染
-	if ( 'moment' === $type ) {
-		$source = glintide_card_get_moment_source( $post_id );
-		$moment = get_post_field( 'post_content', $post_id );
-		$moment = wp_strip_all_tags( $moment );
-		$content_html  = '<blockquote class="glintide-note-quote">' . nl2br( esc_html( $moment ) ) . '</blockquote>';
-		$content_html .= $source ? '<p class="glintide-note-quote-source">— ' . esc_html( $source ) . '</p>' : '';
-	} else {
-		$content_html = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
-	}
+	$content_html = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
 
 	$liked = isset( $_COOKIE[ 'glintide_liked_' . $post_id ] ) && '1' === $_COOKIE[ 'glintide_liked_' . $post_id ];
 
@@ -1543,7 +1475,7 @@ function glintide_card_comment_ajax() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || 'glintide_card' !== $post->post_type ) {
+	if ( ! $post || 'post' !== $post->post_type ) {
 		wp_send_json_error( array( 'msg' => '内容不存在' ), 404 );
 	}
 
@@ -1594,7 +1526,7 @@ function glintide_card_handle_like() {
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	$post    = get_post( $post_id );
 
-	if ( ! $post || 'glintide_card' !== $post->post_type ) {
+	if ( ! $post || 'post' !== $post->post_type ) {
 		wp_send_json_error( array( 'msg' => '内容不存在' ), 404 );
 	}
 

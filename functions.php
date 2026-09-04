@@ -35,6 +35,25 @@ function glintide_local_no_cache_headers() {
 add_action( 'send_headers', 'glintide_local_no_cache_headers', 1 );
 
 /**
+ * 提前建立第三方视频播放器连接,减少嵌入播放器首次打开的等待时间。
+ *
+ * @param array  $urls          资源提示 URL。
+ * @param string $relation_type 资源提示类型。
+ * @return array
+ */
+function glintide_video_resource_hints( $urls, $relation_type ) {
+	if ( 'preconnect' !== $relation_type ) {
+		return $urls;
+	}
+
+	$urls[] = 'https://player.bilibili.com';
+	$urls[] = 'https://www.youtube.com';
+
+	return array_values( array_unique( $urls ) );
+}
+add_filter( 'wp_resource_hints', 'glintide_video_resource_hints', 10, 2 );
+
+/**
  * 主题基础设置
  */
 function glintide_setup() {
@@ -185,6 +204,13 @@ function glintide_scripts() {
 		GLINTIDE_URL . '/assets/js/glintide-card-feed.js',
 		array( 'glintide-photo-swiper', 'jquery' ),
 		filemtime( GLINTIDE_DIR . '/assets/js/glintide-card-feed.js' ),
+		true
+	);
+	wp_enqueue_script(
+		'glintide-link-preview',
+		GLINTIDE_URL . '/assets/js/glintide-link-preview.js',
+		array( 'glintide-card-feed' ),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-link-preview.js' ),
 		true
 	);
 

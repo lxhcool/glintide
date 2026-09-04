@@ -1519,7 +1519,7 @@ html[data-glintide-theme="dark"] .glintide-card-type--video {
 .glintide-article-cover-link {
 	display: block;
 	margin-top: 14px;
-	aspect-ratio: 16 / 9;
+	height: 155px;
 	overflow: hidden;
 	border-radius: 10px;
 	background: var(--color-glintide-surface-soft);
@@ -1660,11 +1660,11 @@ html[data-glintide-theme="dark"] .glintide-card-type--video {
 	display: block;
 	width: 100%;
 	margin: 0;
-	aspect-ratio: 3 / 2;
 	overflow: hidden;
 	border-radius: 12px;
 	background: var(--color-glintide-surface-soft);
 	line-height: 0;
+	height: 155px;
 }
 
 .glintide-article-cover {
@@ -3007,6 +3007,88 @@ body.glintide-photo-lightbox-open {
 	transform: scale(1.1);
 }
 
+/* 外部网页预览: iframe 只负责展示,覆盖层负责新窗口打开。 */
+.glintide-link-preview {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	width: 100%;
+	border-radius: var(--glintide-radius, 16px);
+	overflow: hidden;
+	background: #f4f5f7;
+}
+
+.glintide-link-preview-window {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	background: #fff;
+}
+
+.glintide-link-preview-window iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 1280px;
+	height: 1000px;
+	border: 0;
+	transform: translateY(0) scale(var(--glintide-link-scale, .5));
+	transform-origin: top left;
+	transition: none;
+	pointer-events: none;
+}
+
+.glintide-link-preview:hover .glintide-link-preview-window iframe {
+	transform: translateY(var(--glintide-link-scroll-distance, -200px)) scale(var(--glintide-link-scale, .5));
+	transition: transform 4s linear;
+}
+
+.glintide-link-preview-overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	color: #fff;
+	text-decoration: none;
+	background: linear-gradient(to bottom, transparent 65%, rgb(0 0 0 / 58%));
+	transition: background-color .2s ease;
+}
+
+.glintide-link-preview-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	min-width: 0;
+	padding: 14px 16px;
+	font-size: 13px;
+}
+
+.glintide-link-preview-bar strong,
+.glintide-link-preview-bar span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-link-preview-bar strong {
+	flex: 1;
+}
+
+.glintide-link-preview-bar > i:last-child {
+	flex: 0 0 auto;
+}
+
+.glintide-link-preview-overlay:hover {
+	background-color: rgb(0 0 0 / 8%);
+}
+
+.glintide-link-preview-overlay:hover .glintide-link-preview-bar,
+.glintide-link-preview-overlay:hover .glintide-link-preview-bar strong,
+.glintide-link-preview-overlay:hover .glintide-link-preview-bar span,
+.glintide-link-preview-overlay:hover .glintide-link-preview-bar i {
+	color: #fff;
+}
+
 /* ---------- 音乐卡片(唱片播放器) ---------- */
 /* 卡片外壳:浅色播放器面板,保持内容卡片的独立层级 */
 .glintide-card--music {
@@ -3351,11 +3433,24 @@ body.glintide-photo-lightbox-open {
 	display: none;
 }
 
-.glintide-card-music-netease {
+.glintide-music-card.is-fallback .glintide-music-card-play-row,
+.glintide-music-card.is-fallback .glintide-music-card-bottom {
+	display: none;
+}
+
+.glintide-card-music-official-link {
 	display: block;
-	width: 100%;
-	height: 66px;
-	border: 0;
+	padding: 12px 16px;
+	color: inherit;
+	font-size: 13px;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.glintide-card-music-official-link:hover {
+	background: rgba(255, 255, 255, 0.16);
+	color: #fff;
 }
 
 /* ---------- 音乐卡片(唱片播放器) ---------- */
@@ -3459,8 +3554,8 @@ body.glintide-photo-lightbox-open {
     left: 50%;
     z-index: 1;
     display: block;
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     overflow: hidden;
     border-radius: 50%;
     box-shadow: none;

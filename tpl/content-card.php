@@ -2,7 +2,7 @@
 /**
  * 首页内容卡片。
  *
- * 文章卡片使用图文阅读结构；照片、音乐、视频、动态和链接
+ * 文章卡片使用图文阅读结构；照片、音乐、视频和链接
  * 继续交给各自的媒体渲染器处理。
  *
  * @package glintide
@@ -16,7 +16,7 @@ $title           = $title ? $title : $type_data['label'];
 $permalink       = get_permalink( $post_id );
 $is_article      = 'text' === $type;
 $is_link         = 'link' === $type;
-$is_content_card = 'glintide_card' === get_post_type( $post_id );
+$is_content_card = 'post' === get_post_type( $post_id );
 $author          = get_the_author();
 $author          = $author ? $author : get_bloginfo( 'name' );
 $author_id       = (int) get_the_author_meta( 'ID' );
@@ -57,38 +57,14 @@ $link_label = $link_label ? $link_label : ( $title ? $title : '打开链接' );
 
 <article id="post-<?php the_ID(); ?>" <?php post_class( array( 'glintide-card', 'glintide-card--' . $type, $is_article ? 'glintide-card--article' : '' ) ); ?> data-glintide-card>
 	<?php if ( $is_link ) : ?>
-		<a class="glintide-link-panel" href="<?php echo esc_url( $link_url ); ?>" target="_blank" rel="noopener noreferrer">
-			<span class="glintide-link-top">
-				<span class="glintide-link-chip">
-					<i class="ri-links-line" aria-hidden="true"></i>
-					<span>链接</span>
-				</span>
-				<time class="glintide-link-date" datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( get_the_date( 'Y-m-d' ) ); ?></time>
-			</span>
-
-			<span class="glintide-link-main">
-				<strong><?php echo esc_html( $link_label ); ?></strong>
-				<?php if ( $link_host ) : ?>
-					<span class="glintide-link-origin"><i class="ri-global-line" aria-hidden="true"></i><?php echo esc_html( $link_host ); ?><?php echo $link_path ? ' / ' . esc_html( $link_path ) : ''; ?></span>
-				<?php endif; ?>
-			</span>
-
-			<span class="glintide-link-foot">
-				<span class="glintide-article-author">
-					<?php if ( $author_avatar ) : ?>
-						<img class="glintide-article-avatar" src="<?php echo esc_url( $author_avatar ); ?>" alt="" loading="lazy" decoding="async"
-							data-glintide-avatar data-glintide-avatar-fallback="<?php echo esc_url( $avatar_fallback ); ?>">
-					<?php else : ?>
-						<img class="glintide-article-avatar" src="<?php echo esc_url( $avatar_fallback ); ?>" alt="" loading="lazy" decoding="async">
-					<?php endif; ?>
-					<span class="glintide-article-author-name"><?php echo esc_html( $author ); ?></span>
-				</span>
-
-				<span class="glintide-link-go" aria-hidden="true">
-					<i class="ri-external-link-line"></i>
-				</span>
-			</span>
-		</a>
+		<div class="glintide-link-preview" data-glintide-link-preview>
+			<div class="glintide-link-preview-window">
+				<iframe src="<?php echo esc_url( $link_url ); ?>" title="<?php echo esc_attr( $link_label ); ?>" loading="lazy" tabindex="-1"></iframe>
+			</div>
+			<a class="glintide-link-preview-overlay" href="<?php echo esc_url( $link_url ); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php echo esc_attr( '打开链接：' . $link_label ); ?>">
+				<span class="glintide-link-preview-bar"><i class="ri-links-line" aria-hidden="true"></i><strong><?php echo esc_html( $link_label ); ?></strong><span><?php echo esc_html( $link_host ); ?></span><i class="ri-external-link-line" aria-hidden="true"></i></span>
+			</a>
+		</div>
 	<?php elseif ( $is_article ) : ?>
 		<?php if ( $article_image ) : ?>
 			<a class="glintide-article-cover-link" href="<?php echo esc_url( $permalink ); ?>" aria-label="<?php echo esc_attr( '查看文章：' . $title ); ?>"<?php echo $article_modal; ?>>

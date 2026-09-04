@@ -8,7 +8,34 @@
 	}
 
 	var typeInputs = editor.querySelectorAll('input[name="glintide_card_type"]');
-	var fieldGroups = editor.querySelectorAll('[data-glintide-card-fields]');
+	var fieldGroups = document.querySelectorAll('[data-glintide-card-fields]');
+	var hiddenFields = [
+		document.getElementById('postdivrich'),
+		document.getElementById('postexcerpt'),
+		document.getElementById('commentsdiv'),
+		document.getElementById('tagsdiv-post_tag'),
+		document.getElementById('formatdiv'),
+		document.getElementById('trackbacksdiv'),
+		document.getElementById('slugdiv')
+	];
+	var originalDisplay = [];
+
+	function refreshRichTextEditor() {
+		window.dispatchEvent(new Event('resize'));
+		if (window.jQuery) {
+			window.jQuery(window).trigger('resize');
+		}
+		window.setTimeout(function () {
+			window.dispatchEvent(new Event('resize'));
+			if (window.jQuery) {
+				window.jQuery(window).trigger('resize');
+			}
+		}, 240);
+	}
+
+	for (var fieldIndex = 0; fieldIndex < hiddenFields.length; fieldIndex += 1) {
+		originalDisplay[fieldIndex] = hiddenFields[fieldIndex] ? hiddenFields[fieldIndex].style.display : '';
+	}
 
 	function updateCardFields() {
 		var selectedType = '';
@@ -32,24 +59,20 @@
 			fieldGroups[index].setAttribute('aria-hidden', isActive ? 'false' : 'true');
 		}
 
-		// 照片类型:只保留标题 + 特色图片 + 照片组,隐藏正文/分类/标签
+		// 照片类型只隐藏不相关的编辑区域,分类和标签仍属于统一文章信息
 		var isPhoto = selectedType === 'photo';
-		var body = document.getElementById('postdivrich');
-		var excerpt = document.getElementById('postexcerpt');
-		var commentsdiv = document.getElementById('commentsdiv');
-		var categorydiv = document.getElementById('categorydiv');
-		var tagsdiv = document.getElementById('tagsdiv-post_tag');
-		var formatdiv = document.getElementById('formatdiv');
-		var trackbacksdiv = document.getElementById('trackbacksdiv');
-		var slugHelp = document.getElementById('slugdiv');
-		var hideSelectors = [body, excerpt, commentsdiv, categorydiv, tagsdiv, formatdiv, trackbacksdiv, slugHelp];
-		for (var h = 0; h < hideSelectors.length; h += 1) {
-			if (hideSelectors[h]) {
-				hideSelectors[h].style.display = isPhoto ? 'none' : '';
+		var isMediaOnly = isPhoto || selectedType === 'music' || selectedType === 'video' || selectedType === 'link';
+		for (var h = 0; h < hiddenFields.length; h += 1) {
+			if (hiddenFields[h]) {
+				hiddenFields[h].style.display = isMediaOnly ? 'none' : originalDisplay[h];
 			}
 		}
-		// 文档标题后缀提示
+		if (!isPhoto) {
+			refreshRichTextEditor();
+		}
+		// 文档类型状态集中在 body,切换时可逆且不污染编辑器内联样式
 		document.body.setAttribute('data-glintide-card-type', selectedType);
+		document.body.classList.toggle('glintide-card-photo-mode', isPhoto);
 	}
 
 	for (var inputIndex = 0; inputIndex < typeInputs.length; inputIndex += 1) {
@@ -58,8 +81,167 @@
 
 	updateCardFields();
 
+	var musicSourceRoot = document.querySelector('[data-glintide-music-source]');
+	var musicManual = document.querySelector('[data-glintide-music-manual]');
+	var musicUrl = document.getElementById('glintide-card-music-url');
+	var musicResolve = document.querySelector('.glintide-card-music-resolve');
+	var musicUpload = document.querySelector('.glintide-card-music-upload');
+	var musicStatus = document.querySelector('.glintide-card-music-status');
+	var musicUploadFrame;
+
+	function getMusicSource() {
+		var checked = musicSourceRoot ? musicSourceRoot.querySelector('input:checked') : null;
+		return checked ? checked.value : 'upload';
+	}
+
+	function updateMusicSource() {
+		var source = getMusicSource();
+		var isRemote = source === 'remote';
+		var options = musicSourceRoot ? musicSourceRoot.querySelectorAll('.glintide-card-source-option') : [];
+		for (var sourceIndex = 0; sourceIndex < options.length; sourceIndex += 1) {
+			var input = options[sourceIndex].querySelector('input');
+			options[sourceIndex].classList.toggle('is-selected', input && input.checked);
+		}
+		if (musicManual) {
+			musicManual.style.display = isRemote ? 'none' : 'block';
+		}
+		if (musicResolve) {
+			musicResolve.style.display = isRemote ? 'inline-flex' : 'none';
+		}
+		if (musicUpload) {
+			musicUpload.style.display = isRemote ? 'none' : 'inline-flex';
+		}
+		if (musicUrl) {
+			musicUrl.placeholder = isRemote ? '粘贴网易云歌曲链接' : '选择媒体库中的音频文件';
+		}
+		if (musicStatus) {
+			musicStatus.textContent = isRemote ? '音频地址会自动获取歌名、作者和封面。' : '上传后填写歌名、音乐人和封面。';
+		}
+	}
+
+	if (musicSourceRoot) {
+		var sourceInputs = musicSourceRoot.querySelectorAll('input');
+		for (var sourceInputIndex = 0; sourceInputIndex < sourceInputs.length; sourceInputIndex += 1) {
+			sourceInputs[sourceInputIndex].addEventListener('change', updateMusicSource);
+		}
+	}
+
+	if (musicResolve && musicUrl) {
+		musicResolve.addEventListener('click', function (event) {
+			event.preventDefault();
+			var url = musicUrl.value.trim();
+			if (!url || !window.glintideMusicAdmin || !glintideMusicAdmin.restUrl) {
+				if (musicStatus) {
+					musicStatus.textContent = '请先粘贴有效的网易云歌曲链接。';
+				}
+				return;
+			}
+			musicResolve.disabled = true;
+			if (musicStatus) {
+				musicStatus.textContent = '正在获取音乐信息…';
+			}
+			fetch(glintideMusicAdmin.restUrl + '?url=' + encodeURIComponent(url))
+				.then(function (response) { return response.json(); })
+				.then(function (result) {
+					var data = result && result.title ? result : (result && result.data ? result.data : null);
+					if (!data || !data.title) {
+						throw new Error('empty');
+					}
+					document.getElementById('glintide-card-music-title').value = data.title || '';
+					document.getElementById('glintide-card-music-artist').value = data.artist || '';
+					var coverInput = document.querySelector('input[name="glintide_card_music_cover"]');
+					var coverPreview = coverInput ? coverInput.parentNode.querySelector('.glintide-card-cover-preview') : null;
+					if (coverInput && data.cover) {
+						coverInput.value = data.cover;
+						if (coverPreview) {
+							coverPreview.innerHTML = '<img src="' + data.cover.replace(/"/g, '&quot;') + '" alt="">';
+						}
+					}
+					if (musicStatus) {
+						musicStatus.textContent = '已获取歌名、音乐人和封面。';
+					}
+				})
+				.catch(function () {
+					if (musicStatus) {
+						musicStatus.textContent = '获取失败，请检查链接后重试。';
+					}
+				})
+				.finally(function () {
+					musicResolve.disabled = false;
+				});
+		});
+	}
+
+	if (musicUpload && musicUrl && window.wp && wp.media) {
+		musicUpload.addEventListener('click', function (event) {
+			event.preventDefault();
+			if (musicUploadFrame) {
+				musicUploadFrame.open();
+				return;
+			}
+			musicUploadFrame = wp.media({ title: '选择音频', library: { type: 'audio' }, multiple: false, button: { text: '使用此音频' } });
+			musicUploadFrame.on('select', function () {
+				var attachment = musicUploadFrame.state().get('selection').first().toJSON();
+				musicUrl.value = attachment.url || '';
+			});
+			musicUploadFrame.open();
+		});
+	}
+
+	updateMusicSource();
+
+	var videoSourceRoot = document.querySelector('[data-glintide-video-source]');
+	var videoUrl = document.getElementById('glintide-card-video-url');
+	var videoUpload = document.querySelector('.glintide-card-video-upload');
+	var videoStatus = document.querySelector('.glintide-card-video-status');
+	var videoUploadFrame;
+
+	function updateVideoSource() {
+		var checked = videoSourceRoot ? videoSourceRoot.querySelector('input:checked') : null;
+		var source = checked ? checked.value : 'youtube';
+		var options = videoSourceRoot ? videoSourceRoot.querySelectorAll('.glintide-card-source-option') : [];
+		for (var videoOptionIndex = 0; videoOptionIndex < options.length; videoOptionIndex += 1) {
+			var input = options[videoOptionIndex].querySelector('input');
+			options[videoOptionIndex].classList.toggle('is-selected', input && input.checked);
+		}
+		if (videoUpload) {
+			videoUpload.style.display = source === 'upload' ? 'inline-flex' : 'none';
+		}
+		if (videoUrl) {
+			videoUrl.placeholder = source === 'upload' ? '选择媒体库中的视频文件' : (source === 'bilibili' ? '例如：https://www.bilibili.com/video/BV1xx411c7mD/' : '例如：https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+		}
+		if (videoStatus) {
+			videoStatus.textContent = source === 'upload' ? '上传视频不需要填写正文。' : '粘贴视频链接后不需要填写正文。';
+		}
+	}
+
+	if (videoSourceRoot) {
+		var videoInputs = videoSourceRoot.querySelectorAll('input');
+		for (var videoInputIndex = 0; videoInputIndex < videoInputs.length; videoInputIndex += 1) {
+			videoInputs[videoInputIndex].addEventListener('change', updateVideoSource);
+		}
+	}
+
+	if (videoUpload && videoUrl && window.wp && wp.media) {
+		videoUpload.addEventListener('click', function (event) {
+			event.preventDefault();
+			if (videoUploadFrame) {
+				videoUploadFrame.open();
+				return;
+			}
+			videoUploadFrame = wp.media({ title: '选择视频', library: { type: 'video' }, multiple: false, button: { text: '使用此视频' } });
+			videoUploadFrame.on('select', function () {
+				var attachment = videoUploadFrame.state().get('selection').first().toJSON();
+				videoUrl.value = attachment.url || '';
+			});
+			videoUploadFrame.open();
+		});
+	}
+
+	updateVideoSource();
+
 	// 照片组:多图上传(媒体库选择)
-	var galleryRoot = editor.querySelector('[data-glintide-card-gallery]');
+	var galleryRoot = document.querySelector('[data-glintide-card-gallery]');
 	if (galleryRoot && window.wp && wp.media) {
 		var listEl = galleryRoot.querySelector('.glintide-card-gallery-list');
 		var inputEl = galleryRoot.querySelector('.glintide-card-gallery-input');
@@ -149,7 +331,7 @@
 	}
 
 	// 封面选择(文章 / 音乐)
-	var coverRoots = editor.querySelectorAll('[data-glintide-cover]');
+	var coverRoots = document.querySelectorAll('[data-glintide-cover]');
 	for (var coverIndex = 0; coverIndex < coverRoots.length; coverIndex += 1) {
 		(function (coverRoot) {
 			if (!coverRoot || !window.wp || !wp.media) {

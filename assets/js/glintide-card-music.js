@@ -3,7 +3,7 @@
  *
  * 自上传音频:直接使用 audio 元素播放。
  * 网易云链接:先通过 /glintide/v1/netease-song 解析真实音频直链再播放;
- *            若受版权限制拿不到直链,降级为网易云官方嵌入播放器。
+ *            若受版权限制拿不到直链,提供网易云官方歌曲页播放入口。
  */
 (function () {
 	'use strict';
@@ -91,7 +91,7 @@
 			}
 
 			root.__glintideMusicPending = true;
-			setNote(root, '正在解析音频…');
+			setNote(root, '');
 
 			fetch(restUrl + '?url=' + encodeURIComponent(source), {
 				credentials: 'same-origin'
@@ -199,7 +199,7 @@
 	}
 
 	/**
-	 * 降级:插入网易云官方嵌入播放器
+	 * 降级:提供网易云官方播放入口,避免跨域 iframe 脚本报错
 	 */
 	function showFallback(root) {
 		var wrap = q(root, '[data-glintide-music-fallback]');
@@ -207,22 +207,25 @@
 			return;
 		}
 
+		root.classList.add('is-fallback');
+
 		if (!wrap.__glintideInited) {
-			var embed = root.getAttribute('data-music-embed') || '';
-			if (!embed) {
+			var source = root.getAttribute('data-music-url') || '';
+			if (!source) {
 				return;
 			}
 
 			wrap.__glintideInited = true;
 
-			var iframe = document.createElement('iframe');
-			iframe.className = 'glintide-card-music-netease';
-			iframe.src = embed;
-			iframe.setAttribute('frameborder', '0');
-			iframe.setAttribute('loading', 'lazy');
-			iframe.setAttribute('title', '网易云音乐播放器');
-			wrap.appendChild(iframe);
+			var link = document.createElement('a');
+			link.className = 'glintide-card-music-official-link';
+			link.href = source;
+			link.target = '_blank';
+			link.rel = 'noopener noreferrer';
+			link.textContent = '在网易云音乐中播放';
+			wrap.appendChild(link);
 		}
+		wrap.__glintideInited = true;
 
 		wrap.hidden = false;
 	}
@@ -273,14 +276,14 @@
 					root.__glintideMusicUrl = '';
 					if (root.getAttribute('data-music-source') === 'netease' && !root.__glintidePlayRetried) {
 						root.__glintidePlayRetried = true;
-						setNote(root, '直链已失效,正在重新解析…');
+						setNote(root, '');
 						resolveNetease(root)
 							.then(function (mp3) {
 								audio.src = mp3;
 								doPlay(root, audio);
 							})
 							.catch(function () {
-								setNote(root, '该歌曲已切换为网易云播放器', 'error');
+								setNote(root, '');
 								showFallback(root);
 							});
 						return;
@@ -328,7 +331,7 @@
 						setNote(root, '音频地址未设置', 'error');
 						return;
 					}
-					setNote(root, '该歌曲受版权限制,已切换为网易云播放器', 'error');
+					setNote(root, '');
 					showFallback(root);
 				});
 			return;
@@ -454,6 +457,10 @@
 				// 网易云直链可能过期,清除缓存以便下次重新解析
 				root.__glintideMusicUrl = '';
 				setPlaying(root, false);
+				if (root.getAttribute('data-music-source') === 'netease') {
+					showFallback(root);
+					return;
+				}
 				setNote(root, '音频加载失败,请重试', 'error');
 			});
 

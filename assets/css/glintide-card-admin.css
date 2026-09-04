@@ -1,13 +1,11 @@
-/* Glintide 内容卡片后台编辑器 */
+/* Glintide 内容类型后台编辑器 */
 .glintide-card-editor {
 	max-width: 920px;
-	padding: 4px 0 8px;
+	padding: 0 0 8px;
 }
 
-.glintide-card-editor-intro {
-	margin: 0 0 18px;
-	color: #50575e;
-	font-size: 13px;
+.glintide-card-type-bar {
+	margin: 8px 0 12px;
 }
 
 .glintide-card-type-fieldset {
@@ -17,27 +15,28 @@
 }
 
 .glintide-card-type-fieldset legend {
-	margin-bottom: 10px;
+	margin-bottom: 6px;
 	color: #1d2327;
+	font-size: 13px;
 	font-weight: 600;
 }
 
 .glintide-card-type-options {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 10px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
 }
 
 .glintide-card-type-option {
-	position: relative;
-	display: block;
-	min-width: 0;
-	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 0 10px;
 	border: 1px solid #dcdcde;
-	border-radius: 8px;
+	border-radius: 4px;
 	background: #fff;
 	cursor: pointer;
-	transition: border-color .2s ease, background-color .2s ease, box-shadow .2s ease, transform .2s ease;
+	transition: border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
 }
 
 .glintide-card-type-option:hover {
@@ -53,7 +52,7 @@
 .glintide-card-type-option.is-selected {
 	border-color: #2271b1;
 	background: #f0f6fc;
-	box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+	box-shadow: 0 0 0 1px #2271b1;
 }
 
 .glintide-card-type-option input {
@@ -68,11 +67,7 @@
 }
 
 .glintide-card-type-option-content {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	min-height: 78px;
-	padding: 13px 14px;
+	display: contents;
 }
 
 .glintide-card-type-option-title {
@@ -89,17 +84,12 @@
 	font-size: 17px;
 }
 
-.glintide-card-type-option-description {
-	color: #646970;
-	font-size: 12px;
-	line-height: 1.5;
-}
-
 .glintide-card-field-group {
 	display: none;
 	margin-top: 18px;
-	padding: 16px;
-	border-radius: 8px;
+	padding: 12px;
+	border: 1px solid #e2e4e7;
+	border-radius: 4px;
 	background: #f6f7f7;
 }
 
@@ -123,6 +113,84 @@
 
 .glintide-card-field-row + .glintide-card-field-row {
 	margin-top: 16px;
+}
+
+.glintide-card-source-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.glintide-card-source-option {
+	display: inline-flex;
+	align-items: center;
+	min-height: 30px;
+	padding: 0 10px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	color: #50575e;
+	cursor: pointer;
+	transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+
+.glintide-card-source-option:hover {
+	border-color: #8c8f94;
+	background: #f6f7f7;
+}
+
+.glintide-card-source-option.is-selected {
+	border-color: #2271b1;
+	background: #f0f6fc;
+	color: #2271b1;
+}
+
+.glintide-card-source-option input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+}
+
+.glintide-card-source-option span {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+}
+
+.glintide-card-music-url-control {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.glintide-card-music-url-control input {
+	flex: 1;
+	min-width: 0;
+}
+
+.glintide-card-video-url-control {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.glintide-card-video-url-control input {
+	flex: 1;
+	min-width: 0;
+}
+
+.glintide-card-music-resolve,
+.glintide-card-music-upload {
+	white-space: nowrap;
+}
+
+.glintide-card-music-manual {
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid #dcdcde;
 }
 
 .glintide-card-gallery {
@@ -219,13 +287,29 @@
 
 @media (max-width: 782px) {
 	.glintide-card-type-options {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 5px;
+	}
+
+	.glintide-card-music-url-control {
+		flex-wrap: wrap;
+	}
+
+	.glintide-card-music-url-control input {
+		flex-basis: 100%;
+	}
+
+	.glintide-card-video-url-control {
+		flex-wrap: wrap;
+	}
+
+	.glintide-card-video-url-control input {
+		flex-basis: 100%;
 	}
 }
 
 @media (max-width: 420px) {
 	.glintide-card-type-options {
-		grid-template-columns: minmax(0, 1fr);
+		gap: 5px;
 	}
 }
 
