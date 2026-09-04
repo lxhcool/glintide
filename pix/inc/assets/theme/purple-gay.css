@@ -1,0 +1,258 @@
+/*基佬紫主题*/
+:root {
+    --body-bg-color: #e8e8f1;
+    --withe-bg-color: #fff;
+    --light-bg-color: #f6f7ff;
+    --linear-color:linear-gradient(90deg,#4832ff,#816bff);
+    --shadow-bg: 0px 7px 20px 1px #d7ceff30;
+    --btn-active-color:#3b3eff;
+    --btn-light-color:#e9ecfe;
+    --big-shadow: 0 28px 50px rgb(212 221 255);
+    --hilight-color: #3b3eff;
+    --light-text-color: #9498cd;
+    --heave-text-color: #44507b;
+    --border-color: #f7f7ff;
+    --icon-color : #44507b;
+    --box-bg: #eff1ff;
+    --box-light: #b1b3d2;
+    --dark-color : #2f2f2f;
+}
+
+.uk-link-toggle:hover .uk-link, .uk-link:hover, a:hover , .footer_nav_box ul li a:hover , .copyright a , a.mo_link , .show-more-btn , .page_content .entry-header i
+ , .link_group .item:hover .name a , a.comment-reply-link:hover , .s_set_box a.active , .search_box .s_set_box a:hover , .ad_info a:hover , .audio_choose li.uk-active a, .video_choose li.uk-active a 
+ , .posts_show_widget .no_img li a:before , .posts_mu_list li:hover div, .posts_mu_list li:hover a, .posts_mu_list li.active, .posts_mu_list li.active .s_play_btn
+ , .pl_btn a i:hover{
+    color: var(--hilight-color);
+}
+
+input#img_link_up:focus , .top_tool input.s_input:focus , #t_commentform:focus-within , #commentform:focus-within , .vi_reply_item .target_comment , #comment-author-info input:focus
+, #login_form_box input#username:focus , #login_form_box input#password:focus , .s_set_box a.active , .search_box input.s_input:focus , .edit_card_box .edit_content input:focus 
+, .audio_choose li.uk-active a , .video_choose li.uk-active a {
+    border-color: var(--hilight-color);
+}
+
+body {
+    background: linear-gradient(117deg,#f3efff,#e7f1ff);
+}
+
+.up_from_media a, .up_from_cdn a {
+    background: var(--body-bg-color);
+}
+
+.push_close , .attch_nav a i , a.img_link_cancel  {
+    background: var(--box-light);
+}
+
+.unread_box .vi_reply_item {
+    background: #ebeeff;
+}
+
+a.img_link_btn , a.img_link_cancel , #post_pager a:hover , a.go_top{
+    color: #fff;
+}
+
+.blog_list_inner, .normal_list_inner, .single_wrap , #t_commentform , textarea#comment , .single_content, .page_content, .page_wrap , #commentform , .top_bar
+, .archive_main , .page_main , .posts_mu_list {
+    background: var(--withe-bg-color);
+}
+
+.left_nav_inner , #commentform textarea#comment , .top_tool input.s_input:focus , .post_control_list , .right_admin_tool , .sidebar_right , .posts_mu_list li:nth-of-type(odd) {
+    background: var(--light-bg-color);
+}
+
+.single_wrap .comments-area, .page_content .comments-area , .topic_comments_wrap , .column_inner  {
+    background: #fafbff;
+}
+
+.left_menu_box li[class*=current-] a , .left_menu_box li[class*=current-] a:hover , input#push_comment , input.submit_button {
+    background: var(--linear-color);
+    color: var(--light-bg-color);
+}
+
+.main_wrap , .top_ava img , .widget_tag_cloud a {
+    box-shadow: var(--shadow-bg);
+}
+
+.moment_cat_nav ul li a.active, .posts_cat_nav ul li a.active , #t_pagination a, #pagination a , .up_cat_btn , a.set_local_btn , .push_item , a.img_link_btn , .commentnav span.page-numbers.current
+, ::-webkit-scrollbar-thumb , #post_pager a:hover , a.go_top , .edit_card_box .edit_content a.push_card , a.play_btn , .post_control_list a:hover , .top_set_box a.active , .vo_size {
+    background-color: var(--btn-active-color);
+}
+
+a.set_local_btn , .top_set_box a.active , .top_set_box a.active:hover {
+    color: #fff;
+}
+
+.left_menu_box ul li a:hover, .link_group .item:hover {
+    box-shadow: var(--big-shadow);
+    background: var(--btn-light-color);
+    color: var(--hilight-color);
+}
+
+.moment_cat_nav ul li a, .posts_cat_nav ul li a  , .cancel-comment-reply a , .commentnav a , #post_pager a {
+    background: var(--btn-light-color);
+    color: var(--light-text-color);
+}
+
+textarea#comment , .tool_box , .smile_show , .form_footer , .set_cat , #commentform textarea#comment , .p_item
+, .moment_cat_nav, .posts_cat_nav {
+    border-color: var(--border-color);
+}
+
+.left_menu_box ul , .widget_inner .widget {
+    border-color: #eeefff
+}
+
+.list_user_meta .name , .comment-list p.nodata , .t_cat_box li , .show_cdn_media span , .vi_reply_item .name span , .vi_reply_item .meta a , .msg_log , .links_count , .link_cat_name , #post_pager .c_paged 
+, .p_title a , .ad_info p , .ad_info a , .top_set_box a {
+    color: var(--heave-text-color);
+}
+
+.user_pannel .inner a {
+    background: var(--btn-light-color);
+    color: var(--light-text-color);
+}
+
+.user_pannel .inner a:hover {
+    background: var(--btn-active-color);
+}
+
+.t_dark a i , .top_tool i , .normal_content .post_footer_meta span.comnum i, .normal_card_content .post_footer_meta span.comnum i, .normal_grid_content .post_footer_meta span.comnum i
+, a.up_like i , .footer_nav_box ul li a , a.music_btn , .post_footer_meta span i , .comment_smile_box a i , a.bg_music i , .top_s_box form i , .pix_widget_tongji ul li small , .posts_mu_list .s_play_btn {
+    color: var(--icon-color);
+}
+
+.entry-footer , .t_cat_box li , input#set_local ,  .show_media_box, .show_cdn_media , .single_content .comments-area {
+    background: var(--light-bg-color);
+}
+
+.bottom_tool .inner , .links_page .link_group .item , .link_group .item {
+    background: var(--box-bg);
+}
+
+#topic_content {
+    background: #f6f7ff;
+    border: 1px solid #cccdf0;
+}
+
+.normal_cat , .de_cat {
+    background: var(--dark-color);
+}
+
+.normal_content .entry_meta, .normal_card_content .entry_meta, .normal_grid_content .entry_meta , a.beian , footer#colophon , .page_content .entry-header .right time , a.comment-reply-link 
+, .ad_info .name , .set_text , .widget_tag_cloud a , .cst_widget_comment ul li .right .meta , .posts_show_widget ul li .meta , .pix_widget_tongji ul li span
+, .pl_btn a i {
+    color: var(--light-text-color);
+}
+
+.normal_content .entry-title a, .normal_grid_content .entry-title a {
+    color: var(--dark-color);
+}
+
+a.up_like.done i {
+    color: #ff4040;
+}
+
+.show-more-btn:hover {
+    color: #5457ff;
+}
+
+.smile_box i, .simi i, .t_cat i, .loca i , .post-categories a {
+    background: var(--box-bg);
+    color: var(--box-light);
+}
+
+#topic_content:focus {
+    box-shadow: 0 0 0 0.12rem rgb(182 190 255);
+}
+
+.up_img_btn i  {
+    color: var(--box-light);
+}
+
+.t_cat_box li span {
+    color: var(--heave-text-color) !important;
+}
+
+.form_footer .admin_tool a {
+    display: none;
+}
+
+.top_bar.uk-sticky-fixed.uk-active {
+    background: rgb(245 246 255 / 80%);
+}
+
+#comment-author-info input , #login_form_box input#username, #login_form_box input#password {
+    border-color: #d9dfee;
+    background: var(--light-bg-color);
+}
+
+.post_footer_meta span.sticky_icon {
+    background: #ff5252;
+}
+
+.pix_player {
+    background: rgb(234 234 255 / 81%);
+}
+
+.moment_type_btn i  , .smile_box i, .simi i, .t_cat i, .loca i{
+    color: #746de2;
+    background: transparent;
+}
+
+.loacl_audio , .netease_audio input , .edit_card_box .edit_content input , .local_video , input#moment_video_bili {
+    background: #f1f3ff;
+}
+
+.loacl_audio .audio_right input , input#moment_video_url {
+    background: #dfe3f6;
+}
+
+.moment_card_item a {
+    background: #ebeeff;
+}
+
+.moment_card_item.loop_card_item a:hover {
+    box-shadow: 0px 8px 13px 0px rgb(229 226 255);
+}
+
+.top_s_box input.s_input {
+    background: rgb(237 239 254 / 59%);
+}
+
+.widget_tag_cloud a , .cst_widget_comment ul li .right .body {
+    background: #e9ecfe;
+}
+
+.pix_widget_tongji ul li {
+    background: linear-gradient(90deg,#e9ecfe,#816bff00);
+    box-shadow: 0px 8px 9px 0px rgb(234 235 255 / 47%);
+}
+
+.t_dark a , a.bg_music{
+    background: #c4d0e6;
+}
+
+.single_footer_box {
+    background: linear-gradient(90deg,#f0f2ff,#816bff00);
+}
+
+.footer_main .inner {
+    background: #f6f7ff;
+}
+
+.sf_item a {
+    color: #7e85ad;
+}
+
+a.m_play i , a.m_play i:hover {
+    color: var(--hilight-color);
+}
+
+.player_dot {
+    border-color: var(--hilight-color);;
+}
+
+.player_bar .progress {
+    background: linear-gradient(90deg,#3b3eff,#5c7fff);
+}
+

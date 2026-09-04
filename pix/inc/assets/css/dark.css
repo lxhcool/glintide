@@ -1,0 +1,251 @@
+/*黑夜模式*/
+:root {
+    --dark-bg: #111324;
+    --dark-medium-bg: #161829;
+    --dark-light-bg: #2e325c;
+    --dark-body-bg: #0a0c19;
+    --light-color: #dedede;
+    --text-color: #a5a9c3;
+    --dark-border: #1e2036;
+    --dark-ac-btn: #2b48ff;
+    --dark-icon: #8c92b3;
+    --text-light: #5b5f80;
+    --normal-btn: #292c45;
+    --btn-normal: #1e2139;
+}
+
+body.dark {
+    background: var(--dark-body-bg);
+}
+
+.dark .left_nav_inner , .dark .entry-footer , .dark .topic_comments_wrap , .dark #create_post_box .modal_inner , .dark #topic-title ,.dark input#set_local 
+, .dark .t_cat_box li , .dark .single_content .comments-area , .dark #commentform textarea#comment , .dark .single_wrap .comments-area, .dark .page_content .comments-area
+, .dark .column_inner , .dark #login_form_box .modal_inner , .dark #link_modal .uk-modal-dialog , .dark #msg_modal .uk-modal-dialog , .dark .moment_card_item a 
+, .dark .post_control_list , .dark .sidebar_right , .dark .right_admin_tool , .dark .top_set_box a.active , .dark .single-content blockquote, .dark .entry-content blockquote 
+, .dark .footer_main .inner ,.dark .m_offcanvas .inner {
+    background: var(--dark-bg);
+}
+
+.dark #ava-content {
+    background-color: #292c45;
+}
+
+.dark .unread_box .vi_reply_item {
+    background: var(--dark-light-bg);
+}
+
+.dark .blog_list_inner, .dark .normal_list_inner, .dark .single_wrap , .dark .top_bar , .dark .left_menu_box ul li a:hover, .dark .link_group .item:hover
+, .dark #t_commentform , .dark textarea#comment , .dark .single_content, .dark .page_content, .dark .page_wrap , .dark #topic_content , .dark .t_cat_box
+, .dark .local_box , .dark input#add_cat , .dark .show_media_box, .dark .show_cdn_media , .dark input#img_link_up , .dark .com_smile_show .inner 
+, .dark #commentform , .dark #login_form_box input#username, .dark #login_form_box input#password , .dark #comment-author-info input , .dark .archive_main 
+, .dark .page_main , .dark .loacl_audio .audio_right input, .dark .netease_audio input , .dark .loacl_audio .audio_left , .dark .edit_card_box .edit_content input 
+, .dark input#moment_video_url, .dark input#moment_video_bili , .dark .m_media_left , .dark .widget_tag_cloud a , .dark .cst_widget_comment ul li .right .body
+,.dark .nodata_main , .dark .s_main , .dark .musci_list_box , .dark .volume_box , .dark .top_set_box  , .dark .sw_qrcode {
+    background: var(--dark-medium-bg);
+}
+
+.dark .main_wrap, .dark .top_ava img , .dark .left_menu_box ul li a:hover, .dark .link_group .item:hover , .dark .t_cat_box
+, .dark .local_box , .dark .com_smile_show , .dark #ava-content , .dark .moment_card_item.loop_card_item a:hover , .dark .post_control_list 
+, .dark .widget_tag_cloud a , .dark .single_music_header .mu_img img , .dark .sw_qrcode{
+    box-shadow: none;
+}
+
+.dark .left_menu_box ul li a , .dark .normal_card_content .entry-title a , .dark .list_user_meta .name , .dark .post_footer_meta span.comnum , .dark .p_title a 
+, .dark textarea#comment , .dark .p_title , .dark #topic_content , .dark #topic-title , .dark input#add_cat , .dark input#set_local  
+, .dark input#img_link_up , .dark .comment-list li .com_right .left h4 a , .dark .post-single .entry-title , .dark .page_content .entry-title 
+, .dark .page_content .entry-header i , .dark p.log_title , .dark #login_form_box input#username, .dark #login_form_box input#password , .dark #comment-author-info input 
+, .dark .links_count , .dark .link_cat_name , .dark .link_group .item .info .name a , .dark .msg_title , .dark .archive_main .cat_title h1 
+, .dark .normal_content .entry-title a, .dark .normal_grid_content .entry-title a , .dark .player_meta .title , .dark .moment_card_item .right h4 
+, .dark .loacl_audio .audio_right input, .dark .netease_audio input , .dark .edit_card_box .edit_content input , .dark input#moment_video_url, .dark input#moment_video_bili 
+, .dark .post_control_list a , .dark .t_dark a i , .dark .player_mod .m_info h2 , .dark .posts_mu_list li , .dark .posts_mu_list .s_play_btn {
+    color: var(--light-color);
+}
+
+.dark .normal_content .entry-content p, .dark .normal_card_content .entry-content p , .dark .normal_content .post_footer_meta span.comnum
+, .dark .normal_card_content .post_footer_meta span.comnum, .dark .normal_grid_content .post_footer_meta span.comnum , .dark .post_footer_meta span 
+ , .dark .t_content p , .dark .t_content ,.dark .up_img_btn i , .dark .t_cat_box li , .dark .show_cdn_media span , .dark .form_footer .admin_tool a 
+  , .dark .comment-list li .com_right .body p , .dark .comment-list p.nodata , .dark .single-content p , .dark ul.column_lists li a 
+  , .dark .page_content .entry-content , .dark blockquote , .dark .link_group .item .info .description , .dark .vi_reply_item .content 
+  , .dark .vi_reply_item .target_comment , .dark .msg_log , .dark .post_footer_meta span i , .dark .edit_audio_box .tips, .dark .edit_video_box .tips
+ , .dark span.ip_loca , .dark .posts_show_widget ul li .title a , .dark .cst_widget_comment ul li .right a , .dark .pix_widget_tongji ul li small
+ , .dark .top_s_box input.s_input , .dark .top_menu_box ul li a , .dark .top_menu_box ul li a i , .dark .pl_btn a i  {
+    color: var(--text-color);
+}
+
+.dark .moment_cat_nav, .dark .posts_cat_nav , .dark .left_menu_box ul, .dark textarea#comment, .dark .tool_box, .dark .smile_show, .dark .form_footer, .dark .set_cat, .dark #commentform textarea#comment 
+, .dark .p_item , .dark .footer_nav_box , .dark #t_pagination, .dark #pagination ,.dark input#set_local , .dark input#img_link_up , .dark .comments-area ul.comment-list li
+, .dark .commentnav , .dark #t_commentform , .dark #commentform , .dark .single-inner , .dark .page_content .entry-header , .dark #login_form_box input#username, .dark #login_form_box input#password
+, .dark #comment-author-info input , .dark .vi_reply_item , .dark #topic_content , .dark .archive_main .page-header , .dark .widget_inner .widget , .dark .moment_card_item.loop_card_item a 
+, .dark .edit_card_box .edit_content input , .dark .post_control_list , .dark .link_group_content , .dark .set_text , .dark .s_tips , .dark .single-content blockquote, .dark .entry-content blockquote{
+    border-color: var(--dark-border);
+}
+
+.dark .left_menu_box li[class*=current-] a , .dark .moment_cat_nav ul li a.active, .dark .posts_cat_nav ul li a.active , .dark .normal_cat , .dark #t_pagination a, .dark #pagination a
+, .dark a.go_top , .dark input#push_comment , .dark .up_cat_btn , .dark a.set_local_btn , .dark a.img_link_btn
+, .dark .push_item , .dark .de_cat , .dark .commentnav span.page-numbers.current , .dark input.submit_button , .dark #post_pager a  
+, .dark .edit_card_box .edit_content a.push_card , .dark span.de_card i , .dark .post_control_list a:hover , .dark .t_dark a , .dark .left_menu_box li[class*=current-] a:hover
+,.dark a.bg_music , .dark .vo_size ,.dark .footer_menu .inner .center .mobile_edit {
+    background: var(--dark-ac-btn);
+    color: #fff;
+}
+
+.dark .t_dark a i , .dark .top_tool i , .dark .normal_content .post_footer_meta span.comnum i
+, .dark .normal_card_content .post_footer_meta span.comnum i, .dark .normal_grid_content .post_footer_meta span.comnum i , .dark a.up_like i 
+, .dark .footer_nav_box ul li a  , .dark .comment_smile_box a i , .dark #login_form_box label i  , .dark .ad_info .name , .dark .top_s_box form i {
+    color: var(--dark-icon);
+}
+
+.dark a.up_like.done i {
+    color: #ff5d49;
+}
+
+.dark .normal_content .entry_meta, .dark .normal_card_content .entry_meta, .dark .normal_grid_content .entry_meta , .dark #post_pager .c_paged , .dark .comment-list li .com_right .left time 
+, .dark a.comment-reply-link , .dark span.single_time , .dark ul.column_lists li span , .dark .page_content .entry-header .right time 
+, .dark a.beian , .dark footer#colophon , .dark .ad_info p , .dark .ad_info a , .dark .widget_tag_cloud a , .dark .cst_widget_comment ul li .right .body
+, .dark .cst_widget_comment ul li .right .meta , .dark .posts_show_widget ul li .meta , .dark .pix_widget_tongji ul li span ,.dark .set_text
+, .dark .top_s_box input::-webkit-input-placeholder , .dark .mu_des  , .dark .s_tips  , .dark .top_set_box a {
+    color: var(--text-light);
+}
+
+.dark .moment_cat_nav ul li a, .dark .posts_cat_nav ul li a , .dark .link_group .item:hover {
+    background: var(--normal-btn);
+    color: var(--text-light);
+}
+
+.dark .top_bar.uk-sticky-fixed.uk-active , .dark .footer_nav_box , .dark .top_menu_box  {
+    background: rgb(27 29 48 / 80%);
+}
+
+.dark .footer_nav_box , .dark .top_menu_box {
+    border: none;
+    color: var(--light-color);
+}
+
+.dark .footer_nav_box ul li a:hover , .dark .ad_info a:hover , .dark .audio_choose li.uk-active a , .dark .video_choose li.uk-active a, .dark .s_tips span
+, .dark .posts_mu_list li:hover div, .dark .posts_mu_list li:hover a, .dark .posts_mu_list li.active, .dark .posts_mu_list li.active .s_play_btn , .dark .s_set_box a.active
+, .dark .search_box .s_set_box a:hover , .dark .posts_show_widget .no_img li a:before  {
+    color: var(--dark-ac-btn);
+}
+
+.dark .loca i , .dark a.up_img_btn , .dark .up_from_media a, .dark .up_from_cdn a , .dark .attch_nav a i
+, .dark a.img_link_cancel , .dark .push_close , .dark .commentnav a , .dark .post-categories a  , .dark .link_group .item{
+    background: var(--btn-normal);
+    color: var(--dark-icon);
+}
+
+.dark .up_img_type {
+    border: none;
+}
+
+.dark .t_cat_box li span i {
+    background: transparent;
+}
+
+.dark .t_cat_box li span {
+    color: var(--text-color) !important;
+}
+
+.dark #topic_content:focus {
+    box-shadow: 0 0 0 0.12rem rgb(84 96 155);
+}
+
+.dark input#img_link_up:focus , .dark input#set_local:focus , .dark #t_commentform:focus-within , .dark #commentform:focus-within , .dark #login_form_box input#username:focus
+, .dark #login_form_box input#password:focus , .dark #comment-author-info input:focus , .dark .audio_choose li.uk-active a , .dark .video_choose li.uk-active a , .dark .player_dot{
+    border-color: var(--dark-ac-btn);
+}
+
+.dark a.parents_at , .dark ul.column_lists li a:hover , .dark .single-content a, .dark .page_content .entry-content a , .dark a.mo_link , .dark .show-more-btn , .dark .vi_reply_item .name span
+, .dark .vi_reply_item .meta a , .dark .copyright a {
+    color: #7786e7;
+}
+
+.dark .single-content ul li , .dark .single-content ol li {
+    border-bottom: 1px solid #282a40;
+    color: #bdbfff;
+}
+
+.dark .single-content h1 , .dark .single-content h2 , .dark .single-content h3 , .dark .single-content h4 {
+    color: #e5e8ff;
+}
+
+.dark .page_content pre {
+    border: 1px solid #111324;
+    background: #111324;
+    color: #fff8f8;;
+}
+
+.dark .post_footer_meta span.sticky_icon {
+    background: #ff4731;
+    color: #fff;
+}
+
+.dark .post_footer_meta span.sticky_icon i , .dark .post_footer_meta span.comnum i{
+    color: #fff;
+}
+
+.dark .moment_type_btn i , .dark .smile_box i, .dark .simi i, .dark .t_cat i , .dark span.moment_btn_line , .dark .simi i.ri-lock-unlock-line {
+    color: #6674c1 !important;
+    background: transparent !important;
+}
+
+.dark .pix_player {
+    background: rgb(43 43 43 / 75%);
+}
+
+.dark .player_bar {
+    background: #585858;
+}
+
+.dark .loacl_audio , .dark .local_video {
+    background: #2b2d40;
+}
+
+.dark .show_card {
+    background: #1f2136;
+    border: 1px dashed #4c5985;
+}
+
+.dark .pix_widget_tongji ul li {
+    box-shadow: 0px 8px 4px 0px rgb(15 17 33);
+    background: linear-gradient(90deg,#161829,#816bff00);
+}
+
+.dark .top_s_box input.s_input{
+    background: rgb(13 15 35 / 65%);
+}
+
+.dark .single_music_header .mu_img img {
+    border: 1px solid #0a0c19;
+}
+
+.dark .posts_mu_list {
+    background: #111324;
+    border: 1px solid #0a0c19;
+}
+
+.dark .posts_mu_list li:nth-of-type(odd) {
+    background: #161829;
+}
+
+.dark .left_menu_box li[class*=current-] ul a {
+    background: inherit;
+    color: var(--light-color);
+}
+
+.dark .single_footer_box {
+    background: linear-gradient(90deg,#262841,#816bff00);
+}
+
+.dark .footer_menu .inner {
+    background: #0d0f1e;
+    border-top: 1px solid #0d0f1e;
+}
+
+.dark .bgm_box {
+    border-bottom: 1px solid #0d0f1e;
+}
+
+.dark .footer_menu li a , .dark .footer_menu li a i , .dark .m_offcanvas ul li a , .dark .m_offcanvas ul li a i {
+    color: #c7caff;
+}
+

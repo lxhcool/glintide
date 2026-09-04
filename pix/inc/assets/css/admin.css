@@ -1,0 +1,140 @@
+.auth_content {
+    max-width: 480px;
+    background: #f3f3ff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.auth_title p.fake {
+    background: #ffffff;
+    padding: 15px 10px;
+    border-radius: 5px;
+    color: #ff2c2c;
+}
+
+.auth_title p.valid {
+    background: #161616;
+    padding: 15px 10px;
+    border-radius: 5px;
+    color: #ffc174;
+    display: flex;
+}
+
+.auth_title p.valid img {
+    margin-right: 5px;
+}
+
+.theme_info {
+
+}
+
+.theme_info h4 {
+    font-size: 15px;
+    font-weight: 400;
+    margin-top: 15px !important;
+}
+
+.theme_info .theme_vi {
+    font-size: 13px;
+    padding: 2px 8px;
+    background: #3f2fff;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.wel_des li {
+    list-style: none;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #dfdffe;
+    margin-bottom: 15px;
+    line-height: 2;
+}
+
+.wel_des {
+    font-size: 15px;
+    color: #303c70;
+}
+
+.pixauth_wrap .auth_title {
+    font-size: 15px;
+    color: #353766;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.pixauth_wrap input#pix_authcode {
+    padding: 3px 12px;
+    background: #f5f6ff;
+    border-color: #bcbce8;
+}
+
+.pixauth_wrap input.button-primary {
+    background: #1d1aff;
+    border-color: #1d1aff;
+    border-radius: 5px;
+}
+
+.pixauth_wrap input.button-primary:hover {
+    background: #433fff;
+}
+
+.pixauth_wrap input.button {
+    border-radius: 5px;
+}
+
+.pixauth_wrap .tips {
+    margin-top: 8px;
+    color: #535478;
+    font-size: 14px;
+}
+
+.pixauth_wrap h2 {
+    margin: 0;
+    padding-bottom: 20px;
+    color: #0020ff;
+}
+
+.auth_state {
+    display: inline-block;
+    color: #009529;
+    font-size: 13px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.auth_state.unac {
+    color: #abb0bf;
+}
+
+.auth_info {
+    margin-top: 15px;
+    padding-top: 30px;
+    border-top: 1px solid #ececff;
+}
+
+.auth_info li {
+    list-style: none;
+    margin-bottom: 15px;
+    font-size: 15px;
+    color: #363966;
+}
+
+.auth_info li span {
+    font-weight: 600;
+    width: 140px;
+    display: inline-block;
+    color: #797999;
+}
+
+.pixauth_wrap {
+    background: #fff;
+    padding: 25px;
+    margin-top: 20px;
+    border-radius: 8px;
+    max-width: 450px;
+    margin-right: 10px;
+}
+
+
+

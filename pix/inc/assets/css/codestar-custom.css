@@ -1,0 +1,77 @@
+.csf-field {
+    margin: 10px;
+    background: #fff;
+    border-radius: 5px;
+}
+
+.csf-sections {
+    background: #edeef8;
+}
+
+.csf-theme-dark .csf-header-inner {
+    background-color: #111225;
+}
+
+.csf-theme-dark .csf-nav-background {
+    background-color: #22232d;
+}
+
+.csf-theme-dark .csf-nav ul li a {
+    color: #bec0d9;
+    border-color: #22232d;
+    background-color: #22232d;
+    padding: 18px 12px;
+}
+
+.csf-theme-dark .csf-nav ul li .csf-active {
+    background-color: #2f37a5 !important;
+    border-radius: 8px;
+}
+
+.csf-theme-dark .csf-nav ul li a {
+    border-radius: 8px;
+}
+
+.csf-theme-dark .csf-nav-normal ul li .csf-active:after {
+    display: none;
+}
+
+.csf-field-upload input , .csf-field-text input {
+    padding: 3px 7px;
+    background: #f4f5ff;
+    border-color: #e2e5ff;
+}
+
+.csf-field-upload .button {
+    padding: 3px 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+.wp-core-ui .button-primary {
+    background: #2f37a5;
+}
+
+.chosen-container-multi .chosen-choices {
+    background-image: linear-gradient(#e1e6fff5 1%,#f4f5ff 15%);
+    border-radius: 5px;
+    padding: 3px 5px;
+}
+
+.csf-field-textarea textarea {
+    border-color: #e2e5ff;
+    padding: 5px;
+    background: #f4f5ff;
+}
+
+.csf-nav ul li {
+    margin: 5px;
+}
+
+.csf-field-switcher .csf--active {
+    background: #393dff;
+}
+
+.csf-theme-dark .csf-search input , .csf-theme-dark .csf-expand-all {
+    background-color: #3e4052;
+}
