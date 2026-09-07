@@ -34,11 +34,6 @@ class Glintide_Widget_Profile extends Glintide_Widget {
 				'type'  => 'text',
 				'title' => '城市',
 			),
-			array(
-				'id'    => 'signature',
-				'type'  => 'textarea',
-				'title' => '个性签名',
-			),
 		);
 	}
 
@@ -62,19 +57,61 @@ class Glintide_Widget_Profile extends Glintide_Widget {
 		$username = isset( $instance['username'] ) ? sanitize_text_field( $instance['username'] ) : '';
 		$username = $username ? $username : ( $user instanceof WP_User && $user->exists() ? $user->display_name : get_bloginfo( 'name' ) );
 		$city     = isset( $instance['city'] ) ? sanitize_text_field( $instance['city'] ) : '';
-		$signature = isset( $instance['signature'] ) ? sanitize_textarea_field( $instance['signature'] ) : '';
+		$uid      = 'glintide-profile-hitokoto-' . wp_rand( 1000, 999999 );
 
 		$html  = '<div class="glintide-profile-card">';
+		$html .= '<div class="glintide-profile-main">';
 		$html .= '<img class="glintide-profile-avatar" src="' . esc_url( $avatar ) . '" alt="' . esc_attr( $username ) . '" loading="lazy" data-glintide-avatar data-glintide-avatar-fallback="' . esc_url( glintide_get_default_avatar_url() ) . '">';
 		$html .= '<div class="glintide-profile-copy">';
 		$html .= '<div class="glintide-profile-name">' . esc_html( $username ) . '</div>';
 		if ( $city ) {
 			$html .= '<div class="glintide-profile-city"><i class="ri-map-pin-2-line" aria-hidden="true"></i><span>' . esc_html( $city ) . '</span></div>';
 		}
-		if ( $signature ) {
-			$html .= '<p class="glintide-profile-signature">' . esc_html( $signature ) . '</p>';
-		}
 		$html .= '</div></div>';
+		$html .= '<div class="glintide-profile-signature" id="' . esc_attr( $uid ) . '" aria-live="polite">';
+		$html .= '<span class="glintide-profile-signature-text">加载中...</span>';
+		$html .= '<span class="glintide-profile-progress" aria-hidden="true"><span></span></span>';
+		$html .= '</div>';
+		$html .= '<script>
+(function(){
+	var root = document.getElementById("' . esc_js( $uid ) . '");
+	if (!root) return;
+	var text = root.querySelector(".glintide-profile-signature-text");
+	var progress = root.querySelector(".glintide-profile-progress");
+	var duration = 30000;
+	var timer = null;
+	var loading = false;
+
+	function restartProgress() {
+		if (!progress) return;
+		progress.classList.remove("is-running");
+		void progress.offsetWidth;
+		progress.classList.add("is-running");
+	}
+
+	function load() {
+		if (loading) return;
+		loading = true;
+		fetch("https://v1.hitokoto.cn/?encode=json&charset=utf-8")
+			.then(function(response){ return response.json(); })
+			.then(function(data){
+				if (text) text.textContent = data.hitokoto || "一言获取失败";
+				restartProgress();
+				window.clearTimeout(timer);
+				timer = window.setTimeout(load, duration);
+			})
+			.catch(function(){
+				if (text) text.textContent = "一言获取失败";
+				window.clearTimeout(timer);
+				timer = window.setTimeout(load, duration);
+			})
+			.finally(function(){ loading = false; });
+	}
+
+	load();
+}());
+</script>';
+		$html .= '</div>';
 
 		return $html;
 	}

@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function glintide_render_left_navigation() {
     $site_name = get_bloginfo( 'name' );
+    $footer_text = glintide_get_option( 'footer_text', '' );
+    $footer_text = $footer_text ? do_shortcode( wp_kses_post( $footer_text ) ) : '&copy; ' . date( 'Y' ) . ' Glintide';
     $menu = wp_nav_menu(
         array(
             'theme_location' => 'top',
@@ -44,7 +46,8 @@ function glintide_render_left_navigation() {
     }
 
     $html .= '<div class="glintide-left-rail-footer">';
-    $html .= '<span class="glintide-left-rail-copyright">&copy; 2026 Glintide All rights reserved.</span>';
+    $html .= '<div class="glintide-left-rail-footer-copy">' . wp_kses_post( $footer_text ) . '</div>';
+    $html .= '<button class="glintide-left-rail-theme" type="button" data-glintide-theme-toggle aria-pressed="false" aria-label="切换深色模式" title="切换深色模式"><i class="ri-moon-line" data-glintide-theme-icon aria-hidden="true"></i></button>';
     $html .= '</div>';
 
     $html .= '</div>';

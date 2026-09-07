@@ -138,6 +138,13 @@ CSF::createSection(
 				'edit_title'   => '修改备案号',
 				'remove_title' => '移除备案号',
 			),
+			array(
+				'id'          => 'footer_git_url',
+				'type'        => 'text',
+				'title'       => 'Git 地址',
+				'desc'        => '填写 Git 仓库地址，前台将在左栏底部显示 Git 图标。',
+				'placeholder' => 'https://github.com/your-name/your-repository',
+			),
 		),
 	)
 );

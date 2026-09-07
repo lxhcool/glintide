@@ -6368,22 +6368,94 @@ body {
 }
 
 .glintide-left-rail-footer {
-	display: block;
-	margin-top: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
 	padding-top: 24px;
 	color: var(--text-gray-800);
 	font-size: 12px;
 	line-height: 1.35;
 }
 
-.glintide-left-rail-copyright {
-	display: block;
+.glintide-left-rail-footer-copy {
+	min-width: 0;
+	overflow: hidden;
 	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.glintide-left-rail-theme {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: inherit;
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.glintide-left-rail-theme:hover,
+.glintide-left-rail-theme:focus-visible {
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
 }
 
 
-/* 右栏页面工具 */
+
+.glintide-right-rail-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-top: auto;
+	padding-top: 24px;
+	text-align: right;
+}
+
+.glintide-right-rail-footer .glintide-right-rail-icp:first-child {
+	margin-left: auto;
+}
+
+.glintide-right-rail-git {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	color: var(--color-glintide-muted);
+	font-size: 18px;
+	text-decoration: none;
+	transition: color .2s ease;
+}
+
+.glintide-right-rail-git:hover,
+.glintide-right-rail-git:focus-visible {
+	color: var(--color-glintide-primary);
+}
+
+.glintide-right-rail-icp {
+	color: var(--color-glintide-muted);
+	font-size: 12px;
+	text-decoration: none;
+}
+
+.glintide-right-rail-icp:hover,
+.glintide-right-rail-icp:focus-visible {
+	color: var(--color-glintide-primary);
+}
+
 .glintide-right-rail {
+	display: flex;
+	flex-direction: column;
 	position: sticky;
 	top: 0;
 	width: 100%;
@@ -6434,10 +6506,6 @@ body {
 .glintide-left-widget-stack>.widget {
 	min-width: 0;
 	margin: 0;
-}
-
-.glintide-left-rail-footer {
-	margin-top: 24px;
 }
 
 @media (max-width: 900px) {
@@ -6494,9 +6562,6 @@ body {
 		min-height: 0;
 	}
 
-	.glintide-left-rail-footer {
-		margin-top: 24px;
-	}
 }
 
 /* 深色模式覆盖 */
@@ -6726,24 +6791,33 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 
 /* Profile widget */
 .widget.glintide-profile-widget {
-	padding: 16px;
+	padding: 0px;
+	background: none;
+	box-shadow: none;
 }
 
 .glintide-profile-card {
 	display: flex;
-	align-items: flex-start;
-	gap: 16px;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0;
 	padding: 0;
 	border-radius: 0;
 	background: transparent;
 	box-shadow: none;
 }
 
+.glintide-profile-main {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+}
+
 .glintide-profile-avatar {
 	display: block;
-	flex: 0 0 64px;
-	width: 64px;
-	height: 64px;
+	flex: 0 0 36px;
+	width: 36px;
+	height: 36px;
 	border-radius: 10px;
 	object-fit: cover;
 	background: var(--color-glintide-line, #eef0f4);
@@ -6756,7 +6830,7 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 .glintide-profile-name {
 	overflow: hidden;
 	color: var(--color-glintide-ink, #202124);
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: 700;
 	line-height: 1.3;
 	text-overflow: ellipsis;
@@ -6769,7 +6843,7 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 	gap: 4px;
 	margin-top: 3px;
 	color: var(--color-glintide-muted, #7d8290);
-	font-size: 14px;
+	font-size: 12px;
 	line-height: 1.4;
 }
 
@@ -6778,9 +6852,40 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 }
 
 .glintide-profile-signature {
+	box-sizing: border-box;
+	height: 27px;
 	margin: 8px 0 0;
+	overflow: hidden;
 	color: var(--color-glintide-muted-soft, #969aa5);
-	font-size: 13px;
-	line-height: 1.5;
-	word-break: break-word;
+	font-size: 12px;
+	line-height: 18px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.glintide-profile-signature-text {
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.glintide-profile-progress {
+	display: block;
+	height: 2px;
+	margin-top: 7px;
+	overflow: hidden;
+	background: var(--color-glintide-line, #eef0f4);
+}
+
+.glintide-profile-progress span {
+	display: block;
+	width: 0;
+	height: 100%;
+	background: var(--color-glintide-primary, #3157ff);
+}
+
+.glintide-profile-progress.is-running span {
+	width: 100%;
+	transition: width 30s linear;
 }

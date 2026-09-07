@@ -9,6 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function glintide_render_right_tools() {
     $default_avatar = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
+    $footer_icp = glintide_get_option( 'footer_icp', array() );
+    $footer_icp = is_array( $footer_icp ) ? $footer_icp : array();
+    $icp_url = ! empty( $footer_icp['url'] ) ? esc_url( $footer_icp['url'] ) : '';
+    $icp_text = ! empty( $footer_icp['text'] ) ? sanitize_text_field( $footer_icp['text'] ) : '';
+    $icp_target = ! empty( $footer_icp['target'] ) ? sanitize_key( $footer_icp['target'] ) : '_blank';
+    $git_url = esc_url( glintide_get_option( 'footer_git_url', '' ) );
     $user_link = wp_login_url( home_url( '/' ) );
     $user_label = '登录';
     $user_name = '用户头像';
@@ -31,9 +37,6 @@ function glintide_render_right_tools() {
 
     $html = '<div class="glintide-right-rail">';
     $html .= '<div class="glintide-right-tools" role="toolbar" aria-label="页面工具">';
-    $html .= '<button class="glintide-right-tool" type="button" data-glintide-theme-toggle aria-pressed="false" aria-label="切换深色模式" title="切换深色模式">';
-    $html .= '<i class="ri-moon-line" data-glintide-theme-icon aria-hidden="true"></i>';
-    $html .= '</button>';
     $html .= '<button class="glintide-right-tool" type="button" aria-label="搜索" title="搜索">';
     $html .= '<i class="ri-search-line" aria-hidden="true"></i>';
     $html .= '</button>';
@@ -47,6 +50,17 @@ function glintide_render_right_tools() {
         ob_start();
         dynamic_sidebar( 'sidebar-right' );
         $html .= ob_get_clean();
+        $html .= '</div>';
+    }
+
+    if ( ( $icp_url && $icp_text ) || $git_url ) {
+        $html .= '<div class="glintide-right-rail-footer">';
+        if ( $git_url ) {
+            $html .= '<a class="glintide-right-rail-git" href="' . $git_url . '" target="_blank" rel="noopener noreferrer" aria-label="Git 仓库" title="Git 仓库"><i class="ri-github-line" aria-hidden="true"></i></a>';
+        }
+        if ( $icp_url && $icp_text ) {
+            $html .= '<a class="glintide-right-rail-icp" href="' . $icp_url . '" target="' . esc_attr( $icp_target ) . '" rel="noopener noreferrer">' . esc_html( $icp_text ) . '</a>';
+        }
         $html .= '</div>';
     }
 
