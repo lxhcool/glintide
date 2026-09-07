@@ -131,31 +131,24 @@ add_action( 'widgets_init', 'glintide_widgets_init' );
  * 加载样式与脚本
  */
 function glintide_scripts() {
-	// 照片轮播组件
+	// 照片预览组件 lightGallery(自带缩略图条/缩放/手势,GPLv3)
 	wp_enqueue_style(
-		'glintide-swiper-style',
-		GLINTIDE_URL . '/inc/assets/css/swiper-bundle.min.css',
+		'glintide-lightgallery-style',
+		GLINTIDE_URL . '/assets/css/lightgallery-bundle.min.css',
 		array(),
-		filemtime( GLINTIDE_DIR . '/inc/assets/css/swiper-bundle.min.css' )
+		filemtime( GLINTIDE_DIR . '/assets/css/lightgallery-bundle.min.css' )
 	);
 
 	// 主样式
 	$glintide_style_file    = GLINTIDE_DIR . '/style.css';
 	$glintide_style_version = filemtime( $glintide_style_file ) . '-' . substr( md5_file( $glintide_style_file ), 0, 12 );
-	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array( 'glintide-swiper-style' ), $glintide_style_version );
+	wp_enqueue_style( 'glintide-style', get_stylesheet_uri(), array( 'glintide-lightgallery-style' ), $glintide_style_version );
 
 	// 内容卡片交互(点赞、无限加载所需的 AJAX 配置)
 	wp_enqueue_script(
-		'glintide-swiper',
-		GLINTIDE_URL . '/inc/assets/js/swiper-bundle.min.js',
-		array(),
-		filemtime( GLINTIDE_DIR . '/inc/assets/js/swiper-bundle.min.js' ),
-		true
-	);
-	wp_enqueue_script(
 		'glintide-photo-swiper',
 		GLINTIDE_URL . '/assets/js/glintide-photo-swiper.js',
-		array( 'glintide-swiper', 'jquery' ),
+		array( 'jquery' ),
 		filemtime( GLINTIDE_DIR . '/assets/js/glintide-photo-swiper.js' ),
 		true
 	);
@@ -163,7 +156,10 @@ function glintide_scripts() {
 		'glintide-photo-swiper',
 		'glintide_card_ajax',
 		array(
-			'url' => admin_url( 'admin-ajax.php' ),
+			'url'        => admin_url( 'admin-ajax.php' ),
+			'lgUrl'      => GLINTIDE_URL . '/assets/js/lightgallery.min.js',
+			'lgThumbUrl' => GLINTIDE_URL . '/assets/js/lg-thumbnail.min.js',
+			'lgZoomUrl'  => GLINTIDE_URL . '/assets/js/lg-zoom.min.js',
 		)
 	);
 	wp_enqueue_style(

@@ -2243,10 +2243,8 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 }
 
 .glintide-photo-tile:focus-visible {
-	z-index: 5;
-	outline: 3px solid #fff;
-	outline-offset: -3px;
-	box-shadow: 0 0 0 2px var(--color-glintide-primary);
+	outline: none;
+	box-shadow: none;
 }
 
 .glintide-photo-tile:active img {
@@ -2444,212 +2442,17 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	100% { transform: scale(1); }
 }
 
-/* ---------- 照片大图预览 ---------- */
-.glintide-photo-lightbox {
-	position: fixed;
-	inset: 0;
-	z-index: 100001;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 20px;
-	background: rgb(3 8 7 / 88%);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
-	opacity: 0;
-	visibility: hidden;
-	pointer-events: none;
-	transition: opacity .24s ease, visibility .24s ease;
-}
-
-.glintide-photo-lightbox.is-open {
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-}
-
-.glintide-photo-lightbox-backdrop {
-	position: absolute;
-	inset: 0;
-}
-
-.glintide-photo-lightbox-dialog {
-	position: relative;
-	z-index: 1;
-	display: flex;
-	flex-direction: column;
-	width: min(920px, 100%);
-	height: min(760px, 90vh);
-	min-height: 0;
-	padding: 12px;
-	border-radius: 16px;
-	background: rgb(17 24 39 / 96%);
-	box-shadow: 0 24px 64px rgb(0 0 0 / 40%);
-	transform: translateY(12px) scale(.98);
-	transition: transform .24s ease;
-}
-
-.glintide-photo-lightbox.is-open .glintide-photo-lightbox-dialog {
-	transform: none;
-}
-
-.glintide-photo-lightbox-swiper {
-	position: relative;
-	flex: 1 1 auto;
-	width: 100%;
-	min-height: 0;
-	overflow: hidden;
-	border-radius: 10px;
-	background: var(--color-glintide-media-dark);
-}
-
-.glintide-photo-lightbox-swiper .swiper-wrapper {
-	display: flex;
-	width: 100%;
-	height: 100%;
-}
-
-.glintide-photo-lightbox-swiper .swiper-slide {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-}
-
-.glintide-photo-lightbox-swiper img {
-	display: block;
-	width: auto;
-	max-width: 100%;
-	height: auto;
-	max-height: 100%;
-	object-fit: contain;
-	user-select: none;
-}
-
-.glintide-photo-lightbox-close,
-.glintide-photo-lightbox-nav {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-	border: 0;
-	border-radius: 50%;
-	background: rgb(0 0 0 / 42%);
-	color: #fff;
-	cursor: pointer;
-	transition: background-color .2s ease, color .2s ease, transform .2s ease, opacity .2s ease;
-}
-
-.glintide-photo-lightbox-close {
-	position: absolute;
-	top: 18px;
-	right: 18px;
-	z-index: 5;
-	width: 34px;
-	height: 34px;
-	font-size: 20px;
-}
-
-.glintide-photo-lightbox-close:hover {
-	background: var(--color-glintide-primary);
-	transform: rotate(90deg);
-}
-
-.glintide-photo-lightbox-nav {
-	position: absolute;
-	top: 50%;
-	z-index: 4;
-	width: 38px;
-	height: 38px;
-	margin-top: -19px;
-	font-size: 20px;
-}
-
-.glintide-photo-lightbox-nav--prev {
-	left: 24px;
-}
-
-.glintide-photo-lightbox-nav--next {
-	right: 24px;
-}
-
-.glintide-photo-lightbox-nav:hover {
-	background: var(--color-glintide-primary);
-}
-
-.glintide-photo-lightbox.is-single .glintide-photo-lightbox-nav {
-	opacity: .25;
-	pointer-events: none;
-}
-
-.glintide-photo-lightbox-close:focus-visible,
-.glintide-photo-lightbox-nav:focus-visible {
-	outline: 2px solid #fff;
-	outline-offset: 3px;
-}
-
-.glintide-photo-lightbox-foot {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	min-width: 0;
-	padding: 12px 4px 2px;
-	color: #fff;
-}
-
-.glintide-photo-lightbox-count {
-	flex: 0 0 auto;
-	color: rgb(255 255 255 / 72%);
-	font-size: 12px;
-	font-variant-numeric: tabular-nums;
-}
-
-.glintide-photo-lightbox-caption {
-	overflow: hidden;
+/* ---------- 照片大图预览(lightGallery) ---------- */
+/* 基础样式由 assets/css/lightgallery-bundle.min.css 提供,这里只做主题化微调 */
+.lg-sub-html .glintide-lg-caption {
+	margin: 0;
 	color: rgb(255 255 255 / 92%);
 	font-size: 13px;
 	font-weight: 600;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-body.glintide-photo-lightbox-open {
-	overflow: hidden;
-}
-
-@media (max-width: 640px) {
-	.glintide-photo-lightbox {
-		padding: 10px;
-	}
-
-	.glintide-photo-lightbox-dialog {
-		height: min(720px, 92vh);
-		padding: 8px;
-		border-radius: 12px;
-	}
-
-	.glintide-photo-lightbox-close {
-		top: 14px;
-		right: 14px;
-	}
-
-	.glintide-photo-lightbox-nav--prev {
-		left: 14px;
-	}
-
-	.glintide-photo-lightbox-nav--next {
-		right: 14px;
-	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.glintide-photo-tile img,
-	.glintide-photo-lightbox,
-	.glintide-photo-lightbox-dialog,
-	.glintide-photo-lightbox-close,
-	.glintide-photo-lightbox-nav {
+	.glintide-photo-tile img {
 		transition-duration: .01ms;
 	}
 }
@@ -4049,6 +3852,11 @@ body.glintide-photo-lightbox-open {
 	gap: 6px;
 	color: var(--color-glintide-muted);
 	font-size: 13px;
+}
+
+/* display 会覆盖 hidden 属性,必须显式还原 */
+.glintide-card-feed-loading[hidden] {
+	display: none;
 }
 
 .glintide-card-feed-loading i {

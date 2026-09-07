@@ -1243,7 +1243,6 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 
 	if ( 'video' === $type ) {
 		$video_url = glintide_card_get_video_url( $post_id );
-		$poster    = isset( $images[0] ) ? $images[0] : '';
 
 		if ( ! $video_url ) {
 			return glintide_card_media_empty( $base, 'ri-video-line', '视频地址未设置' );
@@ -1252,9 +1251,10 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 		if ( glintide_card_is_direct_video_url( $video_url ) ) {
 			$mime = glintide_card_get_video_mime( $video_url );
 
-			// 自定义视频播放器:标题、全屏、跳转、播放、进度和音量均保持在视频表面上
+			// 自定义视频播放器:标题、全屏、跳转、播放、进度和音量均保持在视频表面上。
+			// 封面不使用图组图,由前端 JS seek 到首帧渲染真实视频封面。
 			$html  = '<div class="' . esc_attr( $base ) . ' glintide-video-frame" data-glintide-video>';
-			$html .= '<video class="glintide-card-video" playsinline preload="metadata"' . ( $poster ? ' poster="' . esc_url( $poster ) . '"' : '' ) . '><source src="' . esc_url( $video_url ) . '"' . ( $mime ? ' type="' . esc_attr( $mime ) . '"' : '' ) . '><span>当前浏览器不支持视频播放。</span></video>';
+			$html .= '<video class="glintide-card-video" playsinline preload="metadata"><source src="' . esc_url( $video_url ) . '"' . ( $mime ? ' type="' . esc_attr( $mime ) . '"' : '' ) . '><span>当前浏览器不支持视频播放。</span></video>';
 			$html .= '<div class="glintide-video-scrim" aria-hidden="true"></div>';
 			$html .= '<div class="glintide-video-ui">';
 			$html .= '<div class="glintide-video-topbar">';

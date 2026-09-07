@@ -299,11 +299,22 @@
 			state.done = true;
 		}
 
+		// 查找现有哨兵,没有就返回 null,不凭空创建
+		function findSentinel() {
+			if (sentinel && sentinel.isConnected) {
+				return sentinel;
+			}
+			return stream.querySelector('[data-glintide-infinite]');
+		}
+
 		// 无限加载:IntersectionObserver 优先,滚动/轮询兜底
 		function watchSentinel() {
 			if (!('IntersectionObserver' in window)) {
 				window.addEventListener('scroll', function () {
-					var el = ensureSentinel();
+					var el = findSentinel();
+					if (!el) {
+						return;
+					}
 					var rect = el.getBoundingClientRect();
 					if (rect.top < window.innerHeight * 1.5) {
 						loadNext();
@@ -312,6 +323,10 @@
 				return;
 			}
 
+			var initial = findSentinel();
+			if (!initial) {
+				return;
+			}
 			var observer = new IntersectionObserver(function (entries) {
 				entries.forEach(function (entry) {
 					if (entry.isIntersecting) {
@@ -320,7 +335,7 @@
 					}
 				});
 			}, { rootMargin: '600px 0px' });
-			observer.observe(ensureSentinel());
+			observer.observe(initial);
 		}
 		watchSentinel();
 
@@ -330,7 +345,10 @@
 				window.clearInterval(pollTimer);
 				return;
 			}
-			var el = ensureSentinel();
+			var el = findSentinel();
+			if (!el) {
+				return;
+			}
 			var rect = el.getBoundingClientRect();
 			if (rect.top < window.innerHeight + 600 && rect.bottom > -600) {
 				loadNext();

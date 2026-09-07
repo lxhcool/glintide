@@ -42,6 +42,36 @@
 				return;
 			}
 
+			// 没有封面图的自上传视频:元数据加载后 seek 到开头,
+			// 让视频元素自己渲染首帧当封面(仅一次,已开播则不干预)
+			function applyFirstFrame() {
+				if (frame.__glintideFirstFrameDone) {
+					return;
+				}
+				frame.__glintideFirstFrameDone = true;
+
+				if (video.hasAttribute('poster')) {
+					return;
+				}
+				if (video.readyState < 1 || !video.paused || video.currentTime > 0) {
+					return;
+				}
+
+				var total = isFinite(video.duration) ? video.duration : 0;
+				var target = total > 0.2 ? 0.1 : Math.max(0, total / 2);
+				try {
+					video.currentTime = target;
+				} catch (error) { /* 个别格式 seek 失败时保持黑帧 */ }
+			}
+
+			if (!video.hasAttribute('poster')) {
+				if (video.readyState >= 1) {
+					applyFirstFrame();
+				} else {
+					video.addEventListener('loadedmetadata', applyFirstFrame, { once: true });
+				}
+			}
+
 			function updateProgress() {
 				var total = isFinite(video.duration) ? video.duration : 0;
 				var value = isFinite(video.currentTime) ? video.currentTime : 0;
