@@ -1443,25 +1443,82 @@ add_action( 'wp_ajax_glintide_card_feed', 'glintide_card_feed_ajax' );
 add_action( 'wp_ajax_nopriv_glintide_card_feed', 'glintide_card_feed_ajax' );
 
 /**
- * 渲染单条评论(弹窗评论列表用)。
+ * 相对时间(小红书式):刚刚 / N 分钟前 / N 小时前 / N 天前,超过一周显示原日期。
+ *
+ * @param string $mysql_date Y-m-d H:i 格式时间。
+ * @return string
+ */
+function glintide_card_relative_date( $mysql_date ) {
+	$ts   = (int) mysql2date( 'U', $mysql_date );
+	$diff = current_time( 'timestamp' ) - $ts;
+
+	if ( $diff < 60 ) {
+		return '刚刚';
+	}
+	if ( $diff < HOUR_IN_SECONDS ) {
+		return floor( $diff / MINUTE_IN_SECONDS ) . ' 分钟前';
+	}
+	if ( $diff < DAY_IN_SECONDS ) {
+		return floor( $diff / HOUR_IN_SECONDS ) . ' 小时前';
+	}
+	if ( $diff < 7 * DAY_IN_SECONDS ) {
+		return floor( $diff / DAY_IN_SECONDS ) . ' 天前';
+	}
+
+	return $mysql_date;
+}
+
+/**
+ * 获取评论者头像地址。
  *
  * @param object $comment 评论对象。
- * @return array
+ * @return string
  */
-function glintide_card_comment_item( $comment ) {
+function glintide_card_comment_avatar( $comment ) {
 	$author_id = (int) $comment->user_id;
 	$avatar    = ( $author_id && function_exists( 'glintide_get_avatar_url' ) ) ? glintide_get_avatar_url( $author_id ) : '';
 	if ( ! $avatar ) {
 		$avatar = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
 	}
 
+	return $avatar;
+}
+
+/**
+ * 渲染单条评论(弹窗评论列表用)。
+ *
+ * @param object $comment 评论对象。
+ * @return array
+ */
+function glintide_card_comment_item( $comment ) {
+	$avatar = glintide_card_comment_avatar( $comment );
+
 	return array(
-		'id'      => (int) $comment->comment_ID,
-		'author'  => $comment->comment_author,
-		'avatar'  => $avatar,
-		'date'    => get_comment_date( 'Y-m-d H:i', $comment ),
-		'content' => esc_html( $comment->comment_content ),
+		'id'       => (int) $comment->comment_ID,
+		'author'   => $comment->comment_author,
+		'avatar'   => $avatar,
+		'date'     => get_comment_date( 'Y-m-d H:i', $comment ),
+		'content'  => esc_html( $comment->comment_content ),
+		'parent'   => (int) $comment->comment_parent,
+		'reply_to' => glintide_card_comment_reply_to( $comment ),
 	);
+}
+
+/**
+ * 获取回复目标评论的作者名(非回复评论返回空)。
+ *
+ * @param object $comment 评论对象。
+ * @return string
+ */
+function glintide_card_comment_reply_to( $comment ) {
+	$parent_id = (int) $comment->comment_parent;
+	if ( ! $parent_id ) {
+		return '';
+	}
+
+	$parent = get_comment( $parent_id );
+
+	return $parent ? $parent->comment_author : '';
 }
 
 /**
@@ -1551,6 +1608,18 @@ function glintide_card_comment_ajax() {
 	$author  = $user_id ? get_the_author_meta( 'display_name', $user_id ) : '游客';
 	$author  = $author ? $author : '游客';
 
+	// 回复目标:校验属于同一篇文章
+	$parent_id = isset( $_POST['parent'] ) ? absint( $_POST['parent'] ) : 0;
+	if ( $parent_id ) {
+		$parent_comment = get_comment( $parent_id );
+		if ( ! $parent_comment || (int) $parent_comment->comment_post_ID !== $post_id ) {
+			$parent_id = 0;
+		} else {
+			$parent_author = $parent_comment->comment_author;
+			$content       = '回复 @' . $parent_author . '：' . $content;
+		}
+	}
+
 	$comment_id = wp_insert_comment(
 		array(
 			'comment_post_ID'      => $post_id,
@@ -1558,6 +1627,7 @@ function glintide_card_comment_ajax() {
 			'comment_author'       => $author,
 			'comment_author_email' => $user_id ? get_the_author_meta( 'email', $user_id ) : '',
 			'user_id'              => $user_id,
+			'comment_parent'       => $parent_id,
 			'comment_approved'     => 1,
 			'comment_date'         => current_time( 'mysql' ),
 		)

@@ -3916,7 +3916,7 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	-webkit-backdrop-filter: blur(6px);
 	opacity: 0;
 	visibility: hidden;
-	transition: opacity .2s ease, visibility .2s ease;
+	transition: opacity .26s ease, visibility .26s ease;
 }
 
 .glintide-modal-mask.is-open {
@@ -3933,8 +3933,14 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	border-radius: 16px;
 	background: var(--color-glintide-surface);
 	box-shadow: 0 24px 64px rgb(17 24 39 / 28%);
-	transform: translateY(14px) scale(.98);
-	transition: transform .2s ease;
+	opacity: 0;
+	transform: translateY(22px) scale(.965);
+	transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .24s ease;
+}
+
+.glintide-modal-mask.is-open .glintide-modal {
+	opacity: 1;
+	transform: none;
 }
 
 .glintide-modal-mask.is-open .glintide-modal {
@@ -4100,10 +4106,11 @@ body.glintide-modal-open {
 	overflow: hidden;
 }
 
-/* ---------- 笔记式弹窗(单栏:作者 + 内容 + 互动 + 评论) ---------- */
+/* ---------- 笔记式弹窗:左栏正文 + 右栏讨论区,等高满幅 ---------- */
 .glintide-note-modal {
-	width: min(620px, 100%);
-	max-height: min(760px, 88vh);
+	width: min(1200px, 96vw);
+	height: min(920px, 95vh);
+	max-height: none;
 	padding: 0;
 }
 
@@ -4113,23 +4120,43 @@ body.glintide-modal-open {
 	min-height: 0;
 	padding: 0;
 	overflow: hidden;
+	/* overflow:hidden 会按自身圆角裁切子元素,必须继承弹窗圆角 */
+	border-radius: inherit;
 }
 
-/* 中间滚动区:作者 + 内容 + 互动 + 评论一起滚 */
-.glintide-note {
+.glintide-note-layout {
+	display: flex;
 	flex: 1 1 auto;
 	min-height: 0;
+}
+
+/* 左栏:标题 + 正文,与右栏等高,独立滚动 */
+.glintide-note-main {
+	flex: 1 1 auto;
+	min-width: 0;
 	overflow-y: auto;
-	padding: 20px 24px 12px;
+	padding: 26px 34px 32px 24px;
 	scrollbar-width: thin;
+}
+
+/* 右栏顶部:作者居左,独立页入口居右 */
+.glintide-note-side-top {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 0 0 auto;
+	padding: 14px 14px 10px;
+}
+
+.glintide-note-side-top .glintide-note-permalink {
+	margin-left: auto;
 }
 
 .glintide-note-author {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	padding-bottom: 14px;
-	border-bottom: 1px solid var(--color-glintide-border-subtle);
+	min-width: 0;
 }
 
 .glintide-note-author-avatar {
@@ -4143,15 +4170,14 @@ body.glintide-modal-open {
 .glintide-note-author-info {
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 3px;
 	min-width: 0;
-	flex: 1 1 auto;
 }
 
 .glintide-note-author-name {
 	overflow: hidden;
 	color: var(--color-glintide-ink);
-	font-size: 13.5px;
+	font-size: 14px;
 	font-weight: 600;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -4160,35 +4186,22 @@ body.glintide-modal-open {
 .glintide-note-date {
 	color: var(--color-glintide-muted-soft);
 	font-size: 11.5px;
-}
-
-.glintide-note-chip {
-	flex: 0 0 auto;
-	display: inline-flex;
-	align-items: center;
-	padding: 4px 10px;
-	border-radius: 999px;
-	background: var(--color-glintide-primary-soft);
-	color: var(--color-glintide-primary);
-	font-size: 11px;
-	font-weight: 700;
-	line-height: 1.5;
+	white-space: nowrap;
 }
 
 .glintide-note-title {
-	margin: 16px 0 0;
+	margin: 0 0 14px;
 	color: var(--color-glintide-ink);
-	font-size: 19px;
+	font-size: 20px;
 	font-weight: 700;
-	line-height: 1.4;
+	line-height: 1.45;
 	letter-spacing: -0.01em;
 }
 
 .glintide-note-content {
-	margin-top: 12px;
 	color: var(--color-glintide-ink-soft);
-	font-size: 14.5px;
-	line-height: 1.8;
+	font-size: 15px;
+	line-height: 1.9;
 	word-break: break-word;
 }
 
@@ -4232,80 +4245,105 @@ body.glintide-modal-open {
 	font-size: 12.5px;
 }
 
-.glintide-note-actions {
+/* 右栏讨论区:与左栏等高,评论列表独立滚动,输入框吸底 */
+.glintide-note-side {
 	display: flex;
-	align-items: center;
-	gap: 18px;
-	margin-top: 16px;
-	padding: 10px 0;
-	border-top: 1px solid var(--color-glintide-border-subtle);
-	border-bottom: 1px solid var(--color-glintide-border-subtle);
-}
-
-.glintide-note-like,
-.glintide-note-action-count {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-	padding: 0;
-	border: none;
-	background: transparent;
-	color: var(--color-glintide-muted);
-	font-size: 13px;
-	font-variant-numeric: tabular-nums;
-	line-height: 1;
-	cursor: default;
-}
-
-.glintide-note-like {
-	cursor: pointer;
-	transition: color .2s ease, transform .15s ease;
-}
-
-.glintide-note-like i {
-	font-size: 19px;
-	transition: transform .2s ease;
-}
-
-.glintide-note-like:hover {
-	color: #ff2d55;
-	transform: scale(1.05);
-}
-
-.glintide-note-like.is-liked {
-	color: #ff2d55;
-}
-
-.glintide-note-like.is-liked i {
-	animation: glintide-like-pop .3s ease;
-}
-
-.glintide-note-action-count i {
-	font-size: 18px;
+	flex-direction: column;
+	flex: 0 0 320px;
+	min-height: 0;
+	background: var(--color-glintide-surface-soft);
 }
 
 .glintide-note-divider {
-	margin: 14px 0 4px;
+	flex: 0 0 auto;
+	margin: 0;
+	padding: 0 14px 8px;
 	color: var(--color-glintide-muted-soft);
 	font-size: 12px;
 	font-weight: 600;
 }
 
 .glintide-note-comments {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
 	margin: 0;
-	padding: 0;
+	padding: 0 14px 8px;
 	list-style: none;
+	scrollbar-width: thin;
 }
 
 .glintide-note-comment {
 	display: flex;
 	gap: 10px;
-	padding: 12px 0;
-	border-bottom: 1px solid var(--color-glintide-border-subtle);
+	padding: 10px 0;
 }
 
-.glintide-note-comment:last-child {
-	border-bottom: 0;
+.glintide-note-comment + .glintide-note-comment {
+	margin-top: 4px;
+}
+
+/* 回复:缩进到根评论头像下方 */
+.glintide-note-comment--reply {
+	margin-left: 38px;
+}
+
+.glintide-note-comment--reply .glintide-note-comment-avatar {
+	width: 24px;
+	height: 24px;
+}
+
+/* 回复目标前缀 */
+.glintide-note-comment-reply-to {
+	color: var(--color-glintide-muted);
+}
+
+/* 每条评论的"回复"按钮 */
+.glintide-note-comment-reply-btn {
+	display: inline-flex;
+	align-items: center;
+	margin-top: 4px;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--color-glintide-muted-soft);
+	font-size: 11.5px;
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition: color .16s ease;
+}
+
+.glintide-note-comment-reply-btn:hover {
+	color: var(--color-glintide-primary);
+}
+
+.glintide-note-comment-reply-btn:focus-visible {
+	outline: none;
+	color: var(--color-glintide-primary);
+}
+
+/* 独立页回复提示条 */
+.glintide-single-reply-hint {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 10px 0 0;
+	color: var(--color-glintide-muted);
+	font-size: 12px;
+}
+
+.glintide-single-reply-hint-cancel {
+	border: none;
+	background: transparent;
+	color: var(--color-glintide-primary);
+	font-size: 12px;
+	cursor: pointer;
+	padding: 0;
+}
+
+.glintide-single-reply-hint-cancel:hover {
+	text-decoration: underline;
 }
 
 .glintide-note-comment-avatar {
@@ -4351,14 +4389,288 @@ body.glintide-modal-open {
 	text-align: center;
 }
 
-/* 底部评论输入框固定在弹窗下方,不随内容滚动 */
+/* 评论表单基础布局(独立页使用) */
 .glintide-note-comment-form {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 12px 20px 14px;
-	border-top: 1px solid var(--color-glintide-border-subtle);
+}
+
+/* 底部操作栏(收起态):胶囊入口 + 点赞/评论图标 */
+.glintide-note-comment-bar {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	flex: 0 0 auto;
+	padding: 10px 14px;
+	background: var(--color-glintide-surface-soft);
+}
+
+.glintide-note-bar-pill {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1 1 auto;
+	min-width: 0;
+	height: 42px;
+	padding: 0 16px 0 6px;
+	border: none;
+	border-radius: 999px;
+	background: var(--color-glintide-surface);
+	color: var(--color-glintide-muted-soft);
+	font-size: 13px;
+	text-align: left;
+	cursor: text;
+	transition: box-shadow .2s ease;
+}
+
+.glintide-note-bar-pill:hover {
+	box-shadow: 0 0 0 1px var(--color-glintide-border-subtle), 0 2px 8px rgb(17 24 39 / 6%);
+}
+
+.glintide-note-bar-pill:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 14%);
+}
+
+.glintide-note-bar-pill img {
+	flex: 0 0 auto;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.glintide-note-bar-pill span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-note-bar-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	flex: 0 0 auto;
+	padding: 0 2px;
+	border: none;
+	background: transparent;
+	color: var(--color-glintide-muted);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	cursor: pointer;
+	transition: color .16s ease, transform .16s ease;
+}
+
+.glintide-note-bar-btn i {
+	font-size: 20px;
+}
+
+.glintide-note-bar-btn:hover {
+	color: var(--color-glintide-ink);
+	transform: scale(1.05);
+}
+
+.glintide-note-bar-btn:focus-visible {
+	outline: none;
+	color: var(--color-glintide-primary);
+}
+
+.glintide-note-bar-btn.is-liked {
+	color: #ff2d55;
+}
+
+/* 展开态:输入框 + 表情/发送/取消,占满整行 */
+.glintide-note-composer {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	flex: 1 1 auto;
+	width: 100%;
+	gap: 8px;
+}
+
+/* 展开态输入框:安静的灰色圆角框,聚焦不出现蓝色描边光晕 */
+.glintide-note-composer .glintide-note-comment-input {
+	height: 42px;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	background: var(--color-glintide-surface);
+}
+
+.glintide-note-composer .glintide-note-comment-input:focus {
+	border-color: transparent;
+	box-shadow: none;
+}
+
+.glintide-note-composer-foot {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.glintide-note-composer-spacer {
+	flex: 1 1 auto;
+}
+
+.glintide-note-cancel {
+	flex: 0 0 auto;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid var(--color-glintide-border-subtle);
+	border-radius: 999px;
+	background: var(--color-glintide-surface);
+	color: var(--color-glintide-muted);
+	font-size: 13px;
+	cursor: pointer;
+	transition: color .2s ease, border-color .2s ease;
+}
+
+.glintide-note-cancel:hover {
+	color: var(--color-glintide-ink);
+	border-color: var(--color-glintide-muted-soft);
+}
+
+/* 底部点赞按钮:心形+数字,点亮变红 */
+.glintide-note-like {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	flex: 0 0 auto;
+	padding: 0 4px;
+	border: none;
+	background: transparent;
+	color: var(--color-glintide-muted);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	cursor: pointer;
+	transition: color .16s ease, transform .16s ease;
+}
+
+.glintide-note-like i {
+	font-size: 18px;
+	transition: transform .16s ease;
+}
+
+.glintide-note-like:hover {
+	color: #ff2d55;
+	transform: scale(1.06);
+}
+
+.glintide-note-like:focus-visible {
+	outline: none;
+	color: #ff2d55;
+}
+
+.glintide-note-like:active i {
+	transform: scale(.88);
+}
+
+.glintide-note-like.is-liked {
+	color: #ff2d55;
+}
+
+.glintide-note-like.is-liked i {
+	animation: glintide-like-pop .3s ease;
+}
+
+/* 评论作者徽标 */
+.glintide-note-comment-badge {
+	display: inline-flex;
+	align-items: center;
+	margin-left: 6px;
+	padding: 1px 6px;
+	border-radius: 4px;
+	background: rgb(255 45 85 / 8%);
+	color: #ff2d55;
+	font-size: 10.5px;
+	font-weight: 600;
+	line-height: 1.5;
+	vertical-align: 1px;
+}
+
+/* 表情按钮 */
+.glintide-note-emoji-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: none;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--color-glintide-muted);
+	font-size: 18px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .16s ease, color .16s ease;
+}
+
+.glintide-note-emoji-btn:hover {
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+}
+
+.glintide-note-emoji-btn:focus-visible {
+	outline: none;
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+}
+
+.glintide-note-emoji-btn.is-open {
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+}
+
+/* 表情面板:悬浮于输入区上方 */
+.glintide-note-emoji-panel {
+	position: fixed;
+	z-index: 100002;
+	display: none;
+	width: 272px;
+	max-height: 236px;
+	padding: 10px;
+	border-radius: 12px;
+	background: var(--color-glintide-surface);
+	box-shadow: 0 12px 36px rgb(17 24 39 / 22%);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+}
+
+.glintide-note-emoji-panel.is-open {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	gap: 2px;
+}
+
+.glintide-note-emoji-item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 32px;
+	padding: 0;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	font-size: 19px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .16s ease, transform .16s ease;
+}
+
+.glintide-note-emoji-item:hover {
+	background: var(--color-glintide-primary-soft);
+	transform: scale(1.15);
+}
+
+.glintide-note-emoji-item:focus-visible {
+	outline: none;
+	background: var(--color-glintide-primary-soft);
 }
 
 .glintide-note-comment-input {
@@ -4368,15 +4680,16 @@ body.glintide-modal-open {
 	padding: 0 14px;
 	border: 1px solid var(--color-glintide-border-subtle);
 	border-radius: 999px;
-	background: var(--color-glintide-surface-soft);
+	background: var(--color-glintide-surface);
 	color: var(--color-glintide-ink);
 	font-size: 13px;
 	outline: none;
-	transition: border-color .2s ease;
+	transition: border-color .2s ease, box-shadow .2s ease;
 }
 
 .glintide-note-comment-input:focus {
 	border-color: var(--color-glintide-primary);
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 12%);
 }
 
 .glintide-note-comment-tip {
@@ -4411,11 +4724,48 @@ body.glintide-modal-open {
 	transform: scale(.95);
 }
 
-/* 单栏下弹窗底部的独立页链接 */
-.glintide-note-modal .glintide-modal-foot {
-	padding: 0 20px 16px;
-	border-top: 0;
-	margin-top: 0;
+/* 窄屏回退为单栏:正文+评论整体滚动(两栏需要 ≥1024px 才放得下) */
+@media (max-width: 1023px) {
+	.glintide-note-modal {
+		width: min(620px, 100%);
+		height: min(820px, 95vh);
+	}
+
+	.glintide-note-side-top {
+		padding: 14px 20px 12px;
+	}
+
+	.glintide-note-layout {
+		flex-direction: column;
+		overflow-y: auto;
+		scrollbar-width: thin;
+	}
+
+	.glintide-note-main {
+		overflow: visible;
+		flex: 0 0 auto;
+		padding: 2px 20px 14px;
+	}
+
+	.glintide-note-side {
+		flex: 0 0 auto;
+	}
+
+	.glintide-note-comments {
+		overflow: visible;
+		padding-bottom: 14px;
+	}
+
+	.glintide-note-comment-form {
+		padding-bottom: 4px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-modal-mask,
+	.glintide-modal {
+		transition-duration: .01ms;
+	}
 }
 
 /* ---------- 单页详情 ---------- */
@@ -4433,24 +4783,89 @@ body.glintide-modal-open {
 .glintide-card-single-title {
 	margin: 0;
 	color: var(--color-glintide-ink);
-	font-size: 22px;
+	font-size: 20px;
 	font-weight: 700;
-	line-height: 1.4;
+	line-height: 1.45;
 }
 
-.glintide-card-single-meta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px;
-	color: var(--color-glintide-muted);
-	font-size: 13px;
-	line-height: 1.4;
-}
-
-.glintide-card-single-meta span {
+/* 返回入口 */
+.glintide-single-back {
 	display: inline-flex;
 	align-items: center;
 	gap: 5px;
+	margin-bottom: 16px;
+	color: var(--color-glintide-muted);
+	font-size: 12.5px;
+	text-decoration: none;
+	transition: color .2s ease;
+}
+
+.glintide-single-back:hover {
+	color: var(--color-glintide-primary);
+}
+
+.glintide-single-back:focus-visible {
+	outline: none;
+	color: var(--color-glintide-primary);
+}
+
+/* 作者栏:头像 + 昵称/日期 + 点赞/评论数 */
+.glintide-card-single-author {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 18px;
+}
+
+.glintide-single-avatar {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.glintide-single-author-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.glintide-single-author-name {
+	overflow: hidden;
+	color: var(--color-glintide-ink);
+	font-size: 14px;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-single-author-date {
+	color: var(--color-glintide-muted-soft);
+	font-size: 11.5px;
+}
+
+/* 讨论区:软色表面卡片,复用弹窗评论样式 */
+.glintide-single-comments {
+	margin-top: 28px;
+	padding: 16px 20px 18px;
+	border-radius: var(--glintide-radius);
+	background: var(--color-glintide-surface-soft);
+}
+
+.glintide-single-comments .glintide-note-divider {
+	padding: 0 0 10px;
+}
+
+.glintide-single-comments .glintide-note-comments {
+	overflow: visible;
+	padding: 0;
+}
+
+.glintide-single-comments .glintide-note-comment-form {
+	padding: 12px 0 0;
 }
 
 .glintide-card-single-content {

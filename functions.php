@@ -156,10 +156,11 @@ function glintide_scripts() {
 		'glintide-photo-swiper',
 		'glintide_card_ajax',
 		array(
-			'url'        => admin_url( 'admin-ajax.php' ),
-			'lgUrl'      => GLINTIDE_URL . '/assets/js/lightgallery.min.js',
-			'lgThumbUrl' => GLINTIDE_URL . '/assets/js/lg-thumbnail.min.js',
-			'lgZoomUrl'  => GLINTIDE_URL . '/assets/js/lg-zoom.min.js',
+			'url'           => admin_url( 'admin-ajax.php' ),
+			'lgUrl'         => GLINTIDE_URL . '/assets/js/lightgallery.min.js',
+			'lgThumbUrl'    => GLINTIDE_URL . '/assets/js/lg-thumbnail.min.js',
+			'lgZoomUrl'     => GLINTIDE_URL . '/assets/js/lg-zoom.min.js',
+			'defaultAvatar' => function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png',
 		)
 	);
 	wp_enqueue_style(
