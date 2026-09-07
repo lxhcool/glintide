@@ -1288,25 +1288,78 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 }
 
 /**
+ * 校验首页卡片流筛选类型,只允许已知的卡片类型,非法值返回空字符串(表示不过滤)。
+ *
+ * @param mixed $type 前台传入的卡片类型。
+ * @return string
+ */
+function glintide_sanitize_card_type_filter( $type ) {
+	$valid = array( 'text', 'photo', 'music', 'video', 'link' );
+	$type  = sanitize_key( (string) $type );
+
+	return in_array( $type, $valid, true ) ? $type : '';
+}
+
+/**
  * 获取首页内容卡片查询。
  *
- * @param int $paged 当前页码。
+ * @param int   $paged 当前页码。
+ * @param array $args  可选筛选参数:type(卡片类型)、search(关键词)。
  * @return WP_Query
  */
-function glintide_get_card_feed_query( $paged = 1 ) {
+function glintide_get_card_feed_query( $paged = 1, $args = array() ) {
 	$per_page = (int) apply_filters( 'glintide_card_feed_per_page', 12 );
 
-	return new WP_Query(
+	$args = wp_parse_args(
+		$args,
 		array(
-			'post_type'           => 'post',
-			'post_status'         => 'publish',
-			'posts_per_page'      => max( 1, $per_page ),
-			'paged'               => max( 1, absint( $paged ) ),
-			'ignore_sticky_posts' => true,
-			'orderby'             => 'date',
-			'order'               => 'DESC',
+			'type'   => '',
+			'search' => '',
 		)
 	);
+
+	$card_type = glintide_sanitize_card_type_filter( $args['type'] );
+	$search    = sanitize_text_field( (string) $args['search'] );
+
+	$query_args = array(
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => max( 1, $per_page ),
+		'paged'               => max( 1, absint( $paged ) ),
+		'ignore_sticky_posts' => true,
+		'orderby'             => 'date',
+		'order'               => 'DESC',
+	);
+
+	if ( '' !== $search ) {
+		$query_args['s'] = $search;
+	}
+
+	if ( '' !== $card_type ) {
+		if ( 'text' === $card_type ) {
+			// text 是缺省类型,未写入 meta 的历史文章也算 text。
+			$query_args['meta_query'] = array(
+				'relation' => 'OR',
+				array(
+					'key'   => '_glintide_card_type',
+					'value' => $card_type,
+				),
+				array(
+					'key'     => '_glintide_card_type',
+					'compare' => 'NOT EXISTS',
+				),
+			);
+		} else {
+			$query_args['meta_query'] = array(
+				array(
+					'key'   => '_glintide_card_type',
+					'value' => $card_type,
+				),
+			);
+		}
+	}
+
+	return new WP_Query( $query_args );
 }
 
 /**
@@ -1348,16 +1401,23 @@ function glintide_card_feed_ajax() {
 	$paged = isset( $_POST['paged'] ) ? absint( $_POST['paged'] ) : 0;
 	$paged = max( 1, $paged );
 
-	$query = glintide_get_card_feed_query( $paged );
+	$query = glintide_get_card_feed_query(
+		$paged,
+		array(
+			'type'   => isset( $_POST['type'] ) ? wp_unslash( $_POST['type'] ) : '',
+			'search' => isset( $_POST['search'] ) ? wp_unslash( $_POST['search'] ) : '',
+		)
+	);
+
+	$payload = array(
+		'html'      => '',
+		'hasMore'   => false,
+		'paged'     => $paged,
+		'maxPages'  => (int) $query->max_num_pages,
+	);
 
 	if ( ! $query->have_posts() ) {
-		wp_send_json_success(
-			array(
-				'html'    => '',
-				'hasMore' => false,
-				'paged'   => $paged,
-			)
-		);
+		wp_send_json_success( $payload );
 	}
 
 	ob_start();
@@ -1371,9 +1431,10 @@ function glintide_card_feed_ajax() {
 
 	wp_send_json_success(
 		array(
-			'html'    => $html,
-			'hasMore' => $paged < $query->max_num_pages,
-			'paged'   => $paged,
+			'html'      => $html,
+			'hasMore'   => $paged < $query->max_num_pages,
+			'paged'     => $paged,
+			'maxPages'  => (int) $query->max_num_pages,
 		)
 	);
 }

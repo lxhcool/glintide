@@ -1029,73 +1029,131 @@ button {
 
 .glintide-card-stream-header {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: space-between;
-	gap: 18px;
+	gap: 14px;
 	padding: 4px 4px 22px;
 }
 
-.glintide-card-stream-heading {
-	min-width: 0;
-}
-
-.glintide-card-stream-kicker {
-	display: block;
-	margin-bottom: 5px;
-	color: var(--color-glintide-primary);
-	font-size: 11px;
-	font-weight: 700;
-	letter-spacing: .12em;
-	line-height: 1.3;
-	text-transform: uppercase;
-}
-
-.glintide-card-stream-title {
-	margin: 0;
-	color: var(--color-glintide-ink);
-	font-size: 20px;
-	font-weight: 700;
-	line-height: 1.4;
-}
-
-.glintide-card-stream-description {
-	margin: 4px 0 0;
-	color: var(--color-glintide-muted);
-	font-size: 13px;
-	line-height: 1.6;
-}
-
-.glintide-card-publish-link {
-	display: inline-flex;
+.glintide-card-tabs {
+	display: flex;
 	align-items: center;
-	justify-content: center;
+	gap: 4px;
+	max-width: 100%;
+	padding: 4px;
+	border-radius: 999px;
+	background: var(--color-glintide-surface);
+	box-shadow: inset 0 0 0 1px var(--color-glintide-border-subtle);
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+
+.glintide-card-tabs::-webkit-scrollbar {
+	display: none;
+}
+
+.glintide-card-tab {
 	flex: 0 0 auto;
-	gap: 6px;
-	min-height: 34px;
-	padding: 0 12px;
-	border-radius: 8px;
-	background: var(--color-glintide-primary);
-	color: #fff;
+	appearance: none;
+	min-height: 30px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--color-glintide-muted);
 	font-size: 13px;
 	font-weight: 600;
 	line-height: 1;
-	text-decoration: none;
-	transition: background-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+	cursor: pointer;
+	transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
 }
 
-.glintide-card-publish-link:hover {
-	background: var(--color-glintide-primary-hover);
-	color: #fff;
-	box-shadow: 0 4px 12px rgb(49 87 255 / 20%);
+.glintide-card-tab:hover {
+	color: var(--color-glintide-ink);
+	background: var(--color-glintide-primary-soft);
 }
 
-.glintide-card-publish-link:focus-visible {
+.glintide-card-tab:focus-visible {
 	outline: none;
 	box-shadow: 0 0 0 3px rgb(49 87 255 / 22%);
 }
 
-.glintide-card-publish-link:active {
-	transform: scale(.97);
+.glintide-card-tab.is-active {
+	background: var(--color-glintide-primary);
+	color: #fff;
+	box-shadow: 0 2px 8px rgb(49 87 255 / 25%);
+}
+
+.glintide-card-search {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex: 0 1 220px;
+	min-width: 0;
+}
+
+.glintide-card-search>i {
+	position: absolute;
+	left: 12px;
+	color: var(--color-glintide-muted-soft);
+	font-size: 15px;
+	pointer-events: none;
+}
+
+.glintide-card-search-input {
+	width: 100%;
+	min-height: 38px;
+	padding: 0 34px;
+	border: 1px solid var(--color-glintide-border-subtle);
+	border-radius: 999px;
+	background: var(--color-glintide-surface);
+	color: var(--color-glintide-ink);
+	font-size: 13px;
+	line-height: 1.4;
+	transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.glintide-card-search-input::placeholder {
+	color: var(--color-glintide-muted-soft);
+}
+
+.glintide-card-search-input:focus {
+	outline: none;
+	border-color: var(--color-glintide-primary);
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 14%);
+}
+
+.glintide-card-search-input::-webkit-search-cancel-button {
+	display: none;
+}
+
+.glintide-card-search-clear {
+	position: absolute;
+	right: 6px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--color-glintide-surface-soft);
+	color: var(--color-glintide-muted);
+	font-size: 14px;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.glintide-card-search-clear:hover {
+	color: var(--color-glintide-ink);
+	background: var(--color-glintide-primary-soft);
+}
+
+.glintide-card-search-clear:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 22%);
 }
 
 /* 瀑布流容器:纯 CSS columns,列数按视口自适应,不依赖 JS 计算高度 */
@@ -3881,6 +3939,37 @@ body.glintide-photo-lightbox-open {
 	transform: scale(.97);
 }
 
+.glintide-card-empty .glintide-card-filter-reset {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 34px;
+	margin-top: 6px;
+	padding: 0 16px;
+	border: 0;
+	border-radius: var(--glintide-radius-sm);
+	background: var(--color-glintide-primary);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	cursor: pointer;
+	transition: background-color .2s ease, transform .2s ease;
+}
+
+.glintide-card-empty .glintide-card-filter-reset:hover {
+	background: var(--color-glintide-primary-hover);
+}
+
+.glintide-card-empty .glintide-card-filter-reset:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 22%);
+}
+
+.glintide-card-empty .glintide-card-filter-reset:active {
+	transform: scale(.97);
+}
+
 /* ---------- 分页 ---------- */
 /* 胶囊容器 + 内部白色按钮,当前页为主题蓝方块
    注意:paginate_links 的 ul 自带 page-numbers class,
@@ -4602,12 +4691,13 @@ body.glintide-modal-open {
 
 	.glintide-card-stream-header {
 		flex-direction: column;
+		align-items: stretch;
 		gap: 12px;
 		padding: 2px 2px 18px;
 	}
 
-	.glintide-card-publish-link {
-		width: 100%;
+	.glintide-card-search {
+		flex-basis: auto;
 	}
 
 	.glintide-card-single {
@@ -4628,8 +4718,10 @@ body.glintide-modal-open {
 	.glintide-video-play,
 	.glintide-video-progress,
 	.glintide-card-photo-link img,
-	.glintide-card-publish-link,
+	.glintide-card-tab,
+	.glintide-card-search-clear,
 	.glintide-card-empty a,
+	.glintide-card-empty .glintide-card-filter-reset,
 	.glintide-card-media--external a,
 	.glintide-card-pagination .page-numbers {
 		transition-duration: .01ms;

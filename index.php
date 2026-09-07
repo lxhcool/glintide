@@ -19,17 +19,22 @@ $glintide_card_query = glintide_get_card_feed_query( $glintide_card_page );
 		<section class="glintide-site-column glintide-site-column--center" aria-label="主要内容">
 			<div class="glintide-card-stream">
 				<header class="glintide-card-stream-header">
-					<div class="glintide-card-stream-heading">
-						<span class="glintide-card-stream-kicker">CONTENT STREAM</span>
-						<h1 class="glintide-card-stream-title">内容卡片</h1>
-						<p class="glintide-card-stream-description">文章、照片、音乐、视频、链接和动态，在这里自然流动。</p>
-					</div>
-					<?php if ( current_user_can( 'publish_posts' ) ) : ?>
-						<a class="glintide-card-publish-link" href="<?php echo esc_url( admin_url( 'post-new.php' ) ); ?>">
-							<i class="ri-add-line" aria-hidden="true"></i>
-							<span>发布内容</span>
-						</a>
-					<?php endif; ?>
+					<nav class="glintide-card-tabs" aria-label="内容类型筛选">
+						<button type="button" class="glintide-card-tab is-active" data-card-type="" aria-pressed="true">全部</button>
+						<button type="button" class="glintide-card-tab" data-card-type="text" aria-pressed="false">文章</button>
+						<button type="button" class="glintide-card-tab" data-card-type="photo" aria-pressed="false">照片</button>
+						<button type="button" class="glintide-card-tab" data-card-type="music" aria-pressed="false">音乐</button>
+						<button type="button" class="glintide-card-tab" data-card-type="video" aria-pressed="false">视频</button>
+						<button type="button" class="glintide-card-tab" data-card-type="link" aria-pressed="false">链接</button>
+					</nav>
+					<form class="glintide-card-search" role="search" action="#">
+						<i class="ri-search-line" aria-hidden="true"></i>
+						<input class="glintide-card-search-input" type="search" name="card_q" value=""
+							placeholder="搜索内容…" aria-label="搜索内容卡片" autocomplete="off">
+						<button type="button" class="glintide-card-search-clear" aria-label="清除搜索" hidden>
+							<i class="ri-close-line" aria-hidden="true"></i>
+						</button>
+					</form>
 				</header>
 
 				<?php if ( $glintide_card_query->have_posts() ) : ?>
