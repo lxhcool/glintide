@@ -24,7 +24,7 @@
 		MASK.setAttribute('data-glintide-modal-close', '');
 		MASK.innerHTML =
 			'<div class="glintide-modal glintide-note-modal" role="dialog" aria-modal="true" tabindex="-1">' +
-			'<button type="button" class="glintide-modal-close" data-glintide-modal-close aria-label="关闭">&times;</button>' +
+			'<button type="button" class="glintide-modal-close" data-glintide-modal-close aria-label="关闭"><i class="ri-close-line" aria-hidden="true"></i></button>' +
 			'<div class="glintide-modal-inner"></div>' +
 			'</div>';
 		document.body.appendChild(MASK);

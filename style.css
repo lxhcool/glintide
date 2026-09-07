@@ -3965,13 +3965,16 @@ html[data-glintide-theme="dark"] .glintide-moment-glass {
 	font-size: 18px;
 	line-height: 1;
 	cursor: pointer;
-	transition: background-color .2s ease, color .2s ease, transform .15s ease;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.glintide-modal-close i {
+	display: block;
 }
 
 .glintide-modal-close:hover {
 	background: var(--color-glintide-primary-soft);
 	color: var(--color-glintide-primary);
-	transform: rotate(90deg);
 }
 
 .glintide-modal-inner {
