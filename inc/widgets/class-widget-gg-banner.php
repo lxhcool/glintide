@@ -19,11 +19,6 @@ class Glintide_Widget_GG_Banner extends Glintide_Widget {
 	public static function fields() {
 		return array(
 			array(
-				'id'    => 'title',
-				'type'  => 'text',
-				'title' => '标题',
-			),
-			array(
 				'id'           => 'gg_image',
 				'type'         => 'upload',
 				'title'        => '广告图片',
@@ -54,14 +49,12 @@ class Glintide_Widget_GG_Banner extends Glintide_Widget {
 		$image  = $instance['gg_image'] ?? '';
 		$link   = $instance['gg_link'] ?? '#';
 		$target = ! empty( $instance['gg_target'] ) ? 'target="_blank"' : '';
-		$title  = $instance['title'] ?? '';
 
 		if ( empty( $image ) ) {
 			return glintide_widget_notice( '请配置广告图片' );
 		}
 
 		$html  = '<div class="glintide-gg-banner">';
-		$html .= glintide_widget_title( $title );
 		$html .= '<div class="glintide-gg-image wid-item">';
 		$html .= '<a href="' . esc_url( $link ) . '" ' . $target . '>';
 		$html .= '<img src="' . esc_url( $image ) . '" alt="广告">';

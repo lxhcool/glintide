@@ -534,7 +534,6 @@ button {
 .widget {
 	background: var(--color-glintide-surface);
 	border-radius: var(--glintide-radius);
-	box-shadow: var(--glintide-shadow-card);
 	padding: 16px;
 }
 
@@ -5002,27 +5001,42 @@ body.glintide-modal-open {
 .glintide-gg-banner {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 10px;
 	width: 100%
+}
+
+.glintide-gg-banner .glintide-gg-image a {
+	display: block;
+	border-radius: var(--glintide-radius);
+	transition: transform .2s ease, box-shadow .2s ease
+}
+
+.glintide-gg-banner .glintide-gg-image a:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--glintide-shadow-float)
+}
+
+.glintide-gg-banner .glintide-gg-image a:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 14%)
 }
 
 .glintide-gg-banner .glintide-gg-image img {
 	width: 100%;
 	height: auto;
 	display: block;
-	border-radius: var(--glintide-radius-sm)
+	border-radius: var(--glintide-radius)
 }
 
 /* 图标网格 */
 .glintide-icon-grid {
 	display: flex;
-	flex-direction: column;
-	gap: 12px
+	flex-direction: column
 }
 
 .glintide-icon-grid-box {
 	display: grid !important;
-	gap: 12px
+	gap: 6px
 }
 
 .glintide-icon-col-3 {
@@ -5038,24 +5052,33 @@ body.glintide-modal-open {
 	flex-direction: column;
 	align-items: center;
 	text-decoration: none;
-	padding: 12px 8px;
+	padding: 12px 6px;
 	border-radius: var(--glintide-radius-sm);
-	transition: background .2s
+	transition: background-color .16s ease, transform .16s ease
 }
 
 .glintide-icon-item:hover {
+	background: var(--color-glintide-surface-soft);
+	transform: translateY(-2px)
+}
+
+.glintide-icon-item:focus-visible {
+	outline: none;
 	background: var(--color-glintide-surface-soft)
 }
 
 .glintide-icon-wrap {
-	width: 42px;
-	height: 42px;
+	width: 40px;
+	height: 40px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 24px;
+	font-size: 22px;
 	margin-bottom: 8px;
-	border-radius: var(--glintide-radius-sm)
+	border-radius: var(--glintide-radius-sm);
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+	transition: color .16s ease
 }
 
 .glintide-icon-wrap img {
@@ -5222,20 +5245,27 @@ body.glintide-modal-open {
 .glintide-comment-item {
 	display: flex;
 	gap: 10px;
-	padding: 12px 0;
-	border-bottom: 1px solid var(--color-glintide-line-soft);
+	padding: 10px;
+	margin: 0 -10px;
+	border-radius: var(--glintide-radius-sm);
 	text-decoration: none;
-	color: inherit
+	color: inherit;
+	transition: background-color .16s ease
 }
 
-.glintide-comment-item:last-child {
-	border-bottom: none
+.glintide-comment-item:hover {
+	background: var(--color-glintide-surface-soft)
+}
+
+.glintide-comment-item:focus-visible {
+	outline: none;
+	background: var(--color-glintide-surface-soft)
 }
 
 .glintide-comment-avatar {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
+	width: 36px;
+	height: 36px;
+	border-radius: var(--glintide-radius-sm);
 	object-fit: cover;
 	flex-shrink: 0
 }

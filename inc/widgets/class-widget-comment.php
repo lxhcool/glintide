@@ -19,11 +19,6 @@ class Glintide_Widget_Comment extends Glintide_Widget {
 	public static function fields() {
 		return array(
 			array(
-				'id'    => 'title',
-				'type'  => 'text',
-				'title' => '标题',
-			),
-			array(
 				'id'      => 'sort_by',
 				'type'    => 'radio',
 				'title'   => '排序方式',
@@ -43,7 +38,6 @@ class Glintide_Widget_Comment extends Glintide_Widget {
 	}
 
 	public static function render( $instance ) {
-		$title   = isset( $instance['title'] ) ? $instance['title'] : '';
 		$sort_by = isset( $instance['sort_by'] ) ? $instance['sort_by'] : 'newest';
 		$count   = isset( $instance['comment_count'] ) ? intval( $instance['comment_count'] ) : 5;
 
@@ -71,8 +65,7 @@ class Glintide_Widget_Comment extends Glintide_Widget {
 			);
 		}
 
-		$html  = glintide_widget_title( $title );
-		$html .= '<div class="glintide-comment-widget wid-item">';
+		$html  = '<div class="glintide-comment-widget wid-item">';
 
 		if ( empty( $comments ) ) {
 			$html .= '<div class="glintide-comment-empty">暂无评论</div>';

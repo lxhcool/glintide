@@ -19,11 +19,6 @@ class Glintide_Widget_Icon_Grid extends Glintide_Widget {
 	public static function fields() {
 		return array(
 			array(
-				'id'    => 'title',
-				'type'  => 'text',
-				'title' => '标题',
-			),
-			array(
 				'id'      => 'per_row',
 				'type'    => 'radio',
 				'title'   => '每行显示',
@@ -109,7 +104,6 @@ class Glintide_Widget_Icon_Grid extends Glintide_Widget {
 	}
 
 	public static function render( $instance ) {
-		$title   = $instance['title'] ?? '';
 		$per_row = $instance['per_row'] ?? '4';
 		$list    = $instance['icon_list'] ?? array();
 
@@ -118,7 +112,6 @@ class Glintide_Widget_Icon_Grid extends Glintide_Widget {
 		}
 
 		$html  = '<div class="glintide-icon-grid">';
-		$html .= glintide_widget_title( $title );
 		$html .= '<div class="glintide-icon-grid-box wid-item glintide-icon-col-' . absint( $per_row ) . '">';
 		$has_icon = false;
 
