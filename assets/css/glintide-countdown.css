@@ -1,0 +1,280 @@
+/* 倒数日 / 日期卡：可单独使用，也可以组成一组 */
+
+/* 这个组件自带卡片间距，不叠加主题通用小工具的外层表面。 */
+.widget.glintide-countdown-widget-wrap,
+.ppo-widget.glintide-countdown-widget-wrap {
+	padding: 0;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+/* Reset / component baseline */
+.glintide-countdown-widget,
+.glintide-countdown-widget *,
+.glintide-countdown-widget *::before,
+.glintide-countdown-widget *::after {
+	box-sizing: border-box;
+}
+
+.glintide-countdown-widget {
+	--glintide-countdown-blue: var(--color-glintide-primary);
+	--glintide-countdown-blue-text: var(--color-glintide-inverse);
+	--glintide-countdown-orange: var(--color-glintide-warning);
+	--glintide-countdown-orange-text: var(--color-glintide-media-dark);
+	--glintide-countdown-dark: var(--color-glintide-media-dark);
+	--glintide-countdown-dark-text: var(--color-glintide-inverse);
+	--glintide-countdown-glass-highlight: color-mix(in srgb, var(--color-glintide-inverse) 44%, transparent);
+	--glintide-countdown-glass-shadow: color-mix(in srgb, var(--color-glintide-media-dark) 14%, transparent);
+	--glintide-countdown-progress: 0;
+	width: 100%;
+	min-width: 0;
+}
+
+/* Typography / data roles */
+.glintide-countdown-widget p,
+.glintide-countdown-widget strong {
+	display: block;
+	margin: 0;
+}
+
+.glintide-countdown-widget time,
+.glintide-countdown-widget strong,
+.glintide-countdown-widget [data-calendar-day] {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Group layout */
+.glintide-countdown-group {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: start;
+	gap: 8px;
+	width: 100%;
+}
+
+/* Cards */
+.glintide-countdown-card {
+	--glintide-countdown-card-gradient: none;
+	--glintide-countdown-card-image: none;
+	--glintide-countdown-card-base-bg: var(--color-glintide-surface-soft);
+	--glintide-countdown-card-text: var(--color-glintide-ink);
+	position: relative;
+	z-index: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-width: 0;
+	aspect-ratio: 1;
+	overflow: hidden;
+	padding: 12px;
+	border-radius: 16px;
+	text-align: center;
+	background-color: var(--glintide-countdown-card-base-bg);
+	background-color: color-mix(in srgb, var(--glintide-countdown-card-base-bg) 84%, transparent);
+	background-image: var(--glintide-countdown-card-gradient), var(--glintide-countdown-card-image);
+	background-position: center, center;
+	background-repeat: no-repeat;
+	background-size: cover, cover;
+	color: var(--glintide-countdown-card-text);
+	backdrop-filter: blur(18px) saturate(125%);
+	-webkit-backdrop-filter: blur(18px) saturate(125%);
+	box-shadow: var(--glintide-shadow-float), inset 0 1px 0 var(--glintide-countdown-glass-highlight), inset 0 -1px 0 var(--glintide-countdown-glass-shadow);
+}
+
+.glintide-countdown-card--countdown {
+	--glintide-countdown-card-base-bg: var(--glintide-countdown-card-custom-bg, var(--glintide-countdown-blue));
+	--glintide-countdown-card-text: var(--glintide-countdown-card-custom-text, var(--glintide-countdown-blue-text));
+}
+
+.glintide-countdown-card--calendar {
+	--glintide-countdown-card-base-bg: var(--glintide-countdown-card-custom-bg, var(--glintide-countdown-orange));
+	--glintide-countdown-card-text: var(--glintide-countdown-card-custom-text, var(--glintide-countdown-orange-text));
+}
+
+.glintide-countdown-label,
+.glintide-countdown-month {
+	min-height: 16px;
+	font-size: 11px;
+	font-weight: 500;
+	line-height: 1.35;
+}
+
+.glintide-countdown-label {
+	color: color-mix(in srgb, var(--glintide-countdown-card-text) 78%, transparent);
+}
+
+.glintide-countdown-month {
+	color: color-mix(in srgb, var(--glintide-countdown-card-text) 82%, transparent);
+	letter-spacing: .08em;
+}
+
+.glintide-countdown-number-row {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 4px;
+	min-width: 0;
+}
+
+.glintide-countdown-number,
+.glintide-countdown-calendar-day {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	font-size: 22px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -.04em;
+}
+
+.glintide-countdown-unit {
+	font-size: 10px;
+	line-height: 1;
+}
+
+.glintide-countdown-date-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 0 2px;
+	font-size: 9px;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+
+.glintide-countdown-card--countdown .glintide-countdown-date-meta {
+	color: color-mix(in srgb, var(--glintide-countdown-card-text) 78%, transparent);
+}
+
+.glintide-countdown-progress {
+	width: 100%;
+	padding: 7px 9px;
+	border-radius: 20px;
+	background: color-mix(in srgb, var(--glintide-countdown-card-text) 16%, transparent);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--glintide-countdown-card-text) 26%, transparent);
+}
+
+.glintide-countdown-progress-track {
+	position: relative;
+	display: block;
+	height: 4px;
+	border-radius: 4px;
+	background: color-mix(in srgb, var(--glintide-countdown-card-text) 30%, transparent);
+}
+
+.glintide-countdown-progress-fill {
+	display: block;
+	width: calc(var(--glintide-countdown-progress) * 1%);
+	height: 100%;
+	border-radius: 4px;
+	background: var(--glintide-countdown-card-text);
+	transition: width 240ms ease;
+}
+
+.glintide-countdown-progress-dot {
+	position: absolute;
+	top: 50%;
+	left: calc(var(--glintide-countdown-progress) * 1%);
+	display: block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--glintide-countdown-card-text);
+	transform: translate(-50%, -50%);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--glintide-countdown-card-text) 18%, transparent);
+	transition: left 240ms ease;
+}
+
+.glintide-countdown-calendar-day {
+	font-size: 22px;
+	letter-spacing: .02em;
+}
+
+.glintide-countdown-lunar {
+	min-height: 16px;
+	color: color-mix(in srgb, var(--glintide-countdown-card-text) 80%, transparent);
+	font-size: 11px;
+	line-height: 1.35;
+}
+
+.glintide-countdown-weekday-pill {
+	width: 100%;
+	padding: 6px 8px;
+	border-radius: 20px;
+	background: var(--glintide-countdown-dark);
+	background: color-mix(in srgb, var(--glintide-countdown-dark) 84%, transparent);
+	color: var(--glintide-countdown-dark-text);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+	font-size: 10px;
+	line-height: 1.2;
+	letter-spacing: .04em;
+	text-transform: uppercase;
+	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--glintide-countdown-dark-text) 20%, transparent);
+}
+
+/* 右栏小卡片按网格自动组合；播放器等完整宽度小工具保持整行。 */
+.glintide-right-widget-stack {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: 8px;
+	row-gap: 15px;
+}
+
+.glintide-left-widget-stack {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: 8px;
+	row-gap: 15px;
+}
+
+.glintide-right-widget-stack > .widget {
+	grid-column: 1 / -1;
+}
+
+.glintide-left-widget-stack > .widget {
+	grid-column: 1 / -1;
+}
+
+.glintide-right-widget-stack > .widget.glintide-mini-widget-wrap {
+	grid-column: span 1;
+}
+
+.glintide-left-widget-stack > .widget.glintide-mini-widget-wrap {
+	grid-column: span 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.glintide-countdown-group {
+		grid-template-columns: 1fr;
+	}
+
+	.glintide-right-widget-stack {
+		grid-template-columns: 1fr;
+	}
+
+	.glintide-left-widget-stack {
+		grid-template-columns: 1fr;
+	}
+
+	.glintide-right-widget-stack > .widget.glintide-mini-widget-wrap {
+		grid-column: 1 / -1;
+	}
+
+	.glintide-left-widget-stack > .widget.glintide-mini-widget-wrap {
+		grid-column: 1 / -1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-countdown-widget *,
+	.glintide-countdown-widget *::before,
+	.glintide-countdown-widget *::after {
+		animation-duration: .01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: .01ms !important;
+	}
+}

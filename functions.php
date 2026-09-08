@@ -169,6 +169,31 @@ function glintide_scripts() {
 		array( 'glintide-style' ),
 		filemtime( GLINTIDE_DIR . '/assets/css/glintide-music-backup.css' )
 	);
+	wp_enqueue_style(
+		'glintide-countdown',
+		GLINTIDE_URL . '/assets/css/glintide-countdown.css',
+		array( 'glintide-style' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-countdown.css' )
+	);
+	wp_enqueue_style(
+		'glintide-sticker',
+		GLINTIDE_URL . '/assets/css/glintide-sticker.css',
+		array( 'glintide-countdown' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-sticker.css' )
+	);
+	wp_enqueue_style(
+		'glintide-weather',
+		GLINTIDE_URL . '/assets/css/glintide-weather.css',
+		array( 'glintide-sticker' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-weather.css' )
+	);
+	wp_enqueue_script(
+		'glintide-countdown',
+		GLINTIDE_URL . '/assets/js/glintide-countdown.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-countdown.js' ),
+		true
+	);
 
 	// 音乐卡片播放器(网易云直链解析 + 播放 + 降级)
 	wp_enqueue_script(
