@@ -351,6 +351,7 @@ function glintide_custom_css_vars() {
 add_action( 'wp_head', 'glintide_custom_css_vars', 99 );
 require_once GLINTIDE_DIR . '/inc/options/home-option.php';
 require_once GLINTIDE_DIR . '/inc/frontend/home-banner.php';
+require_once GLINTIDE_DIR . '/inc/mod/glintide-markdown.php';
 require_once GLINTIDE_DIR . '/inc/mod/glintide-content-cards.php';
 
 /**

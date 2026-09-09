@@ -80,7 +80,8 @@ class Glintide_Widget_Comment extends Glintide_Widget {
 				$comment_content = self::excerpt( $comment->comment_content );
 				$like_count      = get_comment_meta( $comment->comment_ID, 'like_count', true ) ?: 0;
 
-				$html .= '<a href="' . esc_url( $post_url ) . '" class="glintide-comment-item">';
+				$modal = 'post' === get_post_type( $comment->comment_post_ID ) ? ' data-glintide-modal="' . esc_attr( $comment->comment_post_ID ) . '" data-glintide-no-pjax' : '';
+				$html .= '<a href="' . esc_url( $post_url ) . '" class="glintide-comment-item"' . $modal . '>';
 				$html .= $avatar_url ? '<img src="' . esc_url( $avatar_url ) . '" alt="' . esc_attr( $author_name ) . '" class="glintide-comment-avatar" data-glintide-avatar data-glintide-avatar-fallback="' . esc_url( $avatar_fallback ) . '">' : '<div class="glintide-comment-avatar glintide-comment-avatar-empty"><i class="ri-user-3-line"></i></div>';
 				$html .= '<div class="glintide-comment-body">';
 				$html .= '<div class="glintide-comment-meta">';

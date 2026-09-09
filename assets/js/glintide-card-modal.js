@@ -1,8 +1,8 @@
 /**
  * 内容卡片详情弹窗(小红书笔记式)。
  *
- * 头部为作者 + 独立页入口;左栏正文阅读,右栏评论列表 + 评论输入框;
- * 照片/音乐/视频卡片为全交互设计,无详情弹窗;链接卡片保持外部链接。
+ * 文章入口统一打开弹窗;左栏正文阅读,右栏评论列表和输入框。
+ * 照片/音乐/视频保持卡片内交互,从文章链接进入时也支持详情弹窗。
  */
 (function () {
 	'use strict';
@@ -10,6 +10,7 @@
 	var MASK = null;
 	var lastFocus = null;
 	var CURRENT = null; // { postId, nonce }
+	var detailRequest = null;
 
 	function ajaxUrl() {
 		return (window.glintide_card_ajax && window.glintide_card_ajax.url) || '/wp-admin/admin-ajax.php';
@@ -95,6 +96,17 @@
 		if (!MASK) {
 			return;
 		}
+		if (detailRequest) {
+			detailRequest.abort();
+			detailRequest = null;
+		}
+		MASK.querySelectorAll('audio, video').forEach(function (media) { media.pause(); });
+		MASK.querySelectorAll('iframe').forEach(function (frame) { frame.remove(); });
+		var locationUrl = new URL(window.location.href);
+		if (locationUrl.searchParams.has('glintide_detail')) {
+			locationUrl.searchParams.delete('glintide_detail');
+			window.history.replaceState(window.history.state, '', locationUrl.href);
+		}
 		MASK.classList.remove('is-open');
 		document.body.classList.remove('glintide-modal-open');
 		if (lastFocus && lastFocus.focus) {
@@ -118,7 +130,10 @@
 
 	function renderError() {
 		var inner = ensureMask().querySelector('.glintide-modal-inner');
-		inner.innerHTML = '<div class="glintide-modal-loading">加载失败,请稍后重试</div>';
+		inner.innerHTML = '<div class="glintide-modal-loading"><span>内容暂时无法加载</span><button type="button" class="glintide-note-send" data-glintide-detail-retry>重试</button></div>';
+		inner.querySelector('[data-glintide-detail-retry]').addEventListener('click', function () {
+			openModal('#', MASK.getAttribute('data-detail-id'));
+		});
 	}
 
 	function commentHtml(item, postAuthor, isReply) {
@@ -327,7 +342,7 @@
 			'<div class="glintide-note-layout">' +
 			'<div class="glintide-note-main">' +
 			'<h2 class="glintide-note-title">' + escText(data.title) + '</h2>' +
-			'<div class="glintide-note-content">' + (data.content_html || '') + '</div>' +
+			'<div class="glintide-note-content">' + (data.media_html || '') + (data.content_html || '') + '</div>' +
 			'</div>' +
 			'<aside class="glintide-note-side">' +
 			'<div class="glintide-note-side-top">' +
@@ -348,6 +363,7 @@
 		ensureMask().querySelector('.glintide-modal-inner').innerHTML = html;
 		renderCommentBar();
 		openMask();
+		document.dispatchEvent(new CustomEvent('glintide:cards-appended'));
 
 		var dialog = MASK.querySelector('.glintide-modal');
 		if (dialog) {
@@ -524,13 +540,22 @@
 	}
 
 	function openModal(url, postId) {
-		lastFocus = document.activeElement;
+		if (!/^[1-9]\d*$/.test(String(postId))) { return; }
+		if (detailRequest) { detailRequest.abort(); }
+		var controller = new AbortController();
+		detailRequest = controller;
+		CURRENT = null;
+		if (!MASK || !MASK.classList.contains('is-open')) { lastFocus = document.activeElement; }
 		renderLoading();
+		MASK.setAttribute('data-detail-id', postId);
+		MASK.querySelector('.glintide-modal').focus();
 
 		var body = new URLSearchParams({ action: 'glintide_card_detail', post_id: postId });
-		fetch(ajaxUrl(), { method: 'POST', credentials: 'same-origin', body: body })
+		fetch(ajaxUrl(), { method: 'POST', credentials: 'same-origin', body: body, signal: controller.signal })
 			.then(function (res) { return res.json(); })
 			.then(function (res) {
+				if (detailRequest !== controller) { return; }
+				detailRequest = null;
 				if (!res || !res.success || !res.data) {
 					renderError();
 					return;
@@ -543,9 +568,25 @@
 					renderError();
 				}
 			})
-			.catch(function () {
+			.catch(function (error) {
+				if (detailRequest !== controller || error.name === 'AbortError') { return; }
+				detailRequest = null;
 				renderError();
 			});
+	}
+
+	document.addEventListener('glintide:open-detail', function (event) {
+		openModal('#', event.detail && event.detail.postId);
+	});
+
+	function openRequestedDetail() {
+		var postId = new URL(window.location.href).searchParams.get('glintide_detail');
+		if (postId) { openModal('#', postId); }
+	}
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', openRequestedDetail);
+	} else {
+		openRequestedDetail();
 	}
 
 	document.addEventListener('click', function (event) {

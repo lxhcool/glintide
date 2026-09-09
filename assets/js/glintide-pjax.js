@@ -164,6 +164,15 @@
 			if (!res.ok) {
 				throw new Error('HTTP ' + res.status);
 			}
+			var detailId = new URL(res.url || url, window.location.href).searchParams.get('glintide_detail');
+			if (/^[1-9]\d*$/.test(detailId || '')) {
+				if (currentRequest === controller) {
+					currentRequest = null;
+					setBar(false);
+					document.dispatchEvent(new CustomEvent('glintide:open-detail', { detail: { postId: detailId } }));
+				}
+				return null;
+			}
 			return res.text();
 		}).then(function (html) {
 			if (currentRequest !== controller) {

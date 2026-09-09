@@ -256,6 +256,12 @@ function glintide_render_content_card_meta_box( $post ) {
 	?>
 	<div class="glintide-card-editor">
 		<div class="glintide-card-field-group<?php echo 'text' === $selected ? ' is-active' : ''; ?>" data-glintide-card-fields="text" aria-hidden="<?php echo 'text' === $selected ? 'false' : 'true'; ?>">
+			<div class="glintide-card-field-row">
+				<strong>正文格式</strong>
+				<label><input type="radio" name="glintide_card_body_format" value="html" <?php checked( 'markdown' !== get_post_meta( $post->ID, '_glintide_card_body_format', true ) ); ?>> 富文本 / HTML</label>
+				<label><input type="radio" name="glintide_card_body_format" value="markdown" <?php checked( 'markdown', get_post_meta( $post->ID, '_glintide_card_body_format', true ) ); ?>> Markdown</label>
+				<p class="description">Markdown 模式请在编辑器的“文本”标签中填写原始语法，支持标题、列表、引用、表格和围栏代码。请勿切换到可视化编辑器修改 Markdown。</p>
+			</div>
 			<div class="glintide-card-field-row glintide-card-field-row--cover">
 				<label><strong>文章封面（可选）</strong></label>
 				<div class="glintide-card-cover-picker" data-glintide-cover>
@@ -448,6 +454,8 @@ function glintide_save_content_card_meta( $post_id, $post ) {
 	$type         = isset( $_POST['glintide_card_type'] ) ? sanitize_key( wp_unslash( $_POST['glintide_card_type'] ) ) : 'text';
 	$type         = isset( $type_options[ $type ] ) ? $type : 'text';
 	update_post_meta( $post_id, '_glintide_card_type', $type );
+	$body_format = isset( $_POST['glintide_card_body_format'] ) && 'markdown' === $_POST['glintide_card_body_format'] ? 'markdown' : 'html';
+	update_post_meta( $post_id, '_glintide_card_body_format', $body_format );
 
 	$artist       = isset( $_POST['glintide_card_music_artist'] ) ? sanitize_text_field( wp_unslash( $_POST['glintide_card_music_artist'] ) ) : '';
 	$music_url    = isset( $_POST['glintide_card_music_url'] ) ? esc_url_raw( wp_unslash( $_POST['glintide_card_music_url'] ) ) : '';
@@ -1524,12 +1532,29 @@ function glintide_card_comment_reply_to( $comment ) {
 /**
  * AJAX:卡片详情(弹窗用)。
  */
+/** Public post URLs open the feed with its detail dialog, including shared links. */
+function glintide_card_redirect_detail() {
+	if ( ! is_singular( 'post' ) || is_preview() || is_feed() || is_embed() ) {
+		return;
+	}
+	$post = get_queried_object();
+	if ( ! $post instanceof WP_Post || 'publish' !== $post->post_status || post_password_required( $post ) ) {
+		return;
+	}
+	wp_safe_redirect( add_query_arg( 'glintide_detail', $post->ID, home_url( '/' ) ), 302 );
+	exit;
+}
+add_action( 'template_redirect', 'glintide_card_redirect_detail' );
+
 function glintide_card_detail_ajax() {
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
 	$post    = get_post( $post_id );
 
-	if ( ! $post || 'post' !== $post->post_type ) {
+	if ( ! $post || 'post' !== $post->post_type || 'publish' !== $post->post_status ) {
 		wp_send_json_error( array( 'msg' => '内容不存在' ), 404 );
+	}
+	if ( post_password_required( $post ) ) {
+		wp_send_json_error( array( 'msg' => '该内容受密码保护' ), 403 );
 	}
 
 	$type      = glintide_card_get_type( $post_id );
@@ -1543,7 +1568,7 @@ function glintide_card_detail_ajax() {
 		$avatar = function_exists( 'glintide_get_default_avatar_url' ) ? glintide_get_default_avatar_url() : GLINTIDE_URL . '/assets/images/default-avatar.png';
 	}
 
-	$content_html = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
+	$content_html = glintide_render_post_body( $post_id );
 
 	$liked = isset( $_COOKIE[ 'glintide_liked_' . $post_id ] ) && '1' === $_COOKIE[ 'glintide_liked_' . $post_id ];
 
@@ -1568,6 +1593,7 @@ function glintide_card_detail_ajax() {
 			'avatar'       => $avatar,
 			'date'         => get_the_date( 'Y-m-d H:i', $post_id ),
 			'content_html' => $content_html,
+			'media_html'   => 'text' === $type ? '' : glintide_card_media_html( $post_id, 'single' ),
 			'likes'        => absint( get_post_meta( $post_id, 'likes_count', true ) ),
 			'liked'        => $liked,
 			'comments'     => $comments,

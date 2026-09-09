@@ -70,6 +70,17 @@ CSF::createSection(
 				'title'   => '文字 LOGO',
 			),
 			array(
+				'id'      => 'left_featured_posts',
+				'type'    => 'select',
+				'title'   => '左栏精选文章',
+				'options' => 'posts',
+				'query_args' => array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => -1 ),
+				'chosen' => true,
+				'multiple' => true,
+				'sortable' => true,
+				'desc' => '菜单下方最多展示 3 篇，按选择顺序排列。留空时显示最近文章，点击打开详情弹窗。',
+			),
+			array(
 				'id'      => 'favicon',
 				'type'    => 'media',
 				'title'   => '网站图标（favicon）',
