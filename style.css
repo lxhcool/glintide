@@ -4150,8 +4150,26 @@ body.glintide-modal-open {
 	flex: 1 1 auto;
 	min-width: 0;
 	overflow-y: auto;
-	padding: 26px 34px 32px 24px;
+	padding: 24px 14px 28px;
 	scrollbar-width: thin;
+	scrollbar-color: var(--color-glintide-line) transparent;
+}
+
+.glintide-note-main::-webkit-scrollbar {
+	width: 6px;
+}
+
+.glintide-note-main::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.glintide-note-main::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	background: var(--color-glintide-line);
+}
+
+.glintide-note-main::-webkit-scrollbar-thumb:hover {
+	background: var(--color-glintide-muted-soft);
 }
 
 /* 右栏顶部:作者居左,独立页入口居右 */
@@ -4204,36 +4222,57 @@ body.glintide-modal-open {
 	white-space: nowrap;
 }
 
+.glintide-note-header {
+	max-width: 840px;
+	margin: 0 auto 30px;
+	padding-bottom: 22px;
+	border-bottom: 1px solid var(--color-glintide-border-subtle);
+}
+
+.glintide-note-kicker {
+	display: inline-flex;
+	align-items: center;
+	min-height: 24px;
+	padding: 4px 8px;
+	border-radius: 8px;
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	letter-spacing: .02em;
+}
+
 .glintide-note-main .glintide-note-title {
-	max-width: 720px;
-	margin: 0 auto 28px;
+	max-width: none;
+	margin: 12px 0 0;
 	color: var(--color-glintide-ink);
 	font-size: 20px;
 	font-weight: 700;
-	line-height: 1.4;
+	line-height: 1.5;
 	letter-spacing: 0;
 	overflow-wrap: anywhere;
 }
 
 .glintide-note-content {
 	min-width: 0;
-	max-width: 720px;
+	max-width: 800px;
 	margin: 0 auto;
 	color: var(--color-glintide-ink-soft);
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 400;
-	line-height: 1.85;
+	line-height: 1.95;
 	overflow-wrap: anywhere;
 	letter-spacing: 0;
 }
 
 .glintide-note-content p {
-	margin: 0 0 18px;
+	margin: 0 0 22px;
 }
 
 /* Explicit heading specificity keeps global resets out of article hierarchy. */
 .glintide-note-content :is(h1, h2, h3, h4, h5, h6) {
-	margin: 32px 0 12px;
+	margin: 36px 0 14px;
 	color: var(--color-glintide-ink);
 	font-weight: 700;
 	line-height: 1.45;
@@ -4241,7 +4280,11 @@ body.glintide-modal-open {
 }
 
 .glintide-note-content h1 { font-size: 20px; }
-.glintide-note-content h2 { font-size: 18px; }
+.glintide-note-content h2 {
+	padding-left: 12px;
+	border-left: 3px solid var(--color-glintide-primary);
+	font-size: 18px;
+}
 .glintide-note-content h3 { font-size: 16px; margin-top: 26px; }
 .glintide-note-content h4 { font-size: 15px; margin-top: 24px; }
 .glintide-note-content :is(h5, h6) { font-size: 14px; margin-top: 22px; }
@@ -4263,6 +4306,13 @@ body.glintide-modal-open {
 .glintide-note-content > :last-child,
 .glintide-note-content blockquote > :last-child {
 	margin-bottom: 0;
+}
+
+.glintide-note-content :is(hr, .wp-block-separator) {
+	height: 1px;
+	margin: 32px 0;
+	border: 0;
+	background: var(--color-glintide-border-subtle);
 }
 
 .glintide-note-content :where(ul, ol):not([class]),
@@ -4958,7 +5008,21 @@ body.glintide-modal-open {
 	.glintide-note-main {
 		overflow: visible;
 		flex: 0 0 auto;
-		padding: 2px 20px 14px;
+		padding: 20px 16px 24px;
+	}
+
+	.glintide-note-header {
+		margin-bottom: 26px;
+		padding-bottom: 18px;
+	}
+
+	.glintide-note-content {
+		font-size: 15px;
+		line-height: 1.9;
+	}
+
+	.glintide-note-content p {
+		margin-bottom: 20px;
 	}
 
 	.glintide-note-side {

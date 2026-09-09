@@ -341,7 +341,10 @@
 		var html =
 			'<div class="glintide-note-layout">' +
 			'<div class="glintide-note-main">' +
+			'<header class="glintide-note-header">' +
+			'<span class="glintide-note-kicker">' + escText(data.type_label || '内容') + '</span>' +
 			'<h2 class="glintide-note-title">' + escText(data.title) + '</h2>' +
+			'</header>' +
 			'<div class="glintide-note-content">' + (data.media_html || '') + (data.content_html || '') + '</div>' +
 			'</div>' +
 			'<aside class="glintide-note-side">' +
