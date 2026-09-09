@@ -7236,6 +7236,107 @@ body {
 	object-fit: cover;
 }
 
+/* ---------- 右栏头像账户菜单 ---------- */
+.glintide-user-menu {
+	position: relative;
+}
+
+/* 固定 160×100,内部 flex 平分,紧凑布局 */
+.glintide-user-popover {
+	position: fixed;
+	z-index: 100002;
+	width: 160px;
+	padding: 0;
+	border: 1px solid var(--color-glintide-border-subtle);
+	border-radius: 12px;
+	background: var(--color-glintide-surface);
+	box-shadow: 0 8px 20px rgb(17 24 39 / 12%);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	opacity: 0;
+	transform: translateY(-6px);
+	transition: opacity .18s ease, transform .18s ease;
+}
+
+.glintide-user-menu.is-open .glintide-user-popover {
+	opacity: 1;
+	transform: none;
+}
+
+/* display 会覆盖 hidden 属性,必须显式还原 */
+.glintide-user-popover[hidden] {
+	display: none;
+}
+
+.glintide-user-popover-head {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--color-glintide-border-subtle);
+}
+
+.glintide-user-popover-avatar {
+	flex: 0 0 auto;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.glintide-user-popover-name {
+	overflow: hidden;
+	flex: 1 1 auto;
+	min-width: 0;
+	color: var(--color-glintide-ink);
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 菜单项固定 36px 高,整体高度由内容撑开 */
+.glintide-user-popover-item {
+	flex: 0 0 36px;
+	margin-top: 4px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 10px;
+	color: var(--color-glintide-ink);
+	font-size: 12px;
+	text-decoration: none;
+	transition: background-color .2s ease, color .2s ease;
+}
+
+.glintide-user-popover-item i {
+	color: var(--color-glintide-muted-soft);
+	font-size: 14px;
+	line-height: 1;
+	transition: color .2s ease;
+}
+
+.glintide-user-popover-item:hover,
+.glintide-user-popover-item:focus-visible {
+	outline: none;
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+}
+
+.glintide-user-popover-item:hover i,
+.glintide-user-popover-item:focus-visible i {
+	color: var(--color-glintide-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-user-popover {
+		transition-duration: .01ms;
+	}
+}
+
 @media (max-width: 900px) {
 
 	.glintide-left-rail,

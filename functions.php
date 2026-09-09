@@ -271,6 +271,15 @@ function glintide_scripts() {
 		true
 	);
 
+	// 右栏头像账户菜单(popover:进入后台 / 退出登录)
+	wp_enqueue_script(
+		'glintide-user-menu',
+		GLINTIDE_URL . '/assets/js/glintide-user-menu.js',
+		array(),
+		filemtime( GLINTIDE_DIR . '/assets/js/glintide-user-menu.js' ),
+		true
+	);
+
 	// 图标字体(remixicon)
 	wp_enqueue_style( 'remixicon', GLINTIDE_URL . '/assets/fonts/remixicon.css', array(), GLINTIDE_VERSION );
 
