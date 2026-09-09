@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Glintide_Widget_Music extends Glintide_Widget {
 
 	public static $id          = 'glintide_music_widget';
-	public static $title       = 'PPO · 音乐播放器';
+	public static $title       = 'Glintide · 音乐播放器';
 	public static $description = '网易云歌单播放器，支持播放/进度/音量/播放模式';
 	public static $classname   = 'ppo-widget glintide_music_widget';
 

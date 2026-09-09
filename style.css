@@ -7733,3 +7733,217 @@ html[data-glintide-theme="dark"] .glintide-left-rail-footer {
 	width: 100%;
 	transition: width 30s linear;
 }
+
+/* ---------- 友链 / 朋友圈 小工具 ---------- */
+/* widget 外壳(.widget)已提供背景、圆角与 16px 内边距,
+   这里不再重复做卡片,否则会叠成两层 */
+.glintide-links {
+	position: relative;
+}
+
+/* 顶部 Tab(segmented control,圆角与按钮高度按设计稿加大) */
+.glintide-links-tabs {
+	display: flex;
+	gap: 0;
+	margin: 0 0 14px;
+	padding: 4px;
+	background: var(--color-glintide-surface-soft);
+	border-radius: 999px;
+}
+
+.glintide-links-tab {
+	flex: 1 1 0;
+	min-height: 38px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--color-glintide-muted);
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.glintide-links-tab:hover {
+	color: var(--color-glintide-ink);
+}
+
+.glintide-links-tab.is-active {
+	background: var(--color-glintide-ink);
+	color: #fff;
+	box-shadow: 0 2px 6px rgb(17 24 39 / 14%);
+}
+
+.glintide-links-tab:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 22%);
+}
+
+.glintide-links-panel[hidden] {
+	display: none;
+}
+
+/* 空数据状态(Tab 仍可切换过来时显示) */
+.glintide-links-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 32px 12px;
+	color: var(--color-glintide-muted-soft);
+	text-align: center;
+}
+
+.glintide-links-empty i {
+	font-size: 28px;
+	line-height: 1;
+}
+
+.glintide-links-empty span {
+	font-size: 13px;
+}
+
+/* 列表(每项之间用分隔线,gap 为 0) */
+.glintide-links-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	margin: 0 -4px;
+	padding: 0;
+}
+
+.glintide-link {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 12px 4px;
+	border-bottom: 1px solid var(--color-glintide-line-soft);
+	color: var(--color-glintide-ink);
+	text-decoration: none;
+	transition: background-color .2s ease;
+}
+
+.glintide-link:last-child {
+	border-bottom: 0;
+}
+
+.glintide-link:hover {
+	background: var(--color-glintide-primary-soft);
+}
+
+.glintide-link:focus-visible {
+	outline: none;
+	background: var(--color-glintide-primary-soft);
+	box-shadow: 0 0 0 3px rgb(49 87 255 / 22%);
+}
+
+/* 头像:方角 12px、52px(设计稿规格) */
+.glintide-link-avatar {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	border-radius: 12px;
+	background: var(--color-glintide-primary-soft);
+	color: var(--color-glintide-primary);
+	font-size: 20px;
+	font-weight: 700;
+	overflow: hidden;
+}
+
+/* img:成功显示图片;加载失败浏览器原生显示 alt(首字),
+   字体/颜色/背景与外层一致,视觉等同首字 fallback */
+.glintide-link-avatar img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--color-glintide-primary);
+	background: var(--color-glintide-primary-soft);
+}
+
+.glintide-link-body {
+	flex: 1 1 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.glintide-link-name {
+	overflow: hidden;
+	color: var(--color-glintide-primary);
+	font-size: 17px;
+	font-weight: 600;
+	line-height: 1.35;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.glintide-link-desc {
+	overflow: hidden;
+	color: var(--color-glintide-muted);
+	font-size: 14px;
+	line-height: 1.5;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 跳转图标:方形描边外链
+   注意:不能用 .glintide-link-go —— 链接卡片 widget 有同名类(蓝圆底),会污染这里 */
+.glintide-friend-go {
+	flex: 0 0 auto;
+	color: var(--color-glintide-muted-soft);
+	font-size: 18px;
+	line-height: 1;
+	transition: color .2s ease;
+}
+
+.glintide-link:hover .glintide-friend-go {
+	color: var(--color-glintide-primary);
+}
+
+/* 加载更多:靠右对齐(设计稿规格) */
+.glintide-links-load {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	width: 100%;
+	margin-top: 10px;
+	padding: 6px 4px;
+	border: 0;
+	background: transparent;
+	color: var(--color-glintide-primary);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: opacity .2s ease;
+}
+
+.glintide-links-load[hidden] {
+	display: none;
+}
+
+.glintide-links-load:hover {
+	opacity: .75;
+}
+
+/* 展开后加载更多按钮隐藏 */
+.glintide-links.is-expanded .glintide-links-load {
+	display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.glintide-link,
+	.glintide-links-tab,
+	.glintide-link-go,
+	.glintide-links-load {
+		transition-duration: .01ms;
+	}
+}
