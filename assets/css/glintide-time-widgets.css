@@ -1,0 +1,255 @@
+/* Small date and time widgets share the existing sidebar grid. */
+.widget.glintide-time-widget-wrap,
+.ppo-widget.glintide-time-widget-wrap {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+.glintide-time-card {
+	box-sizing: border-box;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	min-width: 0;
+	min-height: 110px;
+	aspect-ratio: 1;
+	padding: 10px;
+	border-radius: var(--glintide-radius, 16px);
+	background: var(--color-glintide-surface-soft);
+	color: var(--color-glintide-ink);
+	box-shadow: var(--glintide-shadow-card);
+	font-size: 10px;
+	line-height: 1.3;
+	letter-spacing: 0;
+}
+
+.glintide-time-card--moon {
+	--moon-light: var(--color-glintide-media-dark-text);
+	--moon-dark: var(--color-glintide-media-dark-border);
+	gap: 4px;
+	padding: 8px 10px 10px;
+	background: linear-gradient(145deg, var(--color-glintide-media-dark-surface), var(--color-glintide-media-dark));
+	color: var(--color-glintide-media-dark-text);
+	box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-glintide-media-dark-text) 8%, transparent);
+}
+
+.glintide-time-card--moon .glintide-time-card__footer {
+	gap: 3px;
+	line-height: 1.2;
+}
+
+.glintide-time-card--moon .glintide-time-card__footer strong {
+	font-size: 10px;
+	line-height: 1.2;
+}
+
+.glintide-time-card__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+	color: var(--color-glintide-muted);
+}
+
+.glintide-time-card--moon .glintide-time-card__header {
+	color: var(--color-glintide-media-dark-muted);
+}
+
+.glintide-time-card__header span {
+	overflow-wrap: anywhere;
+}
+
+.glintide-time-card__header i {
+	flex: 0 0 auto;
+	font-size: 12px;
+}
+
+.glintide-time-card__footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	text-align: center;
+	font-size: 9px;
+}
+
+.glintide-time-card__footer strong {
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.glintide-time-card__footer > span {
+	opacity: .7;
+}
+
+.glintide-time-card__number {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: baseline;
+	gap: 3px;
+	min-width: 0;
+	padding: 4px 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.glintide-time-card__number strong {
+	max-width: 100%;
+	overflow-wrap: anywhere;
+	font-size: 20px;
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+/* A lit hemisphere and a projected terminator ellipse model the phase. */
+.glintide-moon-disc {
+	position: relative;
+	isolation: isolate;
+	justify-self: center;
+	width: 34px;
+	height: 34px;
+	margin: 2px 0;
+	overflow: hidden;
+	border-radius: 50%;
+	background: var(--moon-dark);
+}
+
+.glintide-moon-disc::before {
+	position: absolute;
+	z-index: 0;
+	inset: 0 0 0 50%;
+	background: var(--moon-light);
+	content: '';
+}
+
+.glintide-moon-disc.is-waning::before {
+	inset: 0 50% 0 0;
+}
+
+.glintide-moon-disc > span {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	left: 50%;
+	width: var(--moon-ellipse, 100%);
+	height: 100%;
+	border-radius: 50%;
+	background: var(--moon-dark);
+	transform: translateX(-50%);
+}
+
+.glintide-moon-disc.is-bright > span {
+	background: var(--moon-light);
+}
+
+.glintide-year-label {
+	flex: 0 0 auto;
+	font-size: 9px;
+	font-variant-numeric: tabular-nums;
+}
+
+.glintide-year-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 0;
+	text-align: center;
+	color: var(--color-glintide-muted);
+	font-size: 9px;
+}
+
+.glintide-time-card--year {
+	background: color-mix(in srgb, var(--color-glintide-accent) 6%, var(--color-glintide-surface));
+}
+
+.glintide-time-card--year .glintide-time-card__number {
+	justify-content: center;
+	padding: 2px 0;
+}
+
+.glintide-year-track {
+	width: 100%;
+}
+
+.glintide-year-cells {
+	display: grid;
+	grid-template-columns: repeat(10, minmax(0, 1fr));
+	gap: 3px;
+}
+
+.glintide-year-cells > span {
+	display: block;
+	height: 3px;
+	overflow: hidden;
+	border-radius: 2px;
+	background: color-mix(in srgb, var(--color-glintide-accent) 14%, var(--color-glintide-surface));
+}
+
+.glintide-year-cells i {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit;
+	background: color-mix(in srgb, var(--color-glintide-accent) 70%, var(--color-glintide-muted));
+	transform-origin: left center;
+}
+
+.glintide-time-card--year .glintide-year-footer {
+	gap: 6px;
+	text-align: center;
+}
+
+.glintide-time-card--uptime {
+	background: color-mix(in srgb, var(--color-glintide-primary) 7%, var(--color-glintide-surface));
+	color: var(--color-glintide-ink);
+}
+
+.glintide-time-card--uptime .glintide-time-card__header i {
+	color: var(--color-glintide-muted);
+}
+
+.glintide-time-card--uptime .glintide-time-card__number {
+	justify-content: center;
+	gap: 4px;
+}
+
+.glintide-time-card--uptime .glintide-time-card__number strong {
+	font-family: var(--glintide-font);
+	font-weight: 500;
+}
+
+.glintide-time-card--uptime .glintide-time-card__number > span {
+	color: var(--color-glintide-muted);
+}
+
+.glintide-time-card--uptime .glintide-time-card__footer {
+	align-items: center;
+	gap: 3px;
+	text-align: center;
+	color: var(--color-glintide-muted);
+}
+
+.glintide-time-card--uptime time {
+	font-family: var(--glintide-font);
+	font-size: 9px;
+	font-variant-numeric: tabular-nums;
+}
+
+.glintide-time-card--empty {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+}
+
+.glintide-time-card--empty .glintide-widget-notice {
+	padding: 0;
+	background: transparent;
+	font-size: 10px;
+	line-height: 1.5;
+}

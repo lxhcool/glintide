@@ -389,24 +389,43 @@ class Glintide_Widget_Weather extends Glintide_Widget {
 		$maximum       = isset( $daily['temperatureMax']['value'] ) ? glintide_weather_temperature_text( $daily['temperatureMax']['value'] ) : '--';
 		$location      = ! empty( $payload['location_name'] ) ? sanitize_text_field( $payload['location_name'] ) : '天气';
 		$night         = (int) $icon_code >= 150 && (int) $icon_code <= 154;
-		$attribution   = 'https://developer.qweather.com/attribution.html';
 
-		if ( ! empty( $current['metadata']['attributions'][0] ) && is_string( $current['metadata']['attributions'][0] ) ) {
-			$remote_attribution = esc_url_raw( $current['metadata']['attributions'][0] );
-			if ( $remote_attribution ) {
-				$attribution = $remote_attribution;
+		$effects = array(
+			'ri-sun-line'          => 'sun',
+			'ri-moon-clear-line'   => 'moon',
+			'ri-sun-cloudy-line'   => 'cloud',
+			'ri-moon-cloudy-line'  => 'cloud',
+			'ri-cloudy-line'       => 'cloud',
+			'ri-rainy-line'        => 'rain',
+			'ri-thunderstorms-line'=> 'rain',
+			'ri-snowy-line'        => 'snow',
+			'ri-mist-line'         => 'mist',
+		);
+		$effect = isset( $effects[ $icon_class ] ) && is_numeric( $icon_code ) && 999 !== (int) $icon_code ? $effects[ $icon_class ] : '';
+		$scene = '';
+		if ( $effect ) {
+			$scene = '<div class="glintide-weather-scene glintide-weather-scene--' . esc_attr( $effect ) . '" aria-hidden="true">';
+			if ( in_array( $effect, array( 'rain', 'snow' ), true ) ) {
+				for ( $i = 0; $i < 8; $i++ ) {
+					$scene .= '<span class="glintide-weather-particle"></span>';
+				}
+			} elseif ( 'cloud' === $effect ) {
+				$scene .= '<i class="ri-cloud-fill"></i><i class="ri-cloud-fill"></i>';
+			} elseif ( 'mist' === $effect ) {
+				$scene .= '<i class="ri-mist-line"></i>';
 			}
+			$scene .= '</div>';
 		}
 
 		$aria = sprintf( '%s天气：%s，%s摄氏度', $location, $condition_text, $temp );
 
-		return '<section class="glintide-weather-widget' . ( $night ? ' glintide-weather-widget--night' : '' ) . '" aria-label="' . esc_attr( $aria ) . '">'
+		return '<section class="glintide-weather-widget' . ( $night ? ' glintide-weather-widget--night' : '' ) . '" data-weather-effect="' . esc_attr( $effect ) . '" aria-label="' . esc_attr( $aria ) . '">'
+			. $scene
 			. '<div class="glintide-weather-header"><span class="glintide-weather-location">' . esc_html( $location ) . '</span><span class="glintide-weather-live">实时</span></div>'
-			. '<div class="glintide-weather-temperature"><strong>' . esc_html( $temp ) . '</strong><span>°C</span></div>'
+			. '<div class="glintide-weather-main"><div class="glintide-weather-temperature"><strong>' . esc_html( $temp ) . '</strong><span>°C</span></div>'
 			. '<div class="glintide-weather-icon' . esc_attr( $icon_modifier ) . '" aria-hidden="true"><i class="' . esc_attr( $icon_class ) . '"></i></div>'
-			. '<p class="glintide-weather-condition">' . esc_html( $condition_text ) . '</p>'
-			. '<div class="glintide-weather-range"><span>最低：' . esc_html( $minimum ) . '°C</span><span>最高：' . esc_html( $maximum ) . '°C</span></div>'
-			. '<a class="glintide-weather-attribution" href="' . esc_url( $attribution ) . '" target="_blank" rel="noopener noreferrer">和风天气</a>'
+			. '<p class="glintide-weather-condition">' . esc_html( $condition_text ) . '</p></div>'
+			. '<div class="glintide-weather-range"><span>最低<strong>' . esc_html( $minimum ) . '°C</strong></span><span>最高<strong>' . esc_html( $maximum ) . '°C</strong></span></div>'
 			. '</section>';
 	}
 }

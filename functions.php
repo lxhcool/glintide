@@ -187,6 +187,18 @@ function glintide_scripts() {
 		array( 'glintide-sticker' ),
 		filemtime( GLINTIDE_DIR . '/assets/css/glintide-weather.css' )
 	);
+	wp_enqueue_style(
+		'glintide-project',
+		GLINTIDE_URL . '/assets/css/glintide-project.css',
+		array( 'glintide-style' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-project.css' )
+	);
+	wp_enqueue_style(
+		'glintide-time-widgets',
+		GLINTIDE_URL . '/assets/css/glintide-time-widgets.css',
+		array( 'glintide-countdown' ),
+		filemtime( GLINTIDE_DIR . '/assets/css/glintide-time-widgets.css' )
+	);
 	wp_enqueue_script(
 		'glintide-countdown',
 		GLINTIDE_URL . '/assets/js/glintide-countdown.js',
