@@ -151,14 +151,15 @@ class Glintide_Widget_Links extends Glintide_Widget {
 	/**
 	 * 渲染一个 panel(友链 / 朋友圈)
 	 */
-	protected static function render_panel( $key, $items, $limit, $active ) {
-		$hidden = $active ? '' : ' hidden';
+	protected static function render_panel( $key, $items, $limit, $active, $panel_id, $tab_id ) {
+		$hidden      = $active ? '' : ' hidden';
+		$aria_hidden = $active ? 'false' : 'true';
 
 		// 空数据:Tab 仍展示,切过来显示空状态
 		if ( empty( $items ) ) {
 			$empty_text = ( 'moments' === $key ) ? '还没有朋友圈内容' : '还没有添加友链';
 
-			return '<div class="glintide-links-panel" data-glintide-panel="' . esc_attr( $key ) . '"' . $hidden . '>'
+			return '<div id="' . esc_attr( $panel_id ) . '" class="glintide-links-panel" data-glintide-panel="' . esc_attr( $key ) . '" role="tabpanel" aria-labelledby="' . esc_attr( $tab_id ) . '" aria-hidden="' . esc_attr( $aria_hidden ) . '"' . $hidden . '>'
 				. '<div class="glintide-links-empty"><i class="ri-inbox-line" aria-hidden="true"></i>'
 				. '<span>' . esc_html( $empty_text ) . '</span></div>'
 				. '</div>';
@@ -174,17 +175,18 @@ class Glintide_Widget_Links extends Glintide_Widget {
 		}
 		$list_html .= '</div>';
 
+		$more_id = $panel_id . '-more';
 		if ( $has_more ) {
-			$list_html .= '<div class="glintide-links-list glintide-links-list--more" hidden>';
+			$list_html .= '<div id="' . esc_attr( $more_id ) . '" class="glintide-links-list glintide-links-list--more" data-glintide-links-extra hidden aria-hidden="true">';
 			foreach ( $rest as $item ) {
 				$list_html .= self::render_item( $item );
 			}
 			$list_html .= '</div>';
 		}
 
-		$load_btn = $has_more ? '<button type="button" class="glintide-links-load" data-glintide-links-more>加载更多</button>' : '';
+		$load_btn = $has_more ? '<button type="button" class="glintide-links-load" data-glintide-links-more aria-controls="' . esc_attr( $more_id ) . '" aria-expanded="false">加载更多</button>' : '';
 
-		return '<div class="glintide-links-panel" data-glintide-panel="' . esc_attr( $key ) . '"' . $hidden . '>'
+		return '<div id="' . esc_attr( $panel_id ) . '" class="glintide-links-panel" data-glintide-panel="' . esc_attr( $key ) . '" role="tabpanel" aria-labelledby="' . esc_attr( $tab_id ) . '" aria-hidden="' . esc_attr( $aria_hidden ) . '"' . $hidden . '>'
 			. $list_html
 			. $load_btn
 			. '</div>';
@@ -199,37 +201,42 @@ class Glintide_Widget_Links extends Glintide_Widget {
 		$page_size = isset( $instance['page_size'] ) && in_array( (string) $instance['page_size'], array( '5', '8', '12', '16' ), true )
 			? (int) $instance['page_size']
 			: 8;
+		$widget_id        = function_exists( 'wp_unique_id' ) ? wp_unique_id( 'glintide-links-' ) : uniqid( 'glintide-links-', false );
+		$friend_tab_id    = $widget_id . '-tab-friends';
+		$moments_tab_id   = $widget_id . '-tab-moments';
+		$friend_panel_id  = $widget_id . '-panel-friends';
+		$moments_panel_id = $widget_id . '-panel-moments';
 
 		// 两个 Tab 始终展示;某组为空时切换到该组显示空状态
-		$tabs  = '<div class="glintide-links-tabs" role="tablist">';
-		$tabs .= '<button type="button" class="glintide-links-tab is-active" data-glintide-tab="friends" role="tab" aria-selected="true">友链</button>';
-		$tabs .= '<button type="button" class="glintide-links-tab" data-glintide-tab="moments" role="tab" aria-selected="false">朋友圈</button>';
+		$tabs  = '<div class="glintide-links-tabs" role="tablist" aria-label="友链内容">';
+		$tabs .= '<button id="' . esc_attr( $friend_tab_id ) . '" type="button" class="glintide-links-tab is-active" data-glintide-tab="friends" role="tab" aria-controls="' . esc_attr( $friend_panel_id ) . '" aria-selected="true" tabindex="0">友链</button>';
+		$tabs .= '<button id="' . esc_attr( $moments_tab_id ) . '" type="button" class="glintide-links-tab" data-glintide-tab="moments" role="tab" aria-controls="' . esc_attr( $moments_panel_id ) . '" aria-selected="false" tabindex="-1">友圈</button>';
 		$tabs .= '</div>';
 
-		$panels  = self::render_panel( 'friends', $friends, $page_size, true );
-		$panels .= self::render_panel( 'moments', $moments, $page_size, false );
+		$panels  = self::render_panel( 'friends', $friends, $page_size, true, $friend_panel_id, $friend_tab_id );
+		$panels .= self::render_panel( 'moments', $moments, $page_size, false, $moments_panel_id, $moments_tab_id );
 
 		// 内联交互脚本:Tab 切换 + 加载更多。
 		// 事件委托到 document:widget 重新渲染(如 PJAX 换页)后旧监听依然有效,
 		// 因为 closest() 是点击时动态查找的;全局标记避免重复叠加监听。
 		$script = '<script>(function(){'
 			. 'if(window.__glintideLinksBound)return;window.__glintideLinksBound=true;'
+			. 'var activate=function(w,key){'
+			. 'var active=w.getAttribute("data-glintide-active-panel")||"friends",current=w.querySelector("[data-glintide-panel="+active+"]"),next=w.querySelector("[data-glintide-panel="+key+"]");if(!next||active===key)return;'
+			. 'window.clearTimeout(w.__glintideLinksTimer);w.querySelectorAll("[data-glintide-panel]").forEach(function(panel){if(panel!==current&&panel!==next){panel.hidden=true;panel.classList.remove("is-entering","is-leaving","is-active");panel.setAttribute("aria-hidden","true")}});'
+			. 'if(current){current.classList.remove("is-entering");current.classList.add("is-leaving");current.setAttribute("aria-hidden","true")}next.hidden=false;next.classList.remove("is-leaving");next.classList.add("is-entering");next.setAttribute("aria-hidden","false");w.setAttribute("data-glintide-active-panel",key);'
+			. 'window.requestAnimationFrame(function(){next.classList.remove("is-entering");next.classList.add("is-active")});'
+			. 'if(current){w.__glintideLinksTimer=window.setTimeout(function(){if(w.getAttribute("data-glintide-active-panel")===key){current.hidden=true;current.classList.remove("is-active","is-leaving")}},220)}'
+			. 'w.querySelectorAll(".glintide-links-tab").forEach(function(t){var selected=t.getAttribute("data-glintide-tab")===key;t.classList.toggle("is-active",selected);t.setAttribute("aria-selected",selected?"true":"false");t.setAttribute("tabindex",selected?"0":"-1")})'
+			. '};'
 			. 'document.addEventListener("click",function(e){'
-			. 'var tab=e.target.closest(".glintide-links-tab");if(tab){'
-			. 'e.preventDefault();var w=tab.closest("[data-glintide-links]");if(!w)return;'
-			. 'var key=tab.getAttribute("data-glintide-tab");'
-			. 'w.querySelectorAll(".glintide-links-tab").forEach(function(t){var a=t===tab;t.classList.toggle("is-active",a);t.setAttribute("aria-selected",a?"true":"false")});'
-			. 'w.querySelectorAll("[data-glintide-panel]").forEach(function(p){p.hidden=p.getAttribute("data-glintide-panel")!==key});'
-			. 'return}'
-			. 'var more=e.target.closest("[data-glintide-links-more]");if(more){'
-			. 'e.preventDefault();var w=more.closest("[data-glintide-links]");if(!w)return;'
-			. 'var extras=more.parentNode.querySelectorAll(".glintide-links-list--more");'
-			. 'extras.forEach(function(el){el.hidden=false});'
-			. 'w.classList.add("is-expanded");more.hidden=true;}'
+			. 'var tab=e.target.closest(".glintide-links-tab");if(tab){e.preventDefault();var w=tab.closest("[data-glintide-links]");if(w)activate(w,tab.getAttribute("data-glintide-tab"));return}'
+			. 'var more=e.target.closest("[data-glintide-links-more]");if(more){e.preventDefault();var w=more.closest("[data-glintide-links]");if(!w)return;more.parentNode.querySelectorAll("[data-glintide-links-extra]").forEach(function(el){el.hidden=false;el.setAttribute("aria-hidden","false");el.classList.add("is-revealing");window.requestAnimationFrame(function(){el.classList.remove("is-revealing")})});more.setAttribute("aria-expanded","true");more.classList.add("is-hiding");window.setTimeout(function(){more.hidden=true},180);w.classList.add("is-expanded")}'
 			. '});'
+			. 'document.addEventListener("keydown",function(e){var tab=e.target.closest(".glintide-links-tab");if(!tab)return;var tabs=Array.prototype.slice.call(tab.closest("[role=tablist]").querySelectorAll(".glintide-links-tab")),index=tabs.indexOf(tab),next=index;if("ArrowRight"===e.key){next=(index+1)%tabs.length}else if("ArrowLeft"===e.key){next=(index+tabs.length-1)%tabs.length}else if("Home"===e.key){next=0}else if("End"===e.key){next=tabs.length-1}else{return}e.preventDefault();tabs[next].focus();tabs[next].click()});'
 			. '})();</script>';
 
-		return '<div class="glintide-links" data-glintide-links>' . $tabs . $panels . $script . '</div>';
+		return '<div class="glintide-links" data-glintide-links data-glintide-active-panel="friends">' . $tabs . '<div class="glintide-links-panels">' . $panels . '</div>' . $script . '</div>';
 	}
 }
 
