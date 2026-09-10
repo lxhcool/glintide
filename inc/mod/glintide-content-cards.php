@@ -1267,18 +1267,17 @@ function glintide_card_media_html( $post_id = 0, $context = 'card' ) {
 			$html .= '<div class="glintide-video-ui">';
 			$html .= '<div class="glintide-video-topbar">';
 			$html .= '<h3 class="glintide-video-title">' . esc_html( $title ) . '</h3>';
-			$html .= '<button type="button" class="glintide-video-control glintide-video-fullscreen" data-glintide-video-fullscreen aria-label="全屏播放" title="全屏播放"><i class="ri-fullscreen-line" aria-hidden="true"></i></button>';
-			$html .= '</div>';
-			$html .= '<div class="glintide-video-center">';
-			$html .= '<button type="button" class="glintide-video-play" data-glintide-video-toggle aria-label="播放视频" title="播放视频"><i class="ri-play-fill" aria-hidden="true"></i></button>';
 			$html .= '</div>';
 			$html .= '<div class="glintide-video-bottom">';
 			$html .= '<span class="glintide-video-time" data-glintide-video-current>00:00</span>';
 			$html .= '<input type="range" class="glintide-video-progress" data-glintide-video-progress min="0" max="0" step="0.1" value="0" aria-label="视频播放进度">';
 			$html .= '<span class="glintide-video-time" data-glintide-video-duration>00:00</span>';
 			$html .= '<button type="button" class="glintide-video-control glintide-video-volume" data-glintide-video-volume aria-label="静音" title="静音"><i class="ri-volume-up-line" aria-hidden="true"></i></button>';
+			$html .= '<button type="button" class="glintide-video-control glintide-video-fullscreen" data-glintide-video-fullscreen aria-label="全屏播放" title="全屏播放"><i class="ri-fullscreen-line" aria-hidden="true"></i></button>';
 			$html .= '</div>';
 			$html .= '</div>';
+			// 播放按钮独立于 UI:未播放居中,播放后移到底部右侧且不随控制条隐藏
+			$html .= '<button type="button" class="glintide-video-play" data-glintide-video-toggle aria-label="播放视频" title="播放视频"><i class="iconfont icon-icon_play_facial_light" aria-hidden="true"></i></button>';
 			$html .= '</div>';
 
 			return $html;

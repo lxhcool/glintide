@@ -122,8 +122,8 @@
 
 				var icon = toggle.querySelector('i');
 				if (icon) {
-					icon.classList.toggle('ri-play-fill', !playing);
-					icon.classList.toggle('ri-pause-line', playing);
+					icon.classList.toggle('icon-icon_play_facial_light', !playing);
+					icon.classList.toggle('icon-icon_pause_linear_light1', playing);
 				}
 
 				if (!playing) {
